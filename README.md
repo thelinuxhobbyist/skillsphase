@@ -60,8 +60,8 @@ archive/                 # Original docx drafts
 
 ## Current status
 
-**Phases 0–4 in place** (foundations, identity, employer verification, seeker profiles, jobs).
+**Phases 0–5 in place** (foundations through applications).
 
 See [`docs/14-credentials-and-services.md`](./docs/14-credentials-and-services.md) for every API key — provision them **after** features, one service at a time.
 
-Next product work: Phase 5 — applications (apply, CV snapshot, status updates).
+Core MVP loop is implemented. Remaining polish: settings export/delete UI, admin user management, then service provisioning (Neon → Clerk → …).

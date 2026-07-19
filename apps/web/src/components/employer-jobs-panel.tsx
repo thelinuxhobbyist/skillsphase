@@ -74,12 +74,17 @@ export function EmployerJobsPanel({ jobs }: { jobs: HorizonJob[] }) {
                 {job.status} · {job.location}
               </p>
               {job.status === "published" ? (
-                <Link
-                  href={`/jobs/${job.slug}`}
-                  className="mt-1 inline-block text-sm text-brand underline"
-                >
-                  View public page
-                </Link>
+                <div className="mt-1 flex flex-wrap gap-3 text-sm">
+                  <Link href={`/jobs/${job.slug}`} className="text-brand underline">
+                    View public page
+                  </Link>
+                  <Link
+                    href={`/employer/jobs/${job.id}/applications`}
+                    className="text-brand underline"
+                  >
+                    View applicants
+                  </Link>
+                </div>
               ) : null}
             </div>
             <div className="flex flex-wrap gap-2">

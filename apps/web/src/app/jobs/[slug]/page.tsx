@@ -1,6 +1,8 @@
+import { ApplyForm } from "@/components/apply-form";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getJobBySlug } from "@/lib/api";
+import { getCurrentUser, getJobBySlug } from "@/lib/api";
 
 type Params = Promise<{ slug: string }>;
 
@@ -12,6 +14,22 @@ export default async function JobDetailPage({ params }: { params: Params }) {
     job = await getJobBySlug(slug);
   } catch {
     notFound();
+  }
+
+  let defaultCoverLetter: string | null = null;
+  const { userId, getToken } = await auth();
+  if (userId) {
+    const token = await getToken();
+    if (token) {
+      try {
+        const user = await getCurrentUser(token);
+        if (user.role === "job_seeker") {
+          defaultCoverLetter = user.coverLetterTemplate;
+        }
+      } catch {
+        // ignore — apply form still works
+      }
+    }
   }
 
   const salary =
@@ -56,17 +74,7 @@ export default async function JobDetailPage({ params }: { params: Params }) {
         </section>
       ) : null}
 
-      <div className="mt-10">
-        <Link
-          href="/login"
-          className="inline-block rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white"
-        >
-          Apply (sign in required)
-        </Link>
-        <p className="mt-2 text-sm text-[color:var(--foreground)]/65">
-          Applications open in the next phase. You can prepare your profile now.
-        </p>
-      </div>
+      <ApplyForm jobId={job.id} defaultCoverLetter={defaultCoverLetter} />
     </main>
   );
 }

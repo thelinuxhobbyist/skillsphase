@@ -1,17 +1,23 @@
 import {
+  createApplication,
   createJob,
+  findApplicationByJobAndUser,
   findCompanyById,
   findCompanyByOwner,
   findJobById,
   findPublishedJobBySlug,
+  listApplicationsForJobDetailed,
   listJobsForCompany,
   listPublishedJobs,
+  recomputeProfileCompleted,
   setJobStatus,
   softDeleteDraftJob,
+  toPublicApplication,
   toPublicJob,
   updateJob,
 } from "@horizon/database";
 import {
+  applyToJobSchema,
   createJobSchema,
   jobListQuerySchema,
   updateJobSchema,
@@ -19,7 +25,12 @@ import {
 import { Hono } from "hono";
 import type { AppEnv } from "../env";
 import { getDb } from "../lib/db";
+import {
+  applicationConfirmationEmailHtml,
+  sendEmail,
+} from "../lib/email";
 import { fail, ok } from "../lib/response";
+import { snapshotCvForApplication } from "../lib/storage";
 import {
   requireAppUser,
   requireClerkAuth,
@@ -302,6 +313,148 @@ jobRoutes.delete(
       return fail(c, "DELETE_FAILED", "Unable to delete job.", 409);
     }
     return ok(c, { deleted: true });
+  },
+);
+
+jobRoutes.post(
+  "/:id/apply",
+  requireClerkAuth,
+  requireAppUser,
+  requireRoles("job_seeker"),
+  async (c) => {
+    const appUser = c.get("appUser");
+    if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+
+    const jobId = Number(c.req.param("id"));
+    if (!Number.isFinite(jobId)) {
+      return fail(c, "VALIDATION_ERROR", "Invalid job id.", 400);
+    }
+
+    const body = await c.req.json().catch(() => ({}));
+    const parsed = applyToJobSchema.safeParse(body);
+    if (!parsed.success) {
+      return fail(
+        c,
+        "VALIDATION_ERROR",
+        parsed.error.issues[0]?.message ?? "Invalid application.",
+        400,
+      );
+    }
+
+    const db = getDb(c);
+    const jobRow = await findJobById(db, jobId);
+    if (!jobRow || jobRow.job.status !== "published" || jobRow.job.removedByAdmin) {
+      return fail(
+        c,
+        "JOB_NOT_AVAILABLE",
+        "This job is not open for applications.",
+        404,
+      );
+    }
+
+    const profileCompleted = await recomputeProfileCompleted(db, appUser);
+    if (!profileCompleted || !appUser.cvUrl) {
+      return fail(
+        c,
+        "PROFILE_INCOMPLETE",
+        "Complete your profile (name, email, location, career summary, skills, and CV) before applying.",
+        409,
+      );
+    }
+
+    const existing = await findApplicationByJobAndUser(db, jobId, appUser.id);
+    if (existing) {
+      return fail(c, "ALREADY_APPLIED", "You have already applied for this job.", 409);
+    }
+
+    const applicationId = crypto.randomUUID();
+    let snapshot;
+    try {
+      snapshot = await snapshotCvForApplication({
+        userId: appUser.id,
+        applicationId,
+        sourceCvUrl: appUser.cvUrl,
+        sourceFileName: appUser.cvFileName,
+        bucket: c.env.UPLOADS,
+        environment: c.env.ENVIRONMENT ?? "development",
+      });
+    } catch (error) {
+      return fail(
+        c,
+        "CV_SNAPSHOT_FAILED",
+        error instanceof Error ? error.message : "Unable to snapshot CV.",
+        400,
+      );
+    }
+
+    const created = await createApplication(db, {
+      id: applicationId,
+      jobId,
+      userId: appUser.id,
+      coverLetter: parsed.data.coverLetter ?? appUser.coverLetterTemplate ?? null,
+      cvUrl: snapshot.cvUrl,
+      cvFileName: snapshot.cvFileName,
+    });
+
+    await sendEmail({
+      to: appUser.email,
+      subject: `Application received: ${jobRow.job.title}`,
+      html: applicationConfirmationEmailHtml({
+        jobTitle: jobRow.job.title,
+        companyName: jobRow.companyName,
+      }),
+      apiKey: c.env.EMAIL_API_KEY,
+      from: c.env.EMAIL_FROM,
+    });
+
+    return ok(
+      c,
+      toPublicApplication({
+        application: created,
+        jobTitle: jobRow.job.title,
+        jobSlug: jobRow.job.slug,
+        companyName: jobRow.companyName,
+        user: appUser,
+      }),
+      201,
+    );
+  },
+);
+
+jobRoutes.get(
+  "/:id/applications",
+  requireClerkAuth,
+  requireAppUser,
+  requireRoles("employer", "admin"),
+  async (c) => {
+    const appUser = c.get("appUser");
+    if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+
+    const jobId = Number(c.req.param("id"));
+    if (!Number.isFinite(jobId)) {
+      return fail(c, "VALIDATION_ERROR", "Invalid job id.", 400);
+    }
+
+    const db = getDb(c);
+    const jobRow = await findJobById(db, jobId);
+    if (!jobRow) return fail(c, "JOB_NOT_FOUND", "Job not found.", 404);
+
+    if (appUser.role === "employer" && jobRow.companyOwnerUserId !== appUser.id) {
+      return fail(c, "FORBIDDEN", "You can only view applicants for your jobs.", 403);
+    }
+    if (
+      appUser.role === "employer" &&
+      jobRow.verificationStatus !== "approved"
+    ) {
+      return fail(
+        c,
+        "COMPANY_NOT_APPROVED",
+        "Your company must be approved to view applicants.",
+        403,
+      );
+    }
+
+    return ok(c, await listApplicationsForJobDetailed(db, jobId));
   },
 );
 

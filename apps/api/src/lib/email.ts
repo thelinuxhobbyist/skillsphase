@@ -57,3 +57,13 @@ export function employerApprovalEmailHtml(companyName: string) {
     <p>You can now sign in and start posting jobs for career returners.</p>
   `;
 }
+
+export function applicationConfirmationEmailHtml(input: {
+  jobTitle: string;
+  companyName: string;
+}) {
+  return `
+    <p>Thanks for applying to <strong>${input.jobTitle}</strong> at <strong>${input.companyName}</strong>.</p>
+    <p>Your application has been received. You can track its status in your Horizon applications dashboard.</p>
+  `;
+}

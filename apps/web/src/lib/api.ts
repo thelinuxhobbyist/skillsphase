@@ -473,6 +473,80 @@ export function adminRemoveJob(token: string, id: number) {
   });
 }
 
+export type HorizonApplication = {
+  id: string;
+  jobId: number;
+  jobTitle: string;
+  jobSlug: string;
+  companyName: string;
+  userId: string;
+  candidateName: string;
+  candidateEmail: string;
+  coverLetter: string | null;
+  cvUrl: string;
+  cvFileName: string | null;
+  status:
+    | "applied"
+    | "under_review"
+    | "interview"
+    | "offer"
+    | "hired"
+    | "rejected"
+    | "withdrawn";
+  createdAt: string;
+  updatedAt: string;
+  careerSummary?: string | null;
+  location?: string | null;
+};
+
+export function applyToJob(
+  token: string,
+  jobId: number,
+  coverLetter?: string | null,
+) {
+  return apiFetch<HorizonApplication>(`/jobs/${jobId}/apply`, {
+    method: "POST",
+    token,
+    body: JSON.stringify({ coverLetter: coverLetter ?? null }),
+  });
+}
+
+export function listMyApplications(token: string) {
+  return apiFetch<HorizonApplication[]>("/applications/me", { token });
+}
+
+export function withdrawApplication(token: string, id: string) {
+  return apiFetch<HorizonApplication>(`/applications/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export function listJobApplications(token: string, jobId: number) {
+  return apiFetch<HorizonApplication[]>(`/jobs/${jobId}/applications`, {
+    token,
+  });
+}
+
+export function updateApplicationStatus(
+  token: string,
+  id: string,
+  status: Exclude<
+    HorizonApplication["status"],
+    "applied" | "withdrawn"
+  >,
+) {
+  return apiFetch<HorizonApplication>(`/applications/${id}`, {
+    method: "PATCH",
+    token,
+    body: JSON.stringify({ status }),
+  });
+}
+
+export function applicationCvUrl(id: string) {
+  return `${getApiBaseUrl()}/applications/${id}/cv`;
+}
+
 export async function uploadCv(token: string, file: File) {
   const form = new FormData();
   form.append("file", file);
