@@ -12,26 +12,11 @@ const PUBLIC_LINKS = [
   { href: "/waitlist", label: "Waitlist" },
 ] as const;
 
-export function SiteHeader() {
-  const { isSignedIn, getToken } = useAuth();
-  const [user, setUser] = useState<HorizonUser | null>(null);
+const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim() ?? "";
+const hasClerk =
+  publishableKey.startsWith("pk_") && !publishableKey.includes("...");
 
-  useEffect(() => {
-    if (!isSignedIn) {
-      setUser(null);
-      return;
-    }
-    void (async () => {
-      try {
-        const token = await getToken();
-        if (!token) return;
-        setUser(await getCurrentUser(token));
-      } catch {
-        setUser(null);
-      }
-    })();
-  }, [isSignedIn, getToken]);
-
+function RoleNav({ user }: { user: HorizonUser | null }) {
   const roleLinks =
     user?.role === "job_seeker"
       ? [
@@ -60,6 +45,70 @@ export function SiteHeader() {
           : PUBLIC_LINKS;
 
   return (
+    <>
+      {roleLinks.map((link) => (
+        <Link key={link.href} href={link.href} className="hover:text-brand">
+          {link.label}
+        </Link>
+      ))}
+    </>
+  );
+}
+
+function AuthenticatedHeader() {
+  const { isSignedIn, getToken } = useAuth();
+  const [user, setUser] = useState<HorizonUser | null>(null);
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      setUser(null);
+      return;
+    }
+    void (async () => {
+      try {
+        const token = await getToken();
+        if (!token) return;
+        setUser(await getCurrentUser(token));
+      } catch {
+        setUser(null);
+      }
+    })();
+  }, [isSignedIn, getToken]);
+
+  return (
+    <>
+      <RoleNav user={isSignedIn ? user : null} />
+      <SignedOut>
+        <Link
+          href="/login"
+          className="btn-primary rounded-md bg-brand-accent px-3 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+        >
+          Sign in
+        </Link>
+      </SignedOut>
+      <SignedIn>
+        <SafeUserButton />
+      </SignedIn>
+    </>
+  );
+}
+
+function PublicOnlyHeader() {
+  return (
+    <>
+      <RoleNav user={null} />
+      <Link
+        href="/login"
+        className="btn-primary rounded-md bg-brand-accent px-3 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+      >
+        Sign in
+      </Link>
+    </>
+  );
+}
+
+export function SiteHeader() {
+  return (
     <header className="border-b border-[color:var(--line)]/70 bg-[color:var(--surface)]/80 backdrop-blur">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-4">
         <Link
@@ -69,22 +118,7 @@ export function SiteHeader() {
           Project Horizon
         </Link>
         <nav className="flex flex-wrap items-center justify-end gap-4 text-sm font-medium text-[color:var(--foreground)]/80">
-          {roleLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:text-brand">
-              {link.label}
-            </Link>
-          ))}
-          <SignedOut>
-            <Link
-              href="/login"
-              className="rounded-md bg-brand px-3 py-2 text-white transition hover:opacity-90"
-            >
-              Sign in
-            </Link>
-          </SignedOut>
-          <SignedIn>
-            <SafeUserButton />
-          </SignedIn>
+          {hasClerk ? <AuthenticatedHeader /> : <PublicOnlyHeader />}
         </nav>
       </div>
     </header>

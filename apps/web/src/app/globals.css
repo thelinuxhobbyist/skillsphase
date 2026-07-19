@@ -29,8 +29,12 @@ body {
 }
 
 a {
-  color: inherit;
   text-decoration: none;
+}
+
+/* Ensure CTA links keep explicit text colours (do not inherit body foreground). */
+a.btn-primary {
+  color: #fff;
 }
 
 @keyframes horizon-pan {

@@ -12,9 +12,12 @@ type ProvidersProps = {
  * the app still renders so docs/UI work can proceed without secrets.
  */
 export function Providers({ children }: ProvidersProps) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const publishableKey =
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim() ?? "";
+  const configured =
+    publishableKey.startsWith("pk_") && !publishableKey.includes("...");
 
-  if (!publishableKey) {
+  if (!configured) {
     return <>{children}</>;
   }
 

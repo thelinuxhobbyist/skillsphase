@@ -19,7 +19,8 @@
   ],
   "vars": {
     "ENVIRONMENT": "development",
-    "DATA_RETENTION_DAYS": "30"
+    "DATA_RETENTION_DAYS": "30",
+    "CLERK_AUTHORIZED_PARTIES": "http://localhost:3000,https://horizon-web.yama.workers.dev"
   },
   // Enable after deploy; runs daily retention purge for soft-deleted accounts.
   "triggers": {

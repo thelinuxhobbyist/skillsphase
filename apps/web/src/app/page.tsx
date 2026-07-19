@@ -40,7 +40,7 @@ export default async function HomePage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/register"
-                className="rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                className="btn-primary rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
               >
                 Find your next role
               </Link>
@@ -51,39 +51,36 @@ export default async function HomePage() {
                 Browse jobs
               </Link>
             </div>
-          </div>
-        </section>
 
-        <section className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-            Search open roles
-          </h2>
-          <p className="mt-2 max-w-2xl text-[color:var(--foreground)]/75">
-            Filter by keyword and location — every listing is from a UK employer
-            that has passed verification.
-          </p>
-          <form
-            action="/jobs"
-            method="get"
-            className="mt-6 grid gap-3 md:grid-cols-[1fr_1fr_auto]"
-          >
-            <input
-              name="keyword"
-              placeholder="Keyword or skill"
-              className="rounded-md border border-[color:var(--line)] bg-white px-3 py-3 text-sm"
-            />
-            <input
-              name="location"
-              placeholder="Location"
-              className="rounded-md border border-[color:var(--line)] bg-white px-3 py-3 text-sm"
-            />
-            <button
-              type="submit"
-              className="rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white"
+            <form
+              action="/jobs"
+              method="get"
+              className="mt-10 max-w-2xl"
+              aria-label="Search open roles"
             >
-              Search jobs
-            </button>
-          </form>
+              <p className="mb-3 text-sm text-white/80">
+                Search verified UK roles by keyword or location.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                <input
+                  name="keyword"
+                  placeholder="Keyword or skill"
+                  className="rounded-md border border-white/25 bg-white px-3 py-3 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--foreground)]/50"
+                />
+                <input
+                  name="location"
+                  placeholder="Location"
+                  className="rounded-md border border-white/25 bg-white px-3 py-3 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--foreground)]/50"
+                />
+                <button
+                  type="submit"
+                  className="btn-primary rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                >
+                  Search
+                </button>
+              </div>
+            </form>
+          </div>
         </section>
 
         <section className="border-y border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
