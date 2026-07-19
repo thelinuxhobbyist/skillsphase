@@ -47,19 +47,25 @@ export default async function AdminDashboardPage() {
         <SafeUserButton />
       </div>
 
-      <section className="mb-8 grid gap-4 md:grid-cols-3">
+      <section className="mb-8 grid gap-4 md:grid-cols-4">
         <Stat label="Pending employers" value={stats.pendingEmployers} />
         <Stat label="Approved employers" value={stats.approvedEmployers} />
         <Stat label="Total employers" value={stats.totalEmployers} />
+        <Stat label="Active jobs" value={stats.activeJobs} />
       </section>
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
           Pending employer approvals
         </h2>
-        <Link href="/admin/employers" className="text-sm font-semibold text-brand underline">
-          View all
-        </Link>
+        <div className="flex gap-4 text-sm font-semibold">
+          <Link href="/admin/employers" className="text-brand underline">
+            All employers
+          </Link>
+          <Link href="/admin/jobs" className="text-brand underline">
+            Moderate jobs
+          </Link>
+        </div>
       </div>
       <AdminEmployersPanel employers={employers} />
     </main>

@@ -116,10 +116,14 @@ export const createJobSchema = z.object({
   industry: z.string().trim().min(1).max(120),
   closingDate: z.string().date().optional().nullable(),
   skillIds: z.array(z.string().uuid()).default([]),
+  skillNames: z.array(z.string().trim().min(1).max(80)).max(40).default([]),
   publish: z.boolean().default(false),
 });
 
-export const updateJobSchema = createJobSchema.partial().omit({ companyId: true });
+export const updateJobSchema = createJobSchema
+  .partial()
+  .omit({ companyId: true, publish: true });
+
 
 export const jobListQuerySchema = paginationQuerySchema.extend({
   keyword: z.string().trim().max(200).optional(),

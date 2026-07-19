@@ -233,6 +233,7 @@ export function getAdminDashboard(token: string) {
     pendingEmployers: number;
     totalEmployers: number;
     approvedEmployers: number;
+    activeJobs: number;
   }>("/admin/dashboard", { token });
 }
 
@@ -357,6 +358,116 @@ export function addQualification(
 
 export function deleteQualification(token: string, id: string) {
   return apiFetch<{ deleted: boolean }>(`/users/me/qualifications/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export type HorizonJob = {
+  id: number;
+  companyId: string;
+  companyName: string;
+  title: string;
+  slug: string;
+  description: string;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  salaryCurrency: string;
+  location: string;
+  remoteType: "on_site" | "hybrid" | "remote";
+  employmentType: string;
+  industry: string;
+  closingDate: string | null;
+  status: "draft" | "published" | "closed";
+  skills: Array<{ id: string; name: string }>;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type JobListResult = {
+  jobs: HorizonJob[];
+  meta: { page: number; pageSize: number; total: number };
+};
+
+export async function listPublishedJobs(params: {
+  keyword?: string;
+  location?: string;
+  employmentType?: string;
+  remoteType?: string;
+  industry?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<JobListResult> {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== "") search.set(key, String(value));
+  }
+  const query = search.toString();
+  const response = await fetch(
+    `${getApiBaseUrl()}/jobs${query ? `?${query}` : ""}`,
+    { headers: { Accept: "application/json" }, cache: "no-store" },
+  );
+  const payload = (await response.json()) as ApiResponse<HorizonJob[]> & {
+    meta?: JobListResult["meta"];
+  };
+  if (!response.ok || !payload.success) {
+    const errorPayload = payload as ApiError;
+    throw new ApiRequestError(
+      response.status,
+      errorPayload.error?.code ?? "REQUEST_FAILED",
+      errorPayload.error?.message ?? "Failed to load jobs",
+    );
+  }
+  return {
+    jobs: payload.data,
+    meta: payload.meta ?? { page: 1, pageSize: 20, total: payload.data.length },
+  };
+}
+
+export function getJobBySlug(slug: string) {
+  return apiFetch<HorizonJob>(`/jobs/by-slug/${encodeURIComponent(slug)}`);
+}
+
+export function listMyJobs(token: string) {
+  return apiFetch<HorizonJob[]>("/jobs/mine", { token });
+}
+
+export function createJob(
+  token: string,
+  body: Record<string, unknown>,
+) {
+  return apiFetch<HorizonJob>("/jobs", {
+    method: "POST",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export function publishJob(token: string, id: number) {
+  return apiFetch<HorizonJob>(`/jobs/${id}/publish`, { method: "POST", token });
+}
+
+export function closeJob(token: string, id: number) {
+  return apiFetch<HorizonJob>(`/jobs/${id}/close`, { method: "POST", token });
+}
+
+export function reopenJob(token: string, id: number) {
+  return apiFetch<HorizonJob>(`/jobs/${id}/reopen`, { method: "POST", token });
+}
+
+export function deleteDraftJob(token: string, id: number) {
+  return apiFetch<{ deleted: boolean }>(`/jobs/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export function listAdminJobs(token: string) {
+  return apiFetch<HorizonJob[]>("/admin/jobs", { token });
+}
+
+export function adminRemoveJob(token: string, id: number) {
+  return apiFetch<HorizonJob>(`/admin/jobs/${id}`, {
     method: "DELETE",
     token,
   });

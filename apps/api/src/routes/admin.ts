@@ -1,8 +1,13 @@
 import {
+  adminRemoveJob,
+  countPublishedJobs,
   findCompanyById,
+  findJobById,
   findUserById,
   listCompaniesForAdmin,
+  listJobsForAdmin,
   toPublicCompany,
+  toPublicJob,
   updateCompany,
   writeAdminLog,
 } from "@horizon/database";
@@ -26,12 +31,14 @@ adminRoutes.get("/dashboard", async (c) => {
   const db = getDb(c);
   const employers = await listCompaniesForAdmin(db);
   const pending = employers.filter((e) => e.verificationStatus === "pending_review");
+  const activeJobs = await countPublishedJobs(db);
 
   return ok(c, {
     pendingEmployers: pending.length,
     totalEmployers: employers.length,
     approvedEmployers: employers.filter((e) => e.verificationStatus === "approved")
       .length,
+    activeJobs,
   });
 });
 
@@ -129,4 +136,35 @@ adminRoutes.patch("/employers/:id", async (c) => {
   }
 
   return ok(c, toPublicCompany(updated));
+});
+
+adminRoutes.get("/jobs", async (c) => {
+  const jobs = await listJobsForAdmin(getDb(c));
+  return ok(c, jobs);
+});
+
+adminRoutes.delete("/jobs/:id", async (c) => {
+  const admin = c.get("appUser");
+  if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+
+  const id = Number(c.req.param("id"));
+  if (!Number.isFinite(id)) {
+    return fail(c, "VALIDATION_ERROR", "Invalid job id.", 400);
+  }
+
+  const db = getDb(c);
+  const existing = await findJobById(db, id);
+  if (!existing) return fail(c, "JOB_NOT_FOUND", "Job not found.", 404);
+
+  const removed = await adminRemoveJob(db, id);
+  if (!removed) return fail(c, "JOB_NOT_FOUND", "Job not found.", 404);
+
+  await writeAdminLog(db, {
+    adminUserId: admin.id,
+    action: "Job Removed",
+    entity: "job",
+    entityId: String(id),
+  });
+
+  return ok(c, await toPublicJob(db, removed, existing.companyName));
 });

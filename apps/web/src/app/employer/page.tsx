@@ -55,9 +55,21 @@ export default async function EmployerDashboardPage() {
       {company ? (
         <div className="space-y-4">
           <CompanyStatusPanel company={company} />
-          <Link href="/employer/company" className="text-sm font-semibold text-brand underline">
-            Manage company profile
-          </Link>
+          <div className="flex flex-wrap gap-4 text-sm font-semibold">
+            <Link href="/employer/company" className="text-brand underline">
+              Manage company profile
+            </Link>
+            {company.verificationStatus === "approved" ? (
+              <>
+                <Link href="/employer/jobs" className="text-brand underline">
+                  Manage jobs
+                </Link>
+                <Link href="/employer/jobs/new" className="text-brand underline">
+                  Create job
+                </Link>
+              </>
+            ) : null}
+          </div>
         </div>
       ) : (
         <section className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-6">

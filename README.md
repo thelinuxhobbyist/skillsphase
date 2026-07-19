@@ -60,8 +60,8 @@ archive/                 # Original docx drafts
 
 ## Current status
 
-**Phases 0–3 in place** (foundations, identity, employer verification, seeker profiles).
+**Phases 0–4 in place** (foundations, identity, employer verification, seeker profiles, jobs).
 
 See [`docs/14-credentials-and-services.md`](./docs/14-credentials-and-services.md) for every API key — provision them **after** features, one service at a time.
 
-Next product work: Phase 4 — jobs (create, publish, public search).
+Next product work: Phase 5 — applications (apply, CV snapshot, status updates).

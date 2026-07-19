@@ -19,7 +19,7 @@ const STATUS_COPY: Record<
   },
   approved: {
     title: "Approved",
-    body: "Your organisation is verified. Job posting will be available in the next phase.",
+    body: "Your organisation is verified. You can create and publish jobs.",
   },
   rejected: {
     title: "Not approved",
