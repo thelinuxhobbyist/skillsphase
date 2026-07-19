@@ -31,7 +31,10 @@ API root: `GET http://localhost:8787/api/v1`
 ## Documentation
 
 Canonical specs: [`docs/README.md`](./docs/README.md)  
-Product decisions: [`docs/decisions/001-canonical-product-decisions.md`](./docs/decisions/001-canonical-product-decisions.md)
+Product decisions: [`docs/decisions/001-canonical-product-decisions.md`](./docs/decisions/001-canonical-product-decisions.md)  
+**API keys & services checklist:** [`docs/14-credentials-and-services.md`](./docs/14-credentials-and-services.md)
+
+> Finish product features first, then provision services **one at a time** (Neon → Clerk → Companies House → R2 → email → deploy).
 
 ## Monorepo layout
 
@@ -57,14 +60,8 @@ archive/                 # Original docx drafts
 
 ## Current status
 
-**Phase 2 — Employer verification** implemented:
+**Phases 0–3 in place** (foundations, identity, employer verification, seeker profiles).
 
-- Companies House validation (`POST /companies/verify`) with dev mock when no API key
-- Employer registration → `pending_review` (unique UK `company_number`)
-- Resubmit after rejection, non-UK `/waitlist`
-- Admin approve / reject / suspend / reinstate + audit log + approval email hook
-- Employer and admin UI for the verification flow
+See [`docs/14-credentials-and-services.md`](./docs/14-credentials-and-services.md) for every API key — provision them **after** features, one service at a time.
 
-**Local setup:** Neon `DATABASE_URL`, Clerk keys, optional `COMPANIES_HOUSE_API_KEY` / Resend keys in `apps/api/.dev.vars`, then `pnpm db:migrate`.
-
-Next: Phase 3 — job seeker profile (history, qualifications, CV upload).
+Next product work: Phase 4 — jobs (create, publish, public search).

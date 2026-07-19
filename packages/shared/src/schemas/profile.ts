@@ -28,6 +28,12 @@ export const setSkillsSchema = z.object({
   skillIds: z.array(z.string().uuid()).min(0),
 });
 
+/** Convenient for MVP UI — upsert skills by name, then attach to the user. */
+export const setSkillsByNameSchema = z.object({
+  skills: z.array(z.string().trim().min(1).max(80)).max(40),
+});
+
+
 /** Fields required before a job seeker may apply (ADR 001). */
 export const profileCompletionSchema = z.object({
   firstName: z.string().trim().min(1),

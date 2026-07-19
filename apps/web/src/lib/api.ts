@@ -235,3 +235,158 @@ export function getAdminDashboard(token: string) {
     approvedEmployers: number;
   }>("/admin/dashboard", { token });
 }
+
+export type ProfileBundle = {
+  user: HorizonUser;
+  employmentHistory: Array<{
+    id: string;
+    employerName: string;
+    jobTitle: string;
+    startDate: string;
+    endDate: string | null;
+    currentlyWorking: boolean;
+    description: string | null;
+  }>;
+  education: Array<{
+    id: string;
+    institution: string;
+    qualification: string;
+    startDate: string;
+    endDate: string | null;
+    description: string | null;
+  }>;
+  qualifications: Array<{
+    id: string;
+    name: string;
+    issuingBody: string | null;
+    dateAwarded: string | null;
+    description: string | null;
+  }>;
+  skills: Array<{ id: string; name: string; category: string | null }>;
+  completion: {
+    profileCompleted: boolean;
+    required: string[];
+  };
+};
+
+export function getProfileBundle(token: string) {
+  return apiFetch<ProfileBundle>("/users/me/profile", { token });
+}
+
+export function setSkillsByName(token: string, skills: string[]) {
+  return apiFetch<Array<{ id: string; name: string; category: string | null }>>(
+    "/users/me/skills",
+    {
+      method: "PUT",
+      token,
+      body: JSON.stringify({ skills }),
+    },
+  );
+}
+
+export function addEmployment(
+  token: string,
+  body: {
+    employerName: string;
+    jobTitle: string;
+    startDate: string;
+    endDate?: string | null;
+    currentlyWorking?: boolean;
+    description?: string | null;
+  },
+) {
+  return apiFetch<ProfileBundle["employmentHistory"][number]>(
+    "/users/me/employment-history",
+    {
+      method: "POST",
+      token,
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function deleteEmployment(token: string, id: string) {
+  return apiFetch<{ deleted: boolean }>(`/users/me/employment-history/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export function addEducation(
+  token: string,
+  body: {
+    institution: string;
+    qualification: string;
+    startDate: string;
+    endDate?: string | null;
+    description?: string | null;
+  },
+) {
+  return apiFetch<ProfileBundle["education"][number]>("/users/me/education", {
+    method: "POST",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export function deleteEducation(token: string, id: string) {
+  return apiFetch<{ deleted: boolean }>(`/users/me/education/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export function addQualification(
+  token: string,
+  body: {
+    name: string;
+    issuingBody?: string | null;
+    dateAwarded?: string | null;
+    description?: string | null;
+  },
+) {
+  return apiFetch<ProfileBundle["qualifications"][number]>(
+    "/users/me/qualifications",
+    {
+      method: "POST",
+      token,
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function deleteQualification(token: string, id: string) {
+  return apiFetch<{ deleted: boolean }>(`/users/me/qualifications/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export async function uploadCv(token: string, file: File) {
+  const form = new FormData();
+  form.append("file", file);
+
+  const response = await fetch(`${getApiBaseUrl()}/users/me/cv`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: form,
+  });
+
+  const payload = (await response.json()) as ApiResponse<{
+    user: HorizonUser;
+    upload: { fileName: string; storage: "r2" | "dev" };
+  }>;
+
+  if (!response.ok || !payload.success) {
+    const errorPayload = payload as ApiError;
+    throw new ApiRequestError(
+      response.status,
+      errorPayload.error?.code ?? "UPLOAD_FAILED",
+      errorPayload.error?.message ?? "CV upload failed",
+    );
+  }
+
+  return payload.data;
+}

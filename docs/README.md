@@ -19,6 +19,7 @@ Before implementing any feature, read the relevant documents and [ADR 001](./dec
 11. [11 — Deployment](./11-deployment.md)
 12. [12 — Development Standards](./12-development-standards.md)
 13. [13 — AI Development Guide](./13-ai-development-guide.md)
+14. [14 — Credentials & Services](./14-credentials-and-services.md) ← API keys checklist
 
 ## Decisions
 

@@ -10,7 +10,13 @@
   },
   // Bind Neon via Hyperdrive in staging/production. Locally, use DATABASE_URL in .dev.vars.
   // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<hyperdrive_id>" }],
-  // "r2_buckets": [{ "binding": "UPLOADS", "bucket_name": "horizon-uploads" }],
+  "r2_buckets": [
+    {
+      "binding": "UPLOADS",
+      "bucket_name": "horizon-uploads",
+      "preview_bucket_name": "horizon-uploads-preview"
+    }
+  ],
   "vars": {
     "ENVIRONMENT": "development",
     "DATA_RETENTION_DAYS": "30"
