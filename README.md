@@ -62,4 +62,10 @@ archive/                 # Original docx drafts
 
 **MVP product features in place** (Phases 0–5 + polish: GDPR settings, admin users/audit/reports, employer edit flows, landing/nav).
 
-API keys are **deferred** — when you are ready, follow the session checklist in [`docs/14-credentials-and-services.md`](./docs/14-credentials-and-services.md) (Neon → Clerk → Companies House → R2 → email → deploy), one service at a time.
+**Live Workers (public shell):**
+- Web: https://horizon-web.yama.workers.dev  
+- API: https://horizon-api.yama.workers.dev/health  
+
+Redeploy: `pnpm --filter @horizon/api run deploy` · `pnpm --filter @horizon/web run deploy`  
+
+API keys are **deferred** — when you are ready, follow the session checklist in [`docs/14-credentials-and-services.md`](./docs/14-credentials-and-services.md) (Neon → Clerk → Companies House → R2 → email), one service at a time. Login/jobs data need Neon + Clerk before the live site is fully functional.
