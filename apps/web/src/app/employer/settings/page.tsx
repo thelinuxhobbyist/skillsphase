@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/api";
 import { dashboardPathForRole } from "@/lib/roles";
 
-export default async function SettingsPage() {
+export default async function EmployerSettingsPage() {
   const { userId, getToken } = await auth();
   if (!userId) redirect("/login");
   const token = await getToken();
@@ -17,24 +17,20 @@ export default async function SettingsPage() {
   } catch {
     redirect("/onboarding");
   }
-
-  if (user.role !== "job_seeker") {
-    if (user.role === "employer") redirect("/employer/settings");
-    redirect(dashboardPathForRole(user.role));
-  }
+  if (user.role !== "employer") redirect(dashboardPathForRole(user.role));
 
   return (
     <>
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 py-12">
         <h1 className="font-[family-name:var(--font-fraunces)] text-4xl text-brand">
-          Account settings
+          Employer settings
         </h1>
         <p className="mt-2 text-[color:var(--foreground)]/75">
-          Manage export and deletion of your Horizon data.
+          Export company-linked account data or delete your employer account.
         </p>
         <div className="mt-8">
-          <AccountSettingsPanel role="job_seeker" />
+          <AccountSettingsPanel role="employer" />
         </div>
       </main>
     </>

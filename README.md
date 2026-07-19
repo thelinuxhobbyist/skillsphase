@@ -60,8 +60,6 @@ archive/                 # Original docx drafts
 
 ## Current status
 
-**Phases 0–5 in place** (foundations through applications).
+**MVP product features in place** (Phases 0–5 + polish: GDPR settings, admin users/audit/reports, employer edit flows, landing/nav).
 
-See [`docs/14-credentials-and-services.md`](./docs/14-credentials-and-services.md) for every API key — provision them **after** features, one service at a time.
-
-Core MVP loop is implemented. Remaining polish: settings export/delete UI, admin user management, then service provisioning (Neon → Clerk → …).
+API keys are **deferred** — when you are ready, follow the session checklist in [`docs/14-credentials-and-services.md`](./docs/14-credentials-and-services.md) (Neon → Clerk → Companies House → R2 → email → deploy), one service at a time.

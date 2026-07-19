@@ -1,3 +1,4 @@
+import { SiteHeader } from "@/components/site-header";
 import Link from "next/link";
 import { listPublishedJobs } from "@/lib/api";
 
@@ -13,10 +14,14 @@ export default async function JobsPage({
   const location = typeof params.location === "string" ? params.location : "";
   const remoteType =
     typeof params.remoteType === "string" ? params.remoteType : "";
+  const employmentType =
+    typeof params.employmentType === "string" ? params.employmentType : "";
   const industry = typeof params.industry === "string" ? params.industry : "";
+  const page = Math.max(1, Number(params.page) || 1);
 
   let jobs: Awaited<ReturnType<typeof listPublishedJobs>>["jobs"] = [];
   let total = 0;
+  let pageSize = 20;
   let error: string | null = null;
 
   try {
@@ -24,18 +29,30 @@ export default async function JobsPage({
       keyword,
       location,
       remoteType,
+      employmentType,
       industry,
-      page: 1,
+      page,
       pageSize: 20,
     });
     jobs = result.jobs;
     total = result.meta.total;
+    pageSize = result.meta.pageSize;
   } catch (err) {
     error = err instanceof Error ? err.message : "Unable to load jobs.";
   }
 
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const queryBase = new URLSearchParams();
+  if (keyword) queryBase.set("keyword", keyword);
+  if (location) queryBase.set("location", location);
+  if (remoteType) queryBase.set("remoteType", remoteType);
+  if (employmentType) queryBase.set("employmentType", employmentType);
+  if (industry) queryBase.set("industry", industry);
+
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
+    <>
+      <SiteHeader />
+      <main className="mx-auto max-w-4xl px-6 py-12">
       <h1 className="font-[family-name:var(--font-fraunces)] text-4xl text-brand">
         Browse jobs
       </h1>
@@ -43,12 +60,12 @@ export default async function JobsPage({
         Roles from verified UK employers welcoming career returners.
       </p>
 
-      <form className="mt-8 grid gap-3 md:grid-cols-4" method="get">
+      <form className="mt-8 grid gap-3 md:grid-cols-3 lg:grid-cols-6" method="get">
         <input
           name="keyword"
           defaultValue={keyword}
           placeholder="Keyword"
-          className="rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
+          className="rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm lg:col-span-2"
         />
         <input
           name="location"
@@ -65,6 +82,17 @@ export default async function JobsPage({
           <option value="on_site">On-site</option>
           <option value="hybrid">Hybrid</option>
           <option value="remote">Remote</option>
+        </select>
+        <select
+          name="employmentType"
+          defaultValue={employmentType}
+          className="rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
+        >
+          <option value="">Employment type</option>
+          <option value="full_time">Full time</option>
+          <option value="part_time">Part time</option>
+          <option value="contract">Contract</option>
+          <option value="temporary">Temporary</option>
         </select>
         <button
           type="submit"
@@ -108,8 +136,38 @@ export default async function JobsPage({
               ))
             )}
           </ul>
+          {totalPages > 1 ? (
+            <div className="mt-8 flex flex-wrap gap-3 text-sm">
+              {page > 1 ? (
+                <Link
+                  href={`/jobs?${new URLSearchParams({
+                    ...Object.fromEntries(queryBase),
+                    page: String(page - 1),
+                  }).toString()}`}
+                  className="text-brand underline"
+                >
+                  Previous
+                </Link>
+              ) : null}
+              <span className="text-[color:var(--foreground)]/65">
+                Page {page} of {totalPages}
+              </span>
+              {page < totalPages ? (
+                <Link
+                  href={`/jobs?${new URLSearchParams({
+                    ...Object.fromEntries(queryBase),
+                    page: String(page + 1),
+                  }).toString()}`}
+                  className="text-brand underline"
+                >
+                  Next
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
         </>
       )}
-    </main>
+      </main>
+    </>
   );
 }

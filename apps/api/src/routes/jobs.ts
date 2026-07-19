@@ -3,6 +3,7 @@ import {
   createJob,
   findApplicationByJobAndUser,
   findCompanyById,
+  writeAdminLog,
   findCompanyByOwner,
   findJobById,
   findPublishedJobBySlug,
@@ -226,6 +227,16 @@ jobRoutes.post(
       skillNames: parsed.data.skillNames,
       publish: parsed.data.publish,
     });
+
+    if (appUser.role === "admin") {
+      await writeAdminLog(db, {
+        adminUserId: appUser.id,
+        action: "Job Created By Admin",
+        entity: "job",
+        entityId: String(created.id),
+        notes: `company ${companyId}`,
+      });
+    }
 
     return ok(c, created, 201);
   },

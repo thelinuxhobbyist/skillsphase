@@ -24,6 +24,7 @@ export const users = pgTable("users", {
   cvUrl: text("cv_url"),
   cvFileName: text("cv_file_name"),
   profileCompleted: boolean("profile_completed").notNull().default(false),
+  suspendedAt: timestamp("suspended_at", { withTimezone: true }),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

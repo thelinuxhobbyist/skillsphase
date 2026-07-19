@@ -81,8 +81,25 @@ export type HorizonUser = {
   cvUrl: string | null;
   cvFileName: string | null;
   profileCompleted: boolean;
+  suspendedAt: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type AdminUser = HorizonUser & {
+  deletedAt: string | null;
+};
+
+export type AdminAuditLog = {
+  id: string;
+  adminUserId: string;
+  adminEmail: string;
+  adminName: string;
+  action: string;
+  entity: string;
+  entityId: string;
+  notes: string | null;
+  createdAt: string;
 };
 
 export function bootstrapUser(
@@ -234,7 +251,83 @@ export function getAdminDashboard(token: string) {
     totalEmployers: number;
     approvedEmployers: number;
     activeJobs: number;
+    totalJobSeekers: number;
+    pendingApplications: number;
+    recentUsers: AdminUser[];
+    recentActions: AdminAuditLog[];
   }>("/admin/dashboard", { token });
+}
+
+export function listAdminUsers(
+  token: string,
+  params?: { role?: string; q?: string },
+) {
+  const search = new URLSearchParams();
+  if (params?.role) search.set("role", params.role);
+  if (params?.q) search.set("q", params.q);
+  const query = search.toString();
+  return apiFetch<AdminUser[]>(`/admin/users${query ? `?${query}` : ""}`, {
+    token,
+  });
+}
+
+export function adminUserAction(
+  token: string,
+  userId: string,
+  action: "suspend" | "reactivate" | "delete",
+) {
+  return apiFetch<AdminUser | { deleted: boolean; id: string }>(
+    `/admin/users/${userId}`,
+    {
+      method: "PATCH",
+      token,
+      body: JSON.stringify({ action }),
+    },
+  );
+}
+
+export function listAdminAudit(token: string) {
+  return apiFetch<AdminAuditLog[]>("/admin/audit", { token });
+}
+
+export function getAdminReports(token: string) {
+  return apiFetch<{
+    note: string;
+    totalEmployers: number;
+    approvedEmployers: number;
+    pendingEmployers: number;
+    activeJobs: number;
+    totalJobSeekers: number;
+    totalEmployerUsers: number;
+    pendingApplications: number;
+  }>("/admin/reports", { token });
+}
+
+export function exportMyData(token: string) {
+  return apiFetch<Record<string, unknown>>("/users/me/export", { token });
+}
+
+export function deleteMyAccount(token: string) {
+  return apiFetch<{ deleted: boolean; softDeletedAt: string }>("/users/me", {
+    method: "DELETE",
+    token,
+  });
+}
+
+export function getJobById(token: string, id: number) {
+  return apiFetch<HorizonJob>(`/jobs/${id}`, { token });
+}
+
+export function updateJob(
+  token: string,
+  id: number,
+  body: Record<string, unknown>,
+) {
+  return apiFetch<HorizonJob>(`/jobs/${id}`, {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(body),
+  });
 }
 
 export type ProfileBundle = {

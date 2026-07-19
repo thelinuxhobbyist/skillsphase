@@ -88,6 +88,12 @@ export function EmployerJobsPanel({ jobs }: { jobs: HorizonJob[] }) {
               ) : null}
             </div>
             <div className="flex flex-wrap gap-2">
+              <Link
+                href={`/employer/jobs/${job.id}/edit`}
+                className="rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm font-semibold text-brand"
+              >
+                Edit
+              </Link>
               {job.status === "draft" ? (
                 <>
                   <Action

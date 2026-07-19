@@ -6,6 +6,7 @@ import { corsMiddleware } from "./middleware/cors";
 import { requestIdMiddleware } from "./middleware/request-id";
 import { healthRoutes } from "./routes/health";
 import { v1Routes } from "./routes/v1";
+import { runRetentionPurge } from "./scheduled";
 
 const app = new Hono<AppEnv>();
 
@@ -29,4 +30,13 @@ app.onError((err, c) => {
   return fail(c, "INTERNAL_ERROR", "An unexpected error occurred.", 500);
 });
 
-export default app;
+export default {
+  fetch: app.fetch,
+  async scheduled(
+    _controller: ScheduledController,
+    env: AppEnv["Bindings"],
+    _ctx: ExecutionContext,
+  ) {
+    await runRetentionPurge(env);
+  },
+};

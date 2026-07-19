@@ -7,6 +7,7 @@ import { Hono } from "hono";
 import type { AppEnv } from "../env";
 import { getDb } from "../lib/db";
 import { fail, ok } from "../lib/response";
+import { buildGdprExport } from "@horizon/database";
 import {
   createAppUser,
   employerHasBlockingDependencies,
@@ -160,10 +161,7 @@ userRoutes.get("/me/export", requireAppUser, async (c) => {
     return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
   }
 
-  return ok(c, {
-    exportedAt: new Date().toISOString(),
-    user: toPublicUser(appUser),
-  });
+  return ok(c, await buildGdprExport(getDb(c), appUser));
 });
 
 userRoutes.delete("/me", requireAppUser, async (c) => {

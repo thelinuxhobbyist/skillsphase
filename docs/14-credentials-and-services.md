@@ -163,15 +163,24 @@ Bucket must be **private**. Serve via signed URLs / authorised API only.
 
 ---
 
-## What we will do later (step by step)
+## Deferred credentials session (do later — not now)
 
-When the MVP features are in place, walk through in this order:
+Keys are **not** required to finish product UI. When you are ready to create accounts and paste secrets, walk this list **one step at a time** in a dedicated chat session. Do not skip ahead.
 
-1. Neon + migrate  
-2. Clerk keys + first real register/login  
-3. Companies House key + real company lookup  
-4. R2 + CV upload  
-5. Resend + approval/application emails  
-6. Deploy (Workers + Pages)
+### Session TODO (copy into the chat when ready)
+
+```
+Credentials walkthrough — Project Horizon
+[ ] 0. Confirm local env files exist (apps/web/.env.local, apps/api/.dev.vars) from examples
+[ ] 1. Neon — create project → paste DATABASE_URL → pnpm db:migrate → smoke /health + a data route
+[ ] 2. Clerk — create app → paste publishable/secret keys (web + api) → set redirect URLs → first register/login
+[ ] 3. Companies House — create API key → paste COMPANIES_HOUSE_API_KEY → real company lookup
+[ ] 4. Cloudflare R2 — create private bucket horizon-uploads → bind UPLOADS / S3 keys → real CV upload
+[ ] 5. Resend — verify domain → EMAIL_API_KEY + EMAIL_FROM → approval + application emails
+[ ] 6. Cloudflare deploy — Pages (web) + Workers (api) + secrets via wrangler secret put
+[ ] 7. Promote one Neon user to role=admin (SQL) and verify /admin
+```
+
+**Rules for that session:** you create each account in the browser; the assistant only tells you where to click and which env var to paste. Never commit real secrets.
 
 Until then, keep building against mocks / optional keys so product work is not blocked.

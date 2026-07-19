@@ -20,5 +20,9 @@
   "vars": {
     "ENVIRONMENT": "development",
     "DATA_RETENTION_DAYS": "30"
+  },
+  // Enable after deploy; runs daily retention purge for soft-deleted accounts.
+  "triggers": {
+    "crons": ["0 3 * * *"]
   }
 }

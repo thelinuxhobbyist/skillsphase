@@ -126,6 +126,15 @@ export const requireAppUser = createMiddleware<AppEnv>(async (c, next) => {
     );
   }
 
+  if (appUser.suspendedAt) {
+    return fail(
+      c,
+      "ACCOUNT_SUSPENDED",
+      "This account has been suspended. Contact support if you believe this is a mistake.",
+      403,
+    );
+  }
+
   await next();
 });
 

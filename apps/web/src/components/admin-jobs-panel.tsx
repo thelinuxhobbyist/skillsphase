@@ -4,7 +4,12 @@ import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { adminRemoveJob, ApiRequestError, type HorizonJob } from "@/lib/api";
+import {
+  adminRemoveJob,
+  ApiRequestError,
+  closeJob,
+  type HorizonJob,
+} from "@/lib/api";
 
 export function AdminJobsPanel({ jobs }: { jobs: HorizonJob[] }) {
   const { getToken } = useAuth();
@@ -45,32 +50,62 @@ export function AdminJobsPanel({ jobs }: { jobs: HorizonJob[] }) {
                 ) : null}
               </p>
             </div>
-            <button
-              type="button"
-              disabled={pendingId === job.id}
-              className="rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
-              onClick={() => {
-                void (async () => {
-                  setPendingId(job.id);
-                  setError(null);
-                  try {
-                    const token = await getToken();
-                    if (!token) throw new Error("Missing session token");
-                    await adminRemoveJob(token, job.id);
-                    router.refresh();
-                  } catch (err) {
-                    setError(
-                      err instanceof ApiRequestError || err instanceof Error
-                        ? err.message
-                        : "Remove failed.",
-                    );
-                    setPendingId(null);
-                  }
-                })();
-              }}
-            >
-              Remove
-            </button>
+            <div className="flex flex-wrap gap-2">
+              {job.status === "published" ? (
+                <button
+                  type="button"
+                  disabled={pendingId === job.id}
+                  className="rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm font-semibold text-brand disabled:opacity-60"
+                  onClick={() => {
+                    void (async () => {
+                      setPendingId(job.id);
+                      setError(null);
+                      try {
+                        const token = await getToken();
+                        if (!token) throw new Error("Missing session token");
+                        await closeJob(token, job.id);
+                        router.refresh();
+                      } catch (err) {
+                        setError(
+                          err instanceof ApiRequestError || err instanceof Error
+                            ? err.message
+                            : "Close failed.",
+                        );
+                        setPendingId(null);
+                      }
+                    })();
+                  }}
+                >
+                  Close
+                </button>
+              ) : null}
+              <button
+                type="button"
+                disabled={pendingId === job.id}
+                className="rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                onClick={() => {
+                  void (async () => {
+                    setPendingId(job.id);
+                    setError(null);
+                    try {
+                      const token = await getToken();
+                      if (!token) throw new Error("Missing session token");
+                      await adminRemoveJob(token, job.id);
+                      router.refresh();
+                    } catch (err) {
+                      setError(
+                        err instanceof ApiRequestError || err instanceof Error
+                          ? err.message
+                          : "Remove failed.",
+                      );
+                      setPendingId(null);
+                    }
+                  })();
+                }}
+              >
+                Remove
+              </button>
+            </div>
           </div>
         </article>
       ))}

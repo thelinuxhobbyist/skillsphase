@@ -1,6 +1,18 @@
-import { and, count, eq, isNull, ne } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  ilike,
+  isNotNull,
+  isNull,
+  lt,
+  ne,
+  or,
+} from "drizzle-orm";
 import type { UserRole } from "@horizon/shared";
 import type { Database } from "../client";
+import { applications } from "../schema/applications";
 import { companies } from "../schema/companies";
 import { jobs } from "../schema/jobs";
 import { userSkills } from "../schema/profile";
@@ -25,8 +37,13 @@ export type PublicUser = {
   cvUrl: string | null;
   cvFileName: string | null;
   profileCompleted: boolean;
+  suspendedAt: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type AdminUserView = PublicUser & {
+  deletedAt: string | null;
 };
 
 export function toPublicUser(user: AppUser): PublicUser {
@@ -47,8 +64,16 @@ export function toPublicUser(user: AppUser): PublicUser {
     cvUrl: user.cvUrl,
     cvFileName: user.cvFileName,
     profileCompleted: user.profileCompleted,
+    suspendedAt: user.suspendedAt?.toISOString() ?? null,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
+  };
+}
+
+export function toAdminUserView(user: AppUser): AdminUserView {
+  return {
+    ...toPublicUser(user),
+    deletedAt: user.deletedAt?.toISOString() ?? null,
   };
 }
 
@@ -216,6 +241,140 @@ export async function softDeleteAppUser(db: Database, userId: string) {
     .set({ deletedAt, updatedAt: deletedAt })
     .where(eq(users.id, userId));
   return deletedAt;
+}
+
+export async function listUsersForAdmin(
+  db: Database,
+  filters?: { role?: UserRole; q?: string },
+): Promise<AdminUserView[]> {
+  const conditions = [isNull(users.deletedAt)];
+  if (filters?.role) {
+    conditions.push(eq(users.role, filters.role));
+  }
+  if (filters?.q?.trim()) {
+    const q = `%${filters.q.trim()}%`;
+    conditions.push(
+      or(
+        ilike(users.email, q),
+        ilike(users.firstName, q),
+        ilike(users.lastName, q),
+      )!,
+    );
+  }
+
+  const rows = await db
+    .select()
+    .from(users)
+    .where(and(...conditions))
+    .orderBy(desc(users.createdAt))
+    .limit(200);
+
+  return rows.map(toAdminUserView);
+}
+
+export async function suspendAppUser(db: Database, userId: string) {
+  const suspendedAt = new Date();
+  const [updated] = await db
+    .update(users)
+    .set({ suspendedAt, updatedAt: suspendedAt })
+    .where(and(eq(users.id, userId), isNull(users.deletedAt)))
+    .returning();
+  return updated ?? null;
+}
+
+export async function reactivateAppUser(db: Database, userId: string) {
+  const [updated] = await db
+    .update(users)
+    .set({ suspendedAt: null, updatedAt: new Date() })
+    .where(and(eq(users.id, userId), isNull(users.deletedAt)))
+    .returning();
+  return updated ?? null;
+}
+
+export async function countUsersByRole(db: Database, role: UserRole) {
+  const [row] = await db
+    .select({ value: count() })
+    .from(users)
+    .where(and(eq(users.role, role), isNull(users.deletedAt)));
+  return Number(row?.value ?? 0);
+}
+
+export async function countPendingApplications(db: Database) {
+  const [row] = await db
+    .select({ value: count() })
+    .from(applications)
+    .where(
+      and(
+        eq(applications.status, "applied"),
+        isNull(applications.deletedAt),
+      ),
+    );
+  return Number(row?.value ?? 0);
+}
+
+export async function listRecentUsers(db: Database, limit = 8) {
+  const rows = await db
+    .select()
+    .from(users)
+    .where(isNull(users.deletedAt))
+    .orderBy(desc(users.createdAt))
+    .limit(limit);
+  return rows.map(toAdminUserView);
+}
+
+/**
+ * After retention: remove seeker rows (profile cascades); anonymise employers
+ * so FK-restricted company/job history remains auditable without PII.
+ */
+export async function purgeExpiredSoftDeletedUsers(
+  db: Database,
+  retentionDays: number,
+) {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - retentionDays);
+
+  const expired = await db
+    .select()
+    .from(users)
+    .where(and(isNotNull(users.deletedAt), lt(users.deletedAt, cutoff)))
+    .limit(100);
+
+  let purged = 0;
+  for (const user of expired) {
+    if (user.role === "job_seeker") {
+      await db.delete(applications).where(eq(applications.userId, user.id));
+      await db.delete(users).where(eq(users.id, user.id));
+      purged += 1;
+      continue;
+    }
+
+    await db
+      .update(companies)
+      .set({ deletedAt: user.deletedAt ?? new Date(), updatedAt: new Date() })
+      .where(eq(companies.ownerUserId, user.id));
+
+    await db
+      .update(users)
+      .set({
+        email: `deleted+${user.id}@horizon.invalid`,
+        firstName: null,
+        lastName: null,
+        phoneNumber: null,
+        city: null,
+        careerSummary: null,
+        careerGapNarrative: null,
+        coverLetterTemplate: null,
+        profilePhotoUrl: null,
+        cvUrl: null,
+        cvFileName: null,
+        clerkUserId: `deleted_${user.id}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, user.id));
+    purged += 1;
+  }
+
+  return { scanned: expired.length, purged };
 }
 
 export async function employerHasBlockingDependencies(

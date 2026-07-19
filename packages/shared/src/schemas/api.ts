@@ -146,5 +146,9 @@ export const adminEmployerActionSchema = z.object({
   rejectionReason: z.string().trim().min(1).max(2000).optional(),
 });
 
+export const adminUserActionSchema = z.object({
+  action: z.enum(["suspend", "reactivate", "delete"]),
+});
+
 export const roleSchema = z.enum(USER_ROLES);
 export const verificationStatusSchema = z.enum(VERIFICATION_STATUSES);
