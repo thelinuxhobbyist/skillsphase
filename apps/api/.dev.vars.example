@@ -1,0 +1,7 @@
+CLERK_SECRET_KEY=sk_test_...
+CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_AUTHORIZED_PARTIES=http://localhost:3000
+DATABASE_URL=postgresql://user:pass@host/neondb?sslmode=require
+COMPANIES_HOUSE_API_KEY=
+EMAIL_API_KEY=
+EMAIL_FROM=noreply@example.com

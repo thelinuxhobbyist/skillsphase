@@ -1,0 +1,27 @@
+{
+  "name": "@horizon/database",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts",
+    "./queries/users": "./src/queries/users.ts"
+  },
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "studio": "drizzle-kit studio",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"No lint configured for @horizon/database\""
+  },
+  "dependencies": {
+    "@horizon/shared": "workspace:*",
+    "@neondatabase/serverless": "^1.0.1",
+    "drizzle-orm": "^0.44.2"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.4",
+    "typescript": "^5.8.3"
+  }
+}

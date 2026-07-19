@@ -1,0 +1,22 @@
+{
+  "name": "project-horizon",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter @horizon/web --filter @horizon/api run dev",
+    "dev:web": "pnpm --filter @horizon/web dev",
+    "dev:api": "pnpm --filter @horizon/api dev",
+    "build": "pnpm -r run build",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "pnpm -r run lint",
+    "db:generate": "pnpm --filter @horizon/database generate",
+    "db:migrate": "pnpm --filter @horizon/database migrate",
+    "db:studio": "pnpm --filter @horizon/database studio"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
