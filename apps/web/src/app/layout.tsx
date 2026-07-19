@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -26,8 +27,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-GB">
-      <body className={`${fraunces.variable} ${sourceSans.variable} antialiased`}>
-        <Providers>{children}</Providers>
+      <body
+        className={`${fraunces.variable} ${sourceSans.variable} flex min-h-screen flex-col antialiased`}
+      >
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <div className="flex-1">{children}</div>
+            <SiteFooter />
+          </div>
+        </Providers>
       </body>
     </html>
   );

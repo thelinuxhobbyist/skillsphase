@@ -12,91 +12,82 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div>
       <SiteHeader />
 
       <main>
-        <section className="relative overflow-hidden">
+        <section className="relative min-h-[70vh] overflow-hidden md:min-h-[78vh]">
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(120deg, rgba(15,76,92,0.94), rgba(15,76,92,0.55)), url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22160%22 viewBox=%220 0 160 160%22%3E%3Cpath fill=%22%23ffffff14%22 d=%22M0 80h160M80 0v160%22/%3E%3C/svg%3E')",
-              backgroundSize: "cover, 48px 48px",
+                "linear-gradient(165deg, #0a3a47 0%, #0f4c5c 42%, #1a5f6e 100%)",
             }}
           />
-          <div className="absolute inset-0 animate-[horizon-pan_18s_ease-in-out_infinite_alternate] bg-[radial-gradient(circle_at_25%_35%,rgba(227,100,20,0.35),transparent_45%)]" />
-          <div className="relative mx-auto flex min-h-[calc(100vh-4.5rem)] w-full max-w-6xl flex-col justify-center px-6 py-16 text-white">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/85">
+          <div
+            className="absolute inset-0 opacity-40"
+            style={{
+              backgroundImage:
+                "radial-gradient(ellipse 80% 60% at 70% 40%, rgba(227,100,20,0.45), transparent 55%), radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08), transparent 40%)",
+            }}
+          />
+          <div className="absolute inset-0 animate-[horizon-pan_22s_ease-in-out_infinite_alternate] bg-[url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Cpath fill=%22%23ffffff08%22 d=%22M0 40h80M40 0v80%22/%3E%3C/svg%3E')] bg-[length:64px_64px]" />
+
+          <div className="relative mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col justify-end px-6 pb-16 pt-28 md:min-h-[78vh] md:pb-20 md:pt-32">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/70">
               Career Return Platform
             </p>
-            <h1 className="mt-4 max-w-2xl font-[family-name:var(--font-fraunces)] text-5xl leading-[1.05] font-semibold tracking-tight md:text-6xl">
+            <h1 className="mt-3 max-w-2xl font-[family-name:var(--font-fraunces)] text-5xl leading-[1.02] font-semibold tracking-tight text-white md:text-7xl">
               Project Horizon
             </h1>
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/85">
-              Your career story isn&apos;t over. Horizon helps you restart,
-              return, and move forward — connecting you with employers who value
+            <p className="mt-5 max-w-md text-base leading-relaxed text-white/80 md:text-lg">
+              Restart, return, and move forward — with employers who value
               experience over perfect timelines.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 href="/register"
-                className="btn-primary rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                className="btn-primary rounded-md bg-brand-accent px-6 py-3.5 text-sm font-semibold text-white transition hover:opacity-90"
               >
-                Find your next role
+                Create your profile
               </Link>
               <Link
                 href="/jobs"
-                className="rounded-md border border-white/40 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
+                className="text-sm font-semibold text-white underline decoration-white/40 underline-offset-4 transition hover:decoration-white"
               >
                 Browse jobs
               </Link>
             </div>
-
-            <form
-              action="/jobs"
-              method="get"
-              className="mt-10 max-w-2xl"
-              aria-label="Search open roles"
-            >
-              <p className="mb-3 text-sm text-white/80">
-                Search verified UK roles by keyword or location.
-              </p>
-              <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
-                <input
-                  name="keyword"
-                  placeholder="Keyword or skill"
-                  className="rounded-md border border-white/25 bg-white px-3 py-3 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--foreground)]/50"
-                />
-                <input
-                  name="location"
-                  placeholder="Location"
-                  className="rounded-md border border-white/25 bg-white px-3 py-3 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--foreground)]/50"
-                />
-                <button
-                  type="submit"
-                  className="btn-primary rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-                >
-                  Search
-                </button>
-              </div>
-            </form>
           </div>
         </section>
 
-        <section className="mx-auto max-w-3xl px-6 py-16 text-center">
-          <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand md:text-4xl">
-            Careers aren&apos;t meant to be perfectly linear.
-          </h2>
-          <p className="mt-5 text-lg leading-relaxed text-[color:var(--foreground)]/80">
-            Millions of talented people pause their careers to recover, raise
-            families, care for loved ones, or simply to breathe. Project Horizon
-            exists to make the way back feel obvious — connecting skilled people
-            with employers who value the whole human, not just the timeline.
-          </p>
+        <section className="border-b border-[color:var(--line)] bg-white/80 py-6">
+          <form
+            action="/jobs"
+            method="get"
+            className="mx-auto grid w-full max-w-6xl gap-3 px-6 sm:grid-cols-[1fr_1fr_auto]"
+            aria-label="Search open roles"
+          >
+            <input
+              name="keyword"
+              placeholder="Keyword or skill"
+              className="rounded-md border border-[color:var(--line)] bg-white px-3 py-3 text-sm"
+            />
+            <input
+              name="location"
+              placeholder="Location"
+              className="rounded-md border border-[color:var(--line)] bg-white px-3 py-3 text-sm"
+            />
+            <button
+              type="submit"
+              className="btn-primary rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              Search jobs
+            </button>
+          </form>
         </section>
 
-        <section className="border-y border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
+        <section className="border-b border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
           <div className="mx-auto max-w-6xl px-6">
             <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
               How it works
