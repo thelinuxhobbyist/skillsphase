@@ -46,16 +46,16 @@ export default async function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
-                href="/register"
+                href="/register?as=seeker"
                 className="btn-primary rounded-md bg-brand-accent px-6 py-3.5 text-sm font-semibold text-white transition hover:opacity-90"
               >
-                Create your profile
+                Register as a returner
               </Link>
               <Link
-                href="/jobs"
-                className="text-sm font-semibold text-white underline decoration-white/40 underline-offset-4 transition hover:decoration-white"
+                href="/register?as=employer"
+                className="rounded-md border border-white/40 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
               >
-                Browse jobs
+                Register as an employer
               </Link>
             </div>
           </div>
@@ -162,10 +162,10 @@ export default async function HomePage() {
               your team.
             </p>
             <Link
-              href="/register"
+              href="/register?as=employer"
               className="btn-primary mt-8 inline-block rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
             >
-              Hire returners
+              Register as an employer
             </Link>
           </div>
         </section>
@@ -214,16 +214,16 @@ export default async function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
-                href="/register"
+                href="/register?as=seeker"
                 className="btn-primary rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
               >
-                Create your profile
+                Register as a returner
               </Link>
               <Link
-                href="/about"
+                href="/register?as=employer"
                 className="rounded-md border border-[color:var(--line)] bg-white/70 px-5 py-3 text-sm font-semibold text-brand transition hover:bg-white"
               >
-                Browse resources
+                Register as an employer
               </Link>
             </div>
           </div>

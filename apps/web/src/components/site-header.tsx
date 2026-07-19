@@ -55,6 +55,22 @@ function RoleNav({ user }: { user: HorizonUser | null }) {
   );
 }
 
+function GuestActions() {
+  return (
+    <>
+      <Link href="/login" className="hover:text-brand">
+        Sign in
+      </Link>
+      <Link
+        href="/register"
+        className="btn-primary rounded-md bg-brand-accent px-3 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+      >
+        Register
+      </Link>
+    </>
+  );
+}
+
 function AuthenticatedHeader() {
   const { isSignedIn, getToken } = useAuth();
   const [user, setUser] = useState<HorizonUser | null>(null);
@@ -79,12 +95,7 @@ function AuthenticatedHeader() {
     <>
       <RoleNav user={isSignedIn ? user : null} />
       <SignedOut>
-        <Link
-          href="/login"
-          className="btn-primary rounded-md bg-brand-accent px-3 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-        >
-          Sign in
-        </Link>
+        <GuestActions />
       </SignedOut>
       <SignedIn>
         <SafeUserButton />
@@ -97,12 +108,7 @@ function PublicOnlyHeader() {
   return (
     <>
       <RoleNav user={null} />
-      <Link
-        href="/login"
-        className="btn-primary rounded-md bg-brand-accent px-3 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-      >
-        Sign in
-      </Link>
+      <GuestActions />
     </>
   );
 }

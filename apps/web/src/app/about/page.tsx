@@ -82,16 +82,16 @@ export default function AboutPage() {
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
-              href="/register"
+              href="/register?as=seeker"
               className="btn-primary rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
             >
-              Create your profile
+              Register as a returner
             </Link>
             <Link
-              href="/jobs"
+              href="/register?as=employer"
               className="rounded-md border border-[color:var(--line)] bg-white px-5 py-3 text-sm font-semibold text-brand"
             >
-              Browse jobs
+              Register as an employer
             </Link>
           </div>
         </section>
