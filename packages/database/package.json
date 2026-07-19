@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./schema": "./src/schema/index.ts",
-    "./queries/users": "./src/queries/users.ts"
+    "./queries/users": "./src/queries/users.ts",
+    "./queries/companies": "./src/queries/companies.ts"
   },
   "scripts": {
     "generate": "drizzle-kit generate",

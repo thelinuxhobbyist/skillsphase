@@ -10,6 +10,7 @@ export default function HomePage() {
         <nav className="flex items-center gap-5 text-sm font-medium text-[color:var(--foreground)]/80">
           <Link href="/jobs">Jobs</Link>
           <Link href="/about">About</Link>
+          <Link href="/waitlist">Waitlist</Link>
           <Link
             href="/login"
             className="rounded-md bg-brand px-3 py-2 text-white transition hover:opacity-90"

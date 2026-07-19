@@ -57,14 +57,14 @@ archive/                 # Original docx drafts
 
 ## Current status
 
-**Phase 1 — Identity & roles** implemented:
+**Phase 2 — Employer verification** implemented:
 
-- Clerk session validation on the API
-- Role selection at registration (`job_seeker` / `employer`)
-- `POST /api/v1/users/me/bootstrap`, `GET/PATCH/DELETE /users/me`, `GET /users/me/export`
-- Protected dashboards (`/dashboard`, `/employer`, `/admin`) with role redirects
-- Admins are not self-serve (provisioned in the database)
+- Companies House validation (`POST /companies/verify`) with dev mock when no API key
+- Employer registration → `pending_review` (unique UK `company_number`)
+- Resubmit after rejection, non-UK `/waitlist`
+- Admin approve / reject / suspend / reinstate + audit log + approval email hook
+- Employer and admin UI for the verification flow
 
-**Still required for a full local auth loop:** Neon `DATABASE_URL` + Clerk keys in `apps/web/.env.local` and `apps/api/.dev.vars`, then `pnpm db:migrate`.
+**Local setup:** Neon `DATABASE_URL`, Clerk keys, optional `COMPANIES_HOUSE_API_KEY` / Resend keys in `apps/api/.dev.vars`, then `pnpm db:migrate`.
 
-Next: Phase 2 — employer verification (Companies House + admin approval).
+Next: Phase 3 — job seeker profile (history, qualifications, CV upload).

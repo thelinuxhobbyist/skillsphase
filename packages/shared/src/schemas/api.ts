@@ -48,7 +48,11 @@ export const updateUserProfileSchema = z.object({
 });
 
 export const createCompanySchema = z.object({
-  companyNumber: z.string().trim().min(1).max(20),
+  companyNumber: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z0-9]{6,8}$/, "Enter a valid UK Companies House number"),
   website: z.string().url().refine((v) => v.startsWith("https://"), {
     message: "Website must use HTTPS",
   }),
@@ -58,14 +62,44 @@ export const createCompanySchema = z.object({
   countryCode: z.literal("GB").default("GB"),
 });
 
+export const updateCompanySchema = z.object({
+  companyNumber: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z0-9]{6,8}$/, "Enter a valid UK Companies House number")
+    .optional(),
+  website: z
+    .string()
+    .url()
+    .refine((v) => v.startsWith("https://"), {
+      message: "Website must use HTTPS",
+    })
+    .optional(),
+  businessEmail: z.string().email().optional(),
+  recruiterName: z.string().trim().min(1).max(120).optional(),
+  recruiterJobTitle: z.string().trim().min(1).max(120).optional(),
+});
+
 export const verifyCompanySchema = z.object({
-  companyNumber: z.string().trim().min(1).max(20),
+  companyNumber: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z0-9]{6,8}$/, "Enter a valid UK Companies House number"),
 });
 
 export const waitlistSchema = z.object({
   email: z.string().email(),
   companyName: z.string().trim().max(200).optional(),
-  countryCode: z.string().trim().min(2).max(2),
+  countryCode: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .length(2)
+    .refine((code) => code !== "GB", {
+      message: "UK employers should register normally, not via the waitlist",
+    }),
   notes: z.string().trim().max(1000).optional(),
 });
 

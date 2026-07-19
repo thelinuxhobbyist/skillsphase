@@ -1,7 +1,9 @@
+import { AdminEmployersPanel } from "@/components/admin-employers-panel";
 import { SafeUserButton } from "@/components/safe-user-button";
 import { auth } from "@clerk/nextjs/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/api";
+import { getAdminDashboard, getCurrentUser, listAdminEmployers } from "@/lib/api";
 import { dashboardPathForRole } from "@/lib/roles";
 
 export default async function AdminDashboardPage() {
@@ -26,6 +28,11 @@ export default async function AdminDashboardPage() {
     redirect(dashboardPathForRole(user.role));
   }
 
+  const [stats, employers] = await Promise.all([
+    getAdminDashboard(token),
+    listAdminEmployers(token, "pending_review"),
+  ]);
+
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
       <div className="mb-8 flex items-center justify-between">
@@ -39,10 +46,31 @@ export default async function AdminDashboardPage() {
         </div>
         <SafeUserButton />
       </div>
-      <p className="text-[color:var(--foreground)]/75">
-        Employer approvals, moderation queues, and audit logs will be wired in a
-        later phase.
-      </p>
+
+      <section className="mb-8 grid gap-4 md:grid-cols-3">
+        <Stat label="Pending employers" value={stats.pendingEmployers} />
+        <Stat label="Approved employers" value={stats.approvedEmployers} />
+        <Stat label="Total employers" value={stats.totalEmployers} />
+      </section>
+
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
+          Pending employer approvals
+        </h2>
+        <Link href="/admin/employers" className="text-sm font-semibold text-brand underline">
+          View all
+        </Link>
+      </div>
+      <AdminEmployersPanel employers={employers} />
     </main>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-4">
+      <p className="text-sm text-[color:var(--foreground)]/70">{label}</p>
+      <p className="mt-1 text-3xl font-semibold text-brand">{value}</p>
+    </div>
   );
 }

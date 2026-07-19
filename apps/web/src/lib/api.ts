@@ -110,3 +110,128 @@ export function updateCurrentUser(
     body: JSON.stringify(body),
   });
 }
+
+export type HorizonCompany = {
+  id: string;
+  ownerUserId: string;
+  companyNumber: string;
+  companyName: string;
+  website: string;
+  businessEmail: string;
+  recruiterName: string;
+  recruiterJobTitle: string;
+  verificationStatus:
+    | "pending_review"
+    | "approved"
+    | "rejected"
+    | "suspended";
+  companiesHouseVerified: boolean;
+  rejectionReason: string | null;
+  countryCode: string;
+  businessEmailIsFreeProvider: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CompaniesHousePreview = {
+  companyNumber: string;
+  companyName: string;
+  companyStatus: string;
+  dateOfCreation?: string;
+  registeredOfficeAddress?: Record<string, string | undefined>;
+  valid: boolean;
+};
+
+export type AdminEmployer = HorizonCompany & {
+  ownerEmail: string;
+  ownerName: string;
+};
+
+export function verifyCompanyNumber(token: string, companyNumber: string) {
+  return apiFetch<CompaniesHousePreview>("/companies/verify", {
+    method: "POST",
+    token,
+    body: JSON.stringify({ companyNumber }),
+  });
+}
+
+export function getMyCompany(token: string) {
+  return apiFetch<HorizonCompany>("/companies/me", { token });
+}
+
+export function createCompany(
+  token: string,
+  body: {
+    companyNumber: string;
+    website: string;
+    businessEmail: string;
+    recruiterName: string;
+    recruiterJobTitle: string;
+    countryCode?: "GB";
+  },
+) {
+  return apiFetch<HorizonCompany>("/companies", {
+    method: "POST",
+    token,
+    body: JSON.stringify({ ...body, countryCode: "GB" }),
+  });
+}
+
+export function updateMyCompany(
+  token: string,
+  body: Record<string, unknown>,
+) {
+  return apiFetch<HorizonCompany>("/companies/me", {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export function resubmitCompany(token: string) {
+  return apiFetch<HorizonCompany>("/companies/me/resubmit", {
+    method: "POST",
+    token,
+  });
+}
+
+export function joinWaitlist(body: {
+  email: string;
+  companyName?: string;
+  countryCode: string;
+  notes?: string;
+}) {
+  return apiFetch<{ id: string }>("/waitlist", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export function listAdminEmployers(
+  token: string,
+  status?: HorizonCompany["verificationStatus"],
+) {
+  const query = status ? `?status=${status}` : "";
+  return apiFetch<AdminEmployer[]>(`/admin/employers${query}`, { token });
+}
+
+export function adminEmployerAction(
+  token: string,
+  companyId: string,
+  action: "approve" | "reject" | "suspend" | "reinstate",
+  rejectionReason?: string,
+) {
+  return apiFetch<HorizonCompany>(`/admin/employers/${companyId}`, {
+    method: "PATCH",
+    token,
+    body: JSON.stringify({ action, rejectionReason }),
+  });
+}
+
+export function getAdminDashboard(token: string) {
+  return apiFetch<{
+    pendingEmployers: number;
+    totalEmployers: number;
+    approvedEmployers: number;
+  }>("/admin/dashboard", { token });
+}

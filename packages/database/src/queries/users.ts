@@ -65,6 +65,19 @@ export async function findActiveUserByClerkId(
   return row ?? null;
 }
 
+export async function findUserById(
+  db: Database,
+  userId: string,
+): Promise<AppUser | null> {
+  const [row] = await db
+    .select()
+    .from(users)
+    .where(and(eq(users.id, userId), isNull(users.deletedAt)))
+    .limit(1);
+
+  return row ?? null;
+}
+
 export async function createAppUser(
   db: Database,
   input: {

@@ -1,7 +1,10 @@
 import { Hono } from "hono";
 import type { AppEnv } from "../env";
 import { ok } from "../lib/response";
+import { adminRoutes } from "./admin";
+import { companyRoutes } from "./companies";
 import { userRoutes } from "./users";
+import { waitlistRoutes } from "./waitlist";
 
 export const v1Routes = new Hono<AppEnv>();
 
@@ -14,3 +17,6 @@ v1Routes.get("/", (c) =>
 );
 
 v1Routes.route("/users", userRoutes);
+v1Routes.route("/companies", companyRoutes);
+v1Routes.route("/waitlist", waitlistRoutes);
+v1Routes.route("/admin", adminRoutes);
