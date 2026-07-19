@@ -34,8 +34,9 @@ export default async function HomePage() {
               Project Horizon
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/85">
-              A trusted place where verified UK employers meet skilled people
-              returning to work after a career break.
+              Your career story isn&apos;t over. Horizon helps you restart,
+              return, and move forward — connecting you with employers who value
+              experience over perfect timelines.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -83,6 +84,18 @@ export default async function HomePage() {
           </div>
         </section>
 
+        <section className="mx-auto max-w-3xl px-6 py-16 text-center">
+          <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand md:text-4xl">
+            Careers aren&apos;t meant to be perfectly linear.
+          </h2>
+          <p className="mt-5 text-lg leading-relaxed text-[color:var(--foreground)]/80">
+            Millions of talented people pause their careers to recover, raise
+            families, care for loved ones, or simply to breathe. Project Horizon
+            exists to make the way back feel obvious — connecting skilled people
+            with employers who value the whole human, not just the timeline.
+          </p>
+        </section>
+
         <section className="border-y border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
           <div className="mx-auto max-w-6xl px-6">
             <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
@@ -124,12 +137,12 @@ export default async function HomePage() {
           <ul className="mt-8 grid gap-6 md:grid-cols-3">
             {[
               {
-                title: "Verified UK employers",
-                body: "Companies House checks plus manual approval before jobs go live.",
+                title: "Gap-friendly employers",
+                body: "Browse companies that explicitly welcome non-linear careers and return-to-work journeys.",
               },
               {
-                title: "Career gaps welcomed",
-                body: "Profiles make space for returners — not a stigma to hide.",
+                title: "Verified UK employers",
+                body: "Companies House checks plus manual approval before jobs go live.",
               },
               {
                 title: "Simple and secure",
@@ -146,57 +159,82 @@ export default async function HomePage() {
           </ul>
         </section>
 
-        <section className="border-t border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
-          <div className="mx-auto max-w-6xl px-6">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-                Featured jobs
-              </h2>
-              <Link href="/jobs" className="text-sm font-semibold text-brand underline">
-                View all
-              </Link>
-            </div>
-            <ul className="mt-8 space-y-4">
-              {featured.length === 0 ? (
-                <li className="text-[color:var(--foreground)]/70">
-                  Published roles will appear here once employers are approved.
-                </li>
-              ) : (
-                featured.map((job) => (
-                  <li key={job.id}>
-                    <Link
-                      href={`/jobs/${job.slug}`}
-                      className="block rounded-md border border-[color:var(--line)] bg-white/70 p-5 transition hover:bg-white"
-                    >
-                      <h3 className="font-semibold text-brand">{job.title}</h3>
-                      <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
-                        {job.companyName} · {job.location}
-                      </p>
-                    </Link>
-                  </li>
-                ))
-              )}
-            </ul>
+        <section className="border-y border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
+          <div className="mx-auto max-w-3xl px-6 text-center">
+            <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand md:text-4xl">
+              Untapped talent is still talent.
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-[color:var(--foreground)]/80">
+              Hire skills-first. Build loyalty. Reach experienced candidates
+              other platforms overlook. Project Horizon connects you with
+              professionals ready to bring depth, perspective, and commitment to
+              your team.
+            </p>
+            <Link
+              href="/register"
+              className="btn-primary mt-8 inline-block rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              Hire returners
+            </Link>
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-6 py-16 text-center">
-          <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-            Ready to return — or to hire returners?
-          </h2>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/register"
-              className="rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white"
-            >
-              Create an account
+        <section className="mx-auto max-w-6xl px-6 py-16">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
+              Featured jobs
+            </h2>
+            <Link href="/jobs" className="text-sm font-semibold text-brand underline">
+              View all
             </Link>
-            <Link
-              href="/about"
-              className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-3 text-sm font-semibold text-brand"
-            >
-              About Horizon
-            </Link>
+          </div>
+          <ul className="mt-8 space-y-4">
+            {featured.length === 0 ? (
+              <li className="text-[color:var(--foreground)]/70">
+                Published roles will appear here once employers are approved.
+              </li>
+            ) : (
+              featured.map((job) => (
+                <li key={job.id}>
+                  <Link
+                    href={`/jobs/${job.slug}`}
+                    className="block rounded-md border border-[color:var(--line)] bg-white/70 p-5 transition hover:bg-white"
+                  >
+                    <h3 className="font-semibold text-brand">{job.title}</h3>
+                    <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
+                      {job.companyName} · {job.location}
+                    </p>
+                  </Link>
+                </li>
+              ))
+            )}
+          </ul>
+        </section>
+
+        <section className="border-t border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
+          <div className="mx-auto max-w-3xl px-6 text-center">
+            <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand md:text-4xl">
+              A better way back into work.
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-[color:var(--foreground)]/80">
+              Whatever your story, your next chapter starts here. It&apos;s free
+              to join, and there&apos;s no pressure to move at anyone&apos;s pace
+              but your own.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/register"
+                className="btn-primary rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+              >
+                Create your profile
+              </Link>
+              <Link
+                href="/about"
+                className="rounded-md border border-[color:var(--line)] bg-white/70 px-5 py-3 text-sm font-semibold text-brand transition hover:bg-white"
+              >
+                Browse resources
+              </Link>
+            </div>
           </div>
         </section>
       </main>
