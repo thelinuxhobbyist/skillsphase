@@ -67,6 +67,9 @@ export default async function AdminDashboardPage() {
           <Link href="/admin/audit" className="underline">
             Audit
           </Link>
+          <Link href="/admin/homepage" className="underline">
+            Homepage
+          </Link>
           <Link href="/admin/reports" className="underline">
             Reports
           </Link>

@@ -1,5 +1,7 @@
 const DEFAULT_API_BASE = "http://localhost:8787/api/v1";
 
+import type { HomepageSectionType } from "@horizon/shared";
+
 export type ApiSuccess<T> = {
   success: true;
   data: T;
@@ -638,6 +640,77 @@ export function updateApplicationStatus(
 
 export function applicationCvUrl(id: string) {
   return `${getApiBaseUrl()}/applications/${id}/cv`;
+}
+
+export type HomepageSectionDto = {
+  id: string;
+  type: HomepageSectionType;
+  enabled: boolean;
+  sortOrder: number;
+  label: string;
+  content: Record<string, unknown>;
+};
+
+export async function getHomepageContent() {
+  return apiFetch<{
+    source: "database" | "defaults";
+    sections: HomepageSectionDto[];
+  }>("/content/homepage");
+}
+
+export function listAdminHomepageSections(token: string) {
+  return apiFetch<{ sections: HomepageSectionDto[] }>("/admin/homepage", {
+    token,
+  });
+}
+
+export function updateAdminHomepageSection(
+  token: string,
+  id: string,
+  body: {
+    enabled?: boolean;
+    label?: string;
+    content?: Record<string, unknown>;
+  },
+) {
+  return apiFetch<HomepageSectionDto>(`/admin/homepage/${id}`, {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export function reorderAdminHomepageSections(token: string, orderedIds: string[]) {
+  return apiFetch<{ sections: HomepageSectionDto[] }>("/admin/homepage/reorder", {
+    method: "PATCH",
+    token,
+    body: JSON.stringify({ orderedIds }),
+  });
+}
+
+export function createAdminHomepageSection(
+  token: string,
+  body: { type: string; label?: string; enabled?: boolean },
+) {
+  return apiFetch<HomepageSectionDto>("/admin/homepage", {
+    method: "POST",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export function deleteAdminHomepageSection(token: string, id: string) {
+  return apiFetch<{ deleted: boolean; id: string }>(`/admin/homepage/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export function resetAdminHomepageSections(token: string) {
+  return apiFetch<{ sections: HomepageSectionDto[] }>("/admin/homepage/reset", {
+    method: "POST",
+    token,
+  });
 }
 
 export async function uploadCv(token: string, file: File) {

@@ -40,6 +40,7 @@ function RoleNav({ user }: { user: HorizonUser | null }) {
               { href: "/admin/users", label: "Users" },
               { href: "/admin/jobs", label: "Jobs" },
               { href: "/admin/audit", label: "Audit" },
+              { href: "/admin/homepage", label: "Homepage" },
               { href: "/admin/reports", label: "Reports" },
             ]
           : PUBLIC_LINKS;

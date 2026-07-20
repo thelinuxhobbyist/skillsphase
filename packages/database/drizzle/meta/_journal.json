@@ -15,6 +15,13 @@
       "when": 1784490000000,
       "tag": "0001_user_suspended",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784500000000,
+      "tag": "0002_homepage_sections",
+      "breakpoints": true
     }
   ]
 }
