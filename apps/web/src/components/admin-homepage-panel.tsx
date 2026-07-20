@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAdminToken } from "@/lib/use-admin-token";
 import {
   HOMEPAGE_SECTION_LABELS,
   HOMEPAGE_SECTION_TYPES,
@@ -28,7 +28,7 @@ export function AdminHomepagePanel({
   databaseConfigured: boolean;
   errorMessage?: string | null;
 }) {
-  const { getToken } = useAuth();
+  const { getToken } = useAdminToken();
   const router = useRouter();
   const [sections, setSections] = useState(initialSections);
   const [editingId, setEditingId] = useState<string | null>(null);

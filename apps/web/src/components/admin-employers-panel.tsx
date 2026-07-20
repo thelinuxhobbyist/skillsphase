@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAdminToken } from "@/lib/use-admin-token";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -14,7 +14,7 @@ export function AdminEmployersPanel({
 }: {
   employers: AdminEmployer[];
 }) {
-  const { getToken } = useAuth();
+  const { getToken } = useAdminToken();
   const router = useRouter();
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>(
     {},

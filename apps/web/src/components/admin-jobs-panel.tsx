@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAdminToken } from "@/lib/use-admin-token";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,7 +12,7 @@ import {
 } from "@/lib/api";
 
 export function AdminJobsPanel({ jobs }: { jobs: HorizonJob[] }) {
-  const { getToken } = useAuth();
+  const { getToken } = useAdminToken();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<number | null>(null);

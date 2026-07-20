@@ -70,6 +70,21 @@ userRoutes.post("/me/bootstrap", async (c) => {
   }
 
   const body = await c.req.json().catch(() => ({}));
+
+  if (
+    body &&
+    typeof body === "object" &&
+    "role" in body &&
+    (body as { role?: unknown }).role === "admin"
+  ) {
+    return fail(
+      c,
+      "FORBIDDEN",
+      "Administrator accounts cannot be created through public registration.",
+      403,
+    );
+  }
+
   const parsedBody = bootstrapRoleSchema.safeParse(body);
 
   const clerkUser = await loadClerkProfile(c);

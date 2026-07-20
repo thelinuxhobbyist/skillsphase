@@ -38,10 +38,12 @@ function RoleNav({ user }: { user: HorizonUser | null }) {
               { href: "/admin", label: "Dashboard" },
               { href: "/admin/employers", label: "Employers" },
               { href: "/admin/users", label: "Users" },
+              { href: "/admin/staff", label: "Admins" },
               { href: "/admin/jobs", label: "Jobs" },
               { href: "/admin/audit", label: "Audit" },
               { href: "/admin/homepage", label: "Homepage" },
               { href: "/admin/reports", label: "Reports" },
+              { href: "/admin/account", label: "Account" },
             ]
           : PUBLIC_LINKS;
 

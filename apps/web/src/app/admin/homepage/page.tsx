@@ -1,24 +1,11 @@
 import { AdminHomepagePanel } from "@/components/admin-homepage-panel";
-import { SiteHeader } from "@/components/site-header";
-import { auth } from "@clerk/nextjs/server";
+import { AdminHeader } from "@/components/admin-header";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { ApiRequestError, getCurrentUser, listAdminHomepageSections } from "@/lib/api";
-import { dashboardPathForRole } from "@/lib/roles";
+import { ApiRequestError, listAdminHomepageSections } from "@/lib/api";
+import { requireAdminPage } from "@/lib/require-admin";
 
 export default async function AdminHomepagePage() {
-  const { userId, getToken } = await auth();
-  if (!userId) redirect("/login");
-  const token = await getToken();
-  if (!token) redirect("/onboarding");
-
-  let user;
-  try {
-    user = await getCurrentUser(token);
-  } catch {
-    redirect("/onboarding");
-  }
-  if (user.role !== "admin") redirect(dashboardPathForRole(user.role));
+  const { token } = await requireAdminPage();
 
   let sections: Awaited<
     ReturnType<typeof listAdminHomepageSections>
@@ -41,7 +28,7 @@ export default async function AdminHomepagePage() {
 
   return (
     <>
-      <SiteHeader />
+      <AdminHeader />
       <main className="mx-auto max-w-4xl px-6 py-12">
         <Link href="/admin" className="text-sm text-brand underline">
           ← Back to dashboard

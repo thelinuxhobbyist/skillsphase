@@ -14,5 +14,7 @@ export type AppEnv = {
     requestId: string;
     clerkUserId?: string;
     appUser?: AppUser;
+    adminSessionToken?: string;
+    adminSessionId?: string;
   };
 };

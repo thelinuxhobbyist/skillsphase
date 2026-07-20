@@ -37,6 +37,10 @@ export type PublicUser = {
   cvUrl: string | null;
   cvFileName: string | null;
   profileCompleted: boolean;
+  isRootAdmin: boolean;
+  adminRole: string | null;
+  adminPermissions: string[] | null;
+  lastAdminLoginAt: string | null;
   suspendedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -64,6 +68,10 @@ export function toPublicUser(user: AppUser): PublicUser {
     cvUrl: user.cvUrl,
     cvFileName: user.cvFileName,
     profileCompleted: user.profileCompleted,
+    isRootAdmin: user.isRootAdmin,
+    adminRole: user.adminRole,
+    adminPermissions: user.adminPermissions ?? null,
+    lastAdminLoginAt: user.lastAdminLoginAt?.toISOString() ?? null,
     suspendedAt: user.suspendedAt?.toISOString() ?? null,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
@@ -131,6 +139,119 @@ export async function createAppUser(
   }
 
   return created;
+}
+
+/** Provision an administrator row — never callable from public bootstrap. */
+export async function createAdminAppUser(
+  db: Database,
+  input: {
+    clerkUserId: string;
+    email: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    isRootAdmin?: boolean;
+    adminRole?: string | null;
+    adminPermissions?: string[] | null;
+    passwordHash: string;
+  },
+): Promise<AppUser> {
+  const isRoot = input.isRootAdmin ?? false;
+  const [created] = await db
+    .insert(users)
+    .values({
+      clerkUserId: input.clerkUserId,
+      role: "admin",
+      email: input.email.toLowerCase(),
+      firstName: input.firstName ?? null,
+      lastName: input.lastName ?? null,
+      profileCompleted: true,
+      isRootAdmin: isRoot,
+      adminRole: isRoot ? "root" : (input.adminRole ?? "admin"),
+      adminPermissions: input.adminPermissions ?? null,
+      passwordHash: input.passwordHash,
+    })
+    .returning();
+
+  if (!created) {
+    throw new Error("Failed to create admin user");
+  }
+
+  return created;
+}
+
+export async function updateAdminStaff(
+  db: Database,
+  userId: string,
+  input: {
+    email?: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    isRootAdmin?: boolean;
+    adminRole?: string | null;
+    adminPermissions?: string[] | null;
+    passwordHash?: string;
+  },
+): Promise<AppUser | null> {
+  const [updated] = await db
+    .update(users)
+    .set({
+      ...(input.email !== undefined
+        ? { email: input.email.toLowerCase() }
+        : {}),
+      ...(input.firstName !== undefined ? { firstName: input.firstName } : {}),
+      ...(input.lastName !== undefined ? { lastName: input.lastName } : {}),
+      ...(input.isRootAdmin !== undefined
+        ? { isRootAdmin: input.isRootAdmin }
+        : {}),
+      ...(input.adminRole !== undefined ? { adminRole: input.adminRole } : {}),
+      ...(input.adminPermissions !== undefined
+        ? { adminPermissions: input.adminPermissions }
+        : {}),
+      ...(input.passwordHash !== undefined
+        ? { passwordHash: input.passwordHash }
+        : {}),
+      updatedAt: new Date(),
+    })
+    .where(
+      and(eq(users.id, userId), eq(users.role, "admin"), isNull(users.deletedAt)),
+    )
+    .returning();
+  return updated ?? null;
+}
+
+export async function countRootAdmins(db: Database): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(users)
+    .where(
+      and(
+        eq(users.role, "admin"),
+        eq(users.isRootAdmin, true),
+        isNull(users.deletedAt),
+      ),
+    );
+  return Number(row?.value ?? 0);
+}
+
+export async function touchAdminLogin(db: Database, userId: string) {
+  const [updated] = await db
+    .update(users)
+    .set({ lastAdminLoginAt: new Date(), updatedAt: new Date() })
+    .where(eq(users.id, userId))
+    .returning();
+  return updated ?? null;
+}
+
+export async function findUserByEmail(
+  db: Database,
+  email: string,
+): Promise<AppUser | null> {
+  const [row] = await db
+    .select()
+    .from(users)
+    .where(and(eq(users.email, email.toLowerCase()), isNull(users.deletedAt)))
+    .limit(1);
+  return row ?? null;
 }
 
 export function isProfileComplete(input: {

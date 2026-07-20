@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAdminToken } from "@/lib/use-admin-token";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ApiRequestError, createJob, type AdminEmployer } from "@/lib/api";
@@ -10,7 +10,7 @@ export function AdminJobCreateForm({
 }: {
   companies: AdminEmployer[];
 }) {
-  const { getToken } = useAuth();
+  const { getToken } = useAdminToken();
   const router = useRouter();
   const [companyId, setCompanyId] = useState(companies[0]?.id ?? "");
   const [title, setTitle] = useState("");

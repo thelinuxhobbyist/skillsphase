@@ -1,49 +1,78 @@
-import { createClerkClient } from "@clerk/backend";
 import {
   adminRemoveJob,
   countPendingApplications,
   countPublishedJobs,
   countUsersByRole,
+  createAdminAppUser,
+  deleteAdminSessionsForUser,
   findCompanyById,
   findJobById,
+  findUserByEmail,
   findUserById,
   listAdminLogs,
   listCompaniesForAdmin,
   listJobsForAdmin,
   listRecentAdminLogs,
-  listRecentUsers,
   listUsersForAdmin,
   reactivateAppUser,
+  setAdminPasswordHash,
   softDeleteAppUser,
   suspendAppUser,
   toAdminUserView,
   toPublicCompany,
   toPublicJob,
+  touchAdminLogin,
+  updateAdminStaff,
   updateCompany,
   writeAdminLog,
 } from "@horizon/database";
 import {
   adminEmployerActionSchema,
   adminUserActionSchema,
+  createAdminStaffSchema,
+  resetAdminPasswordSchema,
+  updateAdminStaffSchema,
   USER_ROLES,
   VERIFICATION_STATUSES,
 } from "@horizon/shared";
 import { Hono } from "hono";
 import type { AppEnv } from "../env";
+import { staffCan, wouldRemoveLastRootAdmin } from "../lib/admin-guard";
+import { hashPassword } from "../lib/admin-crypto";
 import { getDb } from "../lib/db";
 import { employerApprovalEmailHtml, sendEmail } from "../lib/email";
+import { requireAdminAuth } from "../lib/require-admin-auth";
 import { fail, ok } from "../lib/response";
-import {
-  requireAppUser,
-  requireClerkAuth,
-  requireRoles,
-} from "../middleware/auth";
+import { adminAuthRoutes } from "./admin-auth";
 
 export const adminRoutes = new Hono<AppEnv>();
 
-adminRoutes.use("*", requireClerkAuth, requireAppUser, requireRoles("admin"));
+adminRoutes.route("/auth", adminAuthRoutes);
 
-adminRoutes.get("/dashboard", async (c) => {
+const secured = new Hono<AppEnv>();
+secured.use("*", requireAdminAuth);
+
+secured.post("/session", async (c) => {
+  const admin = c.get("appUser");
+  if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  const db = getDb(c);
+  const updated = await touchAdminLogin(db, admin.id);
+
+  const last = admin.lastAdminLoginAt?.getTime() ?? 0;
+  const twelveHours = 12 * 60 * 60 * 1000;
+  if (Date.now() - last > twelveHours) {
+    await writeAdminLog(db, {
+      adminUserId: admin.id,
+      action: "Admin Login",
+      entity: "user",
+      entityId: admin.id,
+    });
+  }
+
+  return ok(c, toAdminUserView(updated ?? admin));
+});
+
+secured.get("/dashboard", async (c) => {
   const db = getDb(c);
   const employers = await listCompaniesForAdmin(db);
   const pending = employers.filter((e) => e.verificationStatus === "pending_review");
@@ -51,13 +80,11 @@ adminRoutes.get("/dashboard", async (c) => {
     activeJobs,
     totalJobSeekers,
     pendingApplications,
-    recentUsers,
     recentActions,
   ] = await Promise.all([
     countPublishedJobs(db),
     countUsersByRole(db, "job_seeker"),
     countPendingApplications(db),
-    listRecentUsers(db, 8),
     listRecentAdminLogs(db, 8),
   ]);
 
@@ -69,12 +96,11 @@ adminRoutes.get("/dashboard", async (c) => {
     activeJobs,
     totalJobSeekers,
     pendingApplications,
-    recentUsers,
     recentActions,
   });
 });
 
-adminRoutes.get("/reports", async (c) => {
+secured.get("/reports", async (c) => {
   const db = getDb(c);
   const employers = await listCompaniesForAdmin(db);
   return ok(c, {
@@ -91,7 +117,7 @@ adminRoutes.get("/reports", async (c) => {
   });
 });
 
-adminRoutes.get("/employers", async (c) => {
+secured.get("/employers", async (c) => {
   const statusParam = c.req.query("status");
   const status =
     statusParam &&
@@ -99,15 +125,21 @@ adminRoutes.get("/employers", async (c) => {
       ? (statusParam as (typeof VERIFICATION_STATUSES)[number])
       : undefined;
 
-  const db = getDb(c);
-  const employers = await listCompaniesForAdmin(db, status);
-  return ok(c, employers);
+  return ok(c, await listCompaniesForAdmin(getDb(c), status));
 });
 
-adminRoutes.patch("/employers/:id", async (c) => {
+secured.patch("/employers/:id", async (c) => {
   const admin = c.get("appUser");
   if (!admin) {
     return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  }
+  if (!staffCan(admin, "manage_employers")) {
+    return fail(
+      c,
+      "FORBIDDEN",
+      "You do not have permission to manage employers.",
+      403,
+    );
   }
 
   const body = await c.req.json().catch(() => null);
@@ -187,7 +219,7 @@ adminRoutes.patch("/employers/:id", async (c) => {
   return ok(c, toPublicCompany(updated));
 });
 
-adminRoutes.get("/users", async (c) => {
+secured.get("/users", async (c) => {
   const roleParam = c.req.query("role");
   const q = c.req.query("q") ?? undefined;
   const role =
@@ -198,9 +230,12 @@ adminRoutes.get("/users", async (c) => {
   return ok(c, await listUsersForAdmin(getDb(c), { role, q }));
 });
 
-adminRoutes.patch("/users/:id", async (c) => {
+secured.patch("/users/:id", async (c) => {
   const admin = c.get("appUser");
   if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  if (!staffCan(admin, "manage_users")) {
+    return fail(c, "FORBIDDEN", "You do not have permission to manage users.", 403);
+  }
 
   const body = await c.req.json().catch(() => null);
   const parsed = adminUserActionSchema.safeParse(body);
@@ -228,9 +263,36 @@ adminRoutes.patch("/users/:id", async (c) => {
     );
   }
 
+  if (
+    target.role === "admin" &&
+    (parsed.data.action === "suspend" || parsed.data.action === "delete")
+  ) {
+    if (!staffCan(admin, "manage_admins")) {
+      return fail(
+        c,
+        "FORBIDDEN",
+        "You do not have permission to manage administrators.",
+        403,
+      );
+    }
+    if (
+      await wouldRemoveLastRootAdmin(db, target, { deleteOrSuspend: true })
+    ) {
+      return fail(
+        c,
+        "LAST_ROOT_ADMIN",
+        "Cannot suspend or delete the last Root Administrator.",
+        403,
+      );
+    }
+  }
+
   if (parsed.data.action === "suspend") {
     const updated = await suspendAppUser(db, target.id);
     if (!updated) return fail(c, "USER_NOT_FOUND", "User not found.", 404);
+    if (target.role === "admin") {
+      await deleteAdminSessionsForUser(db, target.id);
+    }
     await writeAdminLog(db, {
       adminUserId: admin.id,
       action: "User Suspended",
@@ -253,23 +315,28 @@ adminRoutes.patch("/users/:id", async (c) => {
   }
 
   await softDeleteAppUser(db, target.id);
-  try {
-    const clerk = createClerkClient({
-      secretKey: c.env.CLERK_SECRET_KEY,
-      publishableKey: c.env.CLERK_PUBLISHABLE_KEY,
-    });
-    await clerk.users.deleteUser(target.clerkUserId);
-  } catch (error) {
-    console.error(
-      JSON.stringify({
-        level: "error",
-        requestId: c.get("requestId"),
-        message:
-          error instanceof Error
-            ? error.message
-            : "failed_to_delete_clerk_user",
-      }),
-    );
+  if (target.role === "admin") {
+    await deleteAdminSessionsForUser(db, target.id);
+  } else if (!target.clerkUserId.startsWith("local-admin:")) {
+    try {
+      const { createClerkClient } = await import("@clerk/backend");
+      const clerk = createClerkClient({
+        secretKey: c.env.CLERK_SECRET_KEY,
+        publishableKey: c.env.CLERK_PUBLISHABLE_KEY,
+      });
+      await clerk.users.deleteUser(target.clerkUserId);
+    } catch (error) {
+      console.error(
+        JSON.stringify({
+          level: "error",
+          requestId: c.get("requestId"),
+          message:
+            error instanceof Error
+              ? error.message
+              : "failed_to_delete_clerk_user",
+        }),
+      );
+    }
   }
 
   await writeAdminLog(db, {
@@ -282,18 +349,260 @@ adminRoutes.patch("/users/:id", async (c) => {
   return ok(c, { deleted: true, id: target.id });
 });
 
-adminRoutes.get("/audit", async (c) => {
+secured.get("/staff", async (c) => {
+  const admin = c.get("appUser");
+  if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  if (!staffCan(admin, "manage_admins") && !staffCan(admin, "view_audit")) {
+    return fail(
+      c,
+      "FORBIDDEN",
+      "You do not have permission to view administrators.",
+      403,
+    );
+  }
+
+  const q = c.req.query("q") ?? undefined;
+  const staff = await listUsersForAdmin(getDb(c), { role: "admin", q });
+  return ok(c, staff);
+});
+
+secured.post("/staff", async (c) => {
+  const admin = c.get("appUser");
+  if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  if (!staffCan(admin, "manage_admins")) {
+    return fail(
+      c,
+      "FORBIDDEN",
+      "Only Root Administrators can create administrator accounts.",
+      403,
+    );
+  }
+
+  const body = await c.req.json().catch(() => null);
+  const parsed = createAdminStaffSchema.safeParse(body);
+  if (!parsed.success) {
+    return fail(
+      c,
+      "VALIDATION_ERROR",
+      parsed.error.issues[0]?.message ?? "Invalid administrator payload.",
+      400,
+    );
+  }
+
+  if (parsed.data.isRootAdmin && !admin.isRootAdmin) {
+    return fail(
+      c,
+      "FORBIDDEN",
+      "Only a Root Administrator can create another Root Administrator.",
+      403,
+    );
+  }
+
+  const db = getDb(c);
+  const email = parsed.data.email.toLowerCase();
+  const existing = await findUserByEmail(db, email);
+  if (existing) {
+    return fail(
+      c,
+      "EMAIL_IN_USE",
+      "An account with this email already exists.",
+      409,
+    );
+  }
+
+  try {
+    const passwordHash = await hashPassword(parsed.data.password);
+    const created = await createAdminAppUser(db, {
+      clerkUserId: `local-admin:${crypto.randomUUID()}`,
+      email,
+      firstName: parsed.data.firstName ?? null,
+      lastName: parsed.data.lastName ?? null,
+      isRootAdmin: parsed.data.isRootAdmin ?? false,
+      adminRole: parsed.data.isRootAdmin ? "root" : parsed.data.adminRole,
+      adminPermissions: parsed.data.permissions ?? null,
+      passwordHash,
+    });
+
+    await writeAdminLog(db, {
+      adminUserId: admin.id,
+      action: "Admin Created",
+      entity: "user",
+      entityId: created.id,
+      notes: `${email} (${created.adminRole ?? "admin"})`,
+    });
+
+    return ok(c, toAdminUserView(created), 201);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to create admin row.";
+    return fail(c, "ADMIN_CREATE_FAILED", message, 500);
+  }
+});
+
+secured.patch("/staff/:id", async (c) => {
+  const admin = c.get("appUser");
+  if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  if (!staffCan(admin, "manage_admins")) {
+    return fail(
+      c,
+      "FORBIDDEN",
+      "You do not have permission to manage administrators.",
+      403,
+    );
+  }
+
+  const body = await c.req.json().catch(() => null);
+  const parsed = updateAdminStaffSchema.safeParse(body);
+  if (!parsed.success) {
+    return fail(
+      c,
+      "VALIDATION_ERROR",
+      parsed.error.issues[0]?.message ?? "Invalid update.",
+      400,
+    );
+  }
+
+  const db = getDb(c);
+  const target = await findUserById(db, c.req.param("id"));
+  if (!target || target.role !== "admin") {
+    return fail(c, "USER_NOT_FOUND", "Administrator not found.", 404);
+  }
+
+  const nextIsRoot =
+    parsed.data.isRootAdmin ??
+    (parsed.data.adminRole === "root" ? true : undefined);
+
+  if (
+    nextIsRoot === false ||
+    (parsed.data.adminRole &&
+      parsed.data.adminRole !== "root" &&
+      target.isRootAdmin)
+  ) {
+    if (
+      await wouldRemoveLastRootAdmin(db, target, {
+        isRootAdmin: false,
+      })
+    ) {
+      return fail(
+        c,
+        "LAST_ROOT_ADMIN",
+        "Cannot demote the last Root Administrator.",
+        403,
+      );
+    }
+  }
+
+  if (
+    (parsed.data.isRootAdmin === true || parsed.data.adminRole === "root") &&
+    !admin.isRootAdmin
+  ) {
+    return fail(
+      c,
+      "FORBIDDEN",
+      "Only a Root Administrator can grant Root Administrator.",
+      403,
+    );
+  }
+
+  if (parsed.data.email && parsed.data.email.toLowerCase() !== target.email) {
+    const clash = await findUserByEmail(db, parsed.data.email);
+    if (clash && clash.id !== target.id) {
+      return fail(c, "EMAIL_IN_USE", "That email is already in use.", 409);
+    }
+  }
+
+  const isRootAdmin =
+    nextIsRoot ??
+    (parsed.data.adminRole === "root" ? true : target.isRootAdmin);
+  const adminRole = isRootAdmin
+    ? "root"
+    : (parsed.data.adminRole ?? target.adminRole ?? "admin");
+
+  const updated = await updateAdminStaff(db, target.id, {
+    email: parsed.data.email?.toLowerCase(),
+    firstName: parsed.data.firstName,
+    lastName: parsed.data.lastName,
+    isRootAdmin,
+    adminRole: adminRole === "root" ? "root" : adminRole,
+    adminPermissions: parsed.data.permissions,
+  });
+
+  if (!updated) {
+    return fail(c, "USER_NOT_FOUND", "Administrator not found.", 404);
+  }
+
+  await writeAdminLog(db, {
+    adminUserId: admin.id,
+    action: "Admin Updated",
+    entity: "user",
+    entityId: target.id,
+    notes: JSON.stringify(parsed.data),
+  });
+
+  return ok(c, toAdminUserView(updated));
+});
+
+secured.post("/staff/:id/reset-password", async (c) => {
+  const admin = c.get("appUser");
+  if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  if (!staffCan(admin, "manage_admins")) {
+    return fail(
+      c,
+      "FORBIDDEN",
+      "You do not have permission to reset administrator passwords.",
+      403,
+    );
+  }
+
+  const body = await c.req.json().catch(() => null);
+  const parsed = resetAdminPasswordSchema.safeParse(body);
+  if (!parsed.success) {
+    return fail(
+      c,
+      "VALIDATION_ERROR",
+      parsed.error.issues[0]?.message ?? "Invalid password.",
+      400,
+    );
+  }
+
+  const db = getDb(c);
+  const target = await findUserById(db, c.req.param("id"));
+  if (!target || target.role !== "admin") {
+    return fail(c, "USER_NOT_FOUND", "Administrator not found.", 404);
+  }
+
+  const passwordHash = await hashPassword(parsed.data.password);
+  const updated = await setAdminPasswordHash(db, target.id, passwordHash);
+  if (!updated) {
+    return fail(c, "USER_NOT_FOUND", "Administrator not found.", 404);
+  }
+  await deleteAdminSessionsForUser(db, target.id);
+
+  await writeAdminLog(db, {
+    adminUserId: admin.id,
+    action: "Admin Password Reset",
+    entity: "user",
+    entityId: target.id,
+  });
+
+  return ok(c, { reset: true, id: target.id });
+});
+
+secured.get("/audit", async (c) => {
   return ok(c, await listAdminLogs(getDb(c), 200));
 });
 
-adminRoutes.get("/jobs", async (c) => {
+secured.get("/jobs", async (c) => {
   const jobs = await listJobsForAdmin(getDb(c));
   return ok(c, jobs);
 });
 
-adminRoutes.delete("/jobs/:id", async (c) => {
+secured.delete("/jobs/:id", async (c) => {
   const admin = c.get("appUser");
   if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  if (!staffCan(admin, "manage_jobs")) {
+    return fail(c, "FORBIDDEN", "You do not have permission to manage jobs.", 403);
+  }
 
   const id = Number(c.req.param("id"));
   if (!Number.isFinite(id)) {
@@ -316,3 +625,5 @@ adminRoutes.delete("/jobs/:id", async (c) => {
 
   return ok(c, await toPublicJob(db, removed, existing.companyName));
 });
+
+adminRoutes.route("/", secured);

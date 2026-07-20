@@ -83,6 +83,10 @@ export type HorizonUser = {
   cvUrl: string | null;
   cvFileName: string | null;
   profileCompleted: boolean;
+  isRootAdmin: boolean;
+  adminRole: string | null;
+  adminPermissions: string[] | null;
+  lastAdminLoginAt: string | null;
   suspendedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -117,6 +121,47 @@ export function bootstrapUser(
 
 export function getCurrentUser(token: string) {
   return apiFetch<HorizonUser>("/users/me", { token });
+}
+
+export function getAdminMe(token: string) {
+  return apiFetch<HorizonUser>("/admin/auth/me", { token });
+}
+
+export function adminLogin(email: string, password: string) {
+  return apiFetch<{ token: string; expiresAt: string; user: HorizonUser }>(
+    "/admin/auth/login",
+    {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    },
+  );
+}
+
+export function adminChangePassword(
+  token: string,
+  currentPassword: string,
+  newPassword: string,
+) {
+  return apiFetch<{ changed: boolean }>("/admin/auth/change-password", {
+    method: "POST",
+    token,
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+}
+
+export function adminUpdateProfile(
+  token: string,
+  body: {
+    email?: string;
+    firstName?: string | null;
+    lastName?: string | null;
+  },
+) {
+  return apiFetch<HorizonUser>("/admin/auth/profile", {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(body),
+  });
 }
 
 export function updateCurrentUser(
@@ -255,7 +300,6 @@ export function getAdminDashboard(token: string) {
     activeJobs: number;
     totalJobSeekers: number;
     pendingApplications: number;
-    recentUsers: AdminUser[];
     recentActions: AdminAuditLog[];
   }>("/admin/dashboard", { token });
 }
@@ -284,6 +328,65 @@ export function adminUserAction(
       method: "PATCH",
       token,
       body: JSON.stringify({ action }),
+    },
+  );
+}
+
+export function recordAdminSession(token: string) {
+  return apiFetch<AdminUser>("/admin/session", {
+    method: "POST",
+    token,
+    body: JSON.stringify({}),
+  });
+}
+
+export function listAdminStaff(token: string, q?: string) {
+  const query = q ? `?q=${encodeURIComponent(q)}` : "";
+  return apiFetch<AdminUser[]>(`/admin/staff${query}`, { token });
+}
+
+export function createAdminStaff(
+  token: string,
+  body: {
+    email: string;
+    password: string;
+    firstName?: string;
+    lastName?: string;
+    adminRole?: "admin" | "editor" | "moderator";
+    isRootAdmin?: boolean;
+    permissions?: string[] | null;
+  },
+) {
+  return apiFetch<AdminUser>("/admin/staff", {
+    method: "POST",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export function updateAdminStaffMember(
+  token: string,
+  userId: string,
+  body: Record<string, unknown>,
+) {
+  return apiFetch<AdminUser>(`/admin/staff/${userId}`, {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export function resetAdminStaffPassword(
+  token: string,
+  userId: string,
+  password: string,
+) {
+  return apiFetch<{ reset: boolean; id: string }>(
+    `/admin/staff/${userId}/reset-password`,
+    {
+      method: "POST",
+      token,
+      body: JSON.stringify({ password }),
     },
   );
 }

@@ -9,18 +9,24 @@ const hasClerk =
   secretKey.startsWith("sk_") &&
   !secretKey.includes("...");
 
+/** Admin uses local session cookies — never Clerk. */
+const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
+
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/profile(.*)",
   "/applications(.*)",
   "/settings(.*)",
   "/employer(.*)",
-  "/admin(.*)",
   "/onboarding(.*)",
 ]);
 
 export default hasClerk
   ? clerkMiddleware(async (auth, req) => {
+      if (isAdminRoute(req)) {
+        return NextResponse.next();
+      }
+
       if (isProtectedRoute(req)) {
         await auth.protect();
       }

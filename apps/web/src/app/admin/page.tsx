@@ -1,28 +1,11 @@
 import { AdminEmployersPanel } from "@/components/admin-employers-panel";
-import { SiteHeader } from "@/components/site-header";
-import { auth } from "@clerk/nextjs/server";
+import { AdminHeader } from "@/components/admin-header";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getAdminDashboard, getCurrentUser, listAdminEmployers } from "@/lib/api";
-import { dashboardPathForRole } from "@/lib/roles";
+import { getAdminDashboard, listAdminEmployers } from "@/lib/api";
+import { requireAdminPage } from "@/lib/require-admin";
 
 export default async function AdminDashboardPage() {
-  const { userId, getToken } = await auth();
-  if (!userId) redirect("/login");
-
-  const token = await getToken();
-  if (!token) redirect("/onboarding");
-
-  let user;
-  try {
-    user = await getCurrentUser(token);
-  } catch {
-    redirect("/onboarding");
-  }
-
-  if (user.role !== "admin") {
-    redirect(dashboardPathForRole(user.role));
-  }
+  const { token } = await requireAdminPage();
 
   const [stats, employers] = await Promise.all([
     getAdminDashboard(token),
@@ -31,7 +14,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
-      <SiteHeader />
+      <AdminHeader />
       <main className="mx-auto max-w-5xl px-6 py-12">
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand">
@@ -58,6 +41,9 @@ export default async function AdminDashboardPage() {
           <Link href="/admin/users" className="underline">
             Users
           </Link>
+          <Link href="/admin/staff" className="underline">
+            Administrators
+          </Link>
           <Link href="/admin/jobs" className="underline">
             Jobs
           </Link>
@@ -73,6 +59,9 @@ export default async function AdminDashboardPage() {
           <Link href="/admin/reports" className="underline">
             Reports
           </Link>
+          <Link href="/admin/account" className="underline">
+            Account
+          </Link>
         </nav>
 
         <div className="grid gap-10 lg:grid-cols-2">
@@ -87,21 +76,48 @@ export default async function AdminDashboardPage() {
           <section className="space-y-8">
             <div>
               <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
-                Recent users
+                Find a user
               </h2>
-              <ul className="mt-4 space-y-2 text-sm">
-                {stats.recentUsers.length === 0 ? (
-                  <li className="text-[color:var(--foreground)]/70">None yet.</li>
-                ) : (
-                  stats.recentUsers.map((u) => (
-                    <li key={u.id} className="text-[color:var(--foreground)]/80">
-                      {[u.firstName, u.lastName].filter(Boolean).join(" ") ||
-                        u.email}{" "}
-                      · {u.role.replace("_", " ")}
-                    </li>
-                  ))
-                )}
-              </ul>
+              <p className="mt-2 text-sm text-[color:var(--foreground)]/70">
+                Search by name or email to view, suspend, or remove an account.
+                Accounts are not listed here in bulk.
+              </p>
+              <form
+                action="/admin/users"
+                method="get"
+                className="mt-4 flex flex-wrap gap-2"
+              >
+                <input
+                  name="q"
+                  type="search"
+                  required
+                  minLength={2}
+                  placeholder="Name or email"
+                  className="min-w-[16rem] flex-1 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Search
+                </button>
+              </form>
+            </div>
+            <div>
+              <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
+                Your account
+              </h2>
+              <p className="mt-2 text-sm text-[color:var(--foreground)]/70">
+                Change your password, email, or display name on the account page.
+                That is intentional — profile edits stay separate from day-to-day
+                admin tools.
+              </p>
+              <Link
+                href="/admin/account"
+                className="mt-3 inline-block rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white"
+              >
+                Manage password &amp; profile
+              </Link>
             </div>
             <div>
               <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
@@ -118,6 +134,12 @@ export default async function AdminDashboardPage() {
                   ))
                 )}
               </ul>
+              <Link
+                href="/admin/audit"
+                className="mt-3 inline-block text-sm text-brand underline"
+              >
+                Full audit log
+              </Link>
             </div>
           </section>
         </div>

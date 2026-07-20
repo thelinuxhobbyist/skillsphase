@@ -14,7 +14,8 @@
     "lint": "pnpm -r run lint",
     "db:generate": "pnpm --filter @horizon/database generate",
     "db:migrate": "pnpm --filter @horizon/database migrate",
-    "db:studio": "pnpm --filter @horizon/database studio"
+    "db:studio": "pnpm --filter @horizon/database studio",
+    "admin:create-root": "node apps/api/scripts/create-root-admin.mjs"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

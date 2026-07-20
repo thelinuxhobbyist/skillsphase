@@ -6,6 +6,16 @@ import {
   VERIFICATION_STATUSES,
 } from "../constants";
 
+export const adminPermissionSchema = z.enum([
+  "manage_employers",
+  "manage_users",
+  "manage_jobs",
+  "manage_homepage",
+  "manage_admins",
+  "view_audit",
+  "view_reports",
+]);
+
 export const apiSuccessSchema = z.object({
   success: z.literal(true),
   data: z.unknown(),
@@ -148,6 +158,29 @@ export const adminEmployerActionSchema = z.object({
 
 export const adminUserActionSchema = z.object({
   action: z.enum(["suspend", "reactivate", "delete"]),
+});
+
+export const createAdminStaffSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(128),
+  firstName: z.string().trim().min(1).max(100).optional(),
+  lastName: z.string().trim().min(1).max(100).optional(),
+  adminRole: z.enum(["admin", "editor", "moderator"]).default("admin"),
+  isRootAdmin: z.boolean().optional().default(false),
+  permissions: z.array(adminPermissionSchema).optional().nullable(),
+});
+
+export const updateAdminStaffSchema = z.object({
+  email: z.string().email().optional(),
+  firstName: z.string().trim().min(1).max(100).optional().nullable(),
+  lastName: z.string().trim().min(1).max(100).optional().nullable(),
+  adminRole: z.enum(["admin", "editor", "moderator", "root"]).optional(),
+  isRootAdmin: z.boolean().optional(),
+  permissions: z.array(adminPermissionSchema).optional().nullable(),
+});
+
+export const resetAdminPasswordSchema = z.object({
+  password: z.string().min(8).max(128),
 });
 
 export const roleSchema = z.enum(USER_ROLES);

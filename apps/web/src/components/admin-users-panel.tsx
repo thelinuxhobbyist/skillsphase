@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAdminToken } from "@/lib/use-admin-token";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -10,7 +10,7 @@ import {
 } from "@/lib/api";
 
 export function AdminUsersPanel({ users }: { users: AdminUser[] }) {
-  const { getToken } = useAuth();
+  const { getToken } = useAdminToken();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);

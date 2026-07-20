@@ -1,30 +1,16 @@
 import { AdminJobsPanel } from "@/components/admin-jobs-panel";
-import { SiteHeader } from "@/components/site-header";
-import { auth } from "@clerk/nextjs/server";
+import { AdminHeader } from "@/components/admin-header";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getCurrentUser, listAdminJobs } from "@/lib/api";
-import { dashboardPathForRole } from "@/lib/roles";
+import { listAdminJobs } from "@/lib/api";
+import { requireAdminPage } from "@/lib/require-admin";
 
 export default async function AdminJobsPage() {
-  const { userId, getToken } = await auth();
-  if (!userId) redirect("/login");
-  const token = await getToken();
-  if (!token) redirect("/onboarding");
-
-  let user;
-  try {
-    user = await getCurrentUser(token);
-  } catch {
-    redirect("/onboarding");
-  }
-  if (user.role !== "admin") redirect(dashboardPathForRole(user.role));
-
+  const { token } = await requireAdminPage();
   const jobs = await listAdminJobs(token);
 
   return (
     <>
-      <SiteHeader />
+      <AdminHeader />
       <main className="mx-auto max-w-4xl px-6 py-12">
         <Link href="/admin" className="text-sm text-brand underline">
           ← Back to dashboard

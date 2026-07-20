@@ -18,12 +18,8 @@ import {
 import { Hono } from "hono";
 import type { AppEnv } from "../env";
 import { getDb } from "../lib/db";
+import { requireAdminAuth } from "../lib/require-admin-auth";
 import { fail, ok } from "../lib/response";
-import {
-  requireAppUser,
-  requireClerkAuth,
-  requireRoles,
-} from "../middleware/auth";
 
 /** Public homepage template (enabled sections only). Falls back to defaults without DB. */
 export const contentRoutes = new Hono<AppEnv>();
@@ -50,12 +46,7 @@ contentRoutes.get("/homepage", async (c) => {
 /** Admin homepage CMS */
 export const adminHomepageRoutes = new Hono<AppEnv>();
 
-adminHomepageRoutes.use(
-  "*",
-  requireClerkAuth,
-  requireAppUser,
-  requireRoles("admin"),
-);
+adminHomepageRoutes.use("*", requireAdminAuth);
 
 adminHomepageRoutes.get("/", async (c) => {
   if (!c.env.DATABASE_URL) {
