@@ -46,6 +46,35 @@ export async function createEmploymentHistory(
   return row;
 }
 
+export async function updateEmploymentHistory(
+  db: Database,
+  userId: string,
+  id: string,
+  input: {
+    employerName: string;
+    jobTitle: string;
+    startDate: string;
+    endDate?: string | null;
+    currentlyWorking?: boolean;
+    description?: string | null;
+  },
+) {
+  const [row] = await db
+    .update(employmentHistory)
+    .set({
+      employerName: input.employerName,
+      jobTitle: input.jobTitle,
+      startDate: input.startDate,
+      endDate: input.endDate ?? null,
+      currentlyWorking: input.currentlyWorking ?? false,
+      description: input.description ?? null,
+    })
+    .where(and(eq(employmentHistory.id, id), eq(employmentHistory.userId, userId)))
+    .returning();
+  if (!row) throw new Error("Employment history not found");
+  return row;
+}
+
 export async function deleteEmploymentHistory(
   db: Database,
   userId: string,
@@ -90,6 +119,33 @@ export async function createEducation(
   return row;
 }
 
+export async function updateEducation(
+  db: Database,
+  userId: string,
+  id: string,
+  input: {
+    institution: string;
+    qualification: string;
+    startDate: string;
+    endDate?: string | null;
+    description?: string | null;
+  },
+) {
+  const [row] = await db
+    .update(education)
+    .set({
+      institution: input.institution,
+      qualification: input.qualification,
+      startDate: input.startDate,
+      endDate: input.endDate ?? null,
+      description: input.description ?? null,
+    })
+    .where(and(eq(education.id, id), eq(education.userId, userId)))
+    .returning();
+  if (!row) throw new Error("Education not found");
+  return row;
+}
+
 export async function deleteEducation(db: Database, userId: string, id: string) {
   await db
     .delete(education)
@@ -125,6 +181,31 @@ export async function createQualification(
     })
     .returning();
   if (!row) throw new Error("Failed to create qualification");
+  return row;
+}
+
+export async function updateQualification(
+  db: Database,
+  userId: string,
+  id: string,
+  input: {
+    name: string;
+    issuingBody?: string | null;
+    dateAwarded?: string | null;
+    description?: string | null;
+  },
+) {
+  const [row] = await db
+    .update(qualifications)
+    .set({
+      name: input.name,
+      issuingBody: input.issuingBody ?? null,
+      dateAwarded: input.dateAwarded ?? null,
+      description: input.description ?? null,
+    })
+    .where(and(eq(qualifications.id, id), eq(qualifications.userId, userId)))
+    .returning();
+  if (!row) throw new Error("Qualification not found");
   return row;
 }
 
@@ -214,7 +295,7 @@ export async function setUserSkillsByName(
 export async function updateUserCv(
   db: Database,
   userId: string,
-  input: { cvUrl: string; cvFileName: string },
+  input: { cvUrl: string | null; cvFileName: string | null },
 ) {
   const [updated] = await db
     .update(users)

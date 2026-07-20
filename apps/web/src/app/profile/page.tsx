@@ -31,11 +31,11 @@ export default async function ProfilePage() {
         ← Back to dashboard
       </Link>
       <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
-        My profile
+        Your profile
       </h1>
       <p className="mt-2 mb-8 text-[color:var(--foreground)]/75">
-        Add your experience, qualifications, skills, and CV. Career-gap context
-        is welcome — Horizon is built for non-linear careers.
+        Edit anytime — jump between steps, update entries, or remove mistakes.
+        Changes save as you go. To delete your whole account, use Settings.
       </p>
       <ProfileEditor initial={profile} />
     </main>

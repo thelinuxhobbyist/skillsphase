@@ -1,8 +1,8 @@
 import { ApplyForm } from "@/components/apply-form";
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCurrentUser, getJobBySlug } from "@/lib/api";
+import { getJobBySlug } from "@/lib/api";
+import { formatUkDateLabel } from "@/lib/dates";
 
 type Params = Promise<{ slug: string }>;
 
@@ -14,22 +14,6 @@ export default async function JobDetailPage({ params }: { params: Params }) {
     job = await getJobBySlug(slug);
   } catch {
     notFound();
-  }
-
-  let defaultCoverLetter: string | null = null;
-  const { userId, getToken } = await auth();
-  if (userId) {
-    const token = await getToken();
-    if (token) {
-      try {
-        const user = await getCurrentUser(token);
-        if (user.role === "job_seeker") {
-          defaultCoverLetter = user.coverLetterTemplate;
-        }
-      } catch {
-        // ignore — apply form still works
-      }
-    }
   }
 
   const salary =
@@ -51,7 +35,9 @@ export default async function JobDetailPage({ params }: { params: Params }) {
       </p>
       <p className="mt-2 text-sm text-[color:var(--foreground)]/65">
         {salary}
-        {job.closingDate ? ` · Closes ${job.closingDate}` : ""}
+        {job.closingDate
+          ? ` · Closes ${formatUkDateLabel(job.closingDate)}`
+          : ""}
       </p>
 
       <article className="prose mt-8 max-w-none whitespace-pre-wrap text-[color:var(--foreground)]/85">
@@ -74,7 +60,7 @@ export default async function JobDetailPage({ params }: { params: Params }) {
         </section>
       ) : null}
 
-      <ApplyForm jobId={job.id} defaultCoverLetter={defaultCoverLetter} />
+      <ApplyForm jobId={job.id} />
     </main>
   );
 }

@@ -10,9 +10,13 @@ import {
   type CompaniesHousePreview,
 } from "@/lib/api";
 
+/**
+ * Two-step employer onboarding: verify Companies House number, then confirm details.
+ */
 export function CompanyRegistrationForm() {
   const { getToken } = useAuth();
   const router = useRouter();
+  const [step, setStep] = useState<1 | 2>(1);
   const [companyNumber, setCompanyNumber] = useState("");
   const [website, setWebsite] = useState("https://");
   const [businessEmail, setBusinessEmail] = useState("");
@@ -29,113 +33,160 @@ export function CompanyRegistrationForm() {
   }
 
   return (
-    <form
-      className="space-y-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        void (async () => {
-          setPending(true);
-          setError(null);
-          try {
-            const token = await withToken();
-            if (!preview) {
-              const result = await verifyCompanyNumber(token, companyNumber);
-              setPreview(result);
+    <div className="space-y-6">
+      <ol className="flex gap-2 text-xs font-semibold">
+        <li
+          className={`rounded-md px-2.5 py-1 ${
+            step === 1 ? "bg-brand text-white" : "bg-white text-brand ring-1 ring-[color:var(--line)]"
+          }`}
+        >
+          1. Verify company
+        </li>
+        <li
+          className={`rounded-md px-2.5 py-1 ${
+            step === 2 ? "bg-brand text-white" : "bg-white text-brand ring-1 ring-[color:var(--line)]"
+          }`}
+        >
+          2. Contact details
+        </li>
+      </ol>
+
+      <form
+        className="space-y-4 rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-5"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void (async () => {
+            setPending(true);
+            setError(null);
+            try {
+              const token = await withToken();
+              if (step === 1 || !preview) {
+                const result = await verifyCompanyNumber(token, companyNumber);
+                setPreview(result);
+                setStep(2);
+                setPending(false);
+                return;
+              }
+              await createCompany(token, {
+                companyNumber,
+                website,
+                businessEmail,
+                recruiterName,
+                recruiterJobTitle,
+              });
+              router.refresh();
+            } catch (err) {
+              setError(
+                err instanceof ApiRequestError || err instanceof Error
+                  ? err.message
+                  : "Unable to submit company registration.",
+              );
               setPending(false);
-              return;
             }
-            await createCompany(token, {
-              companyNumber,
-              website,
-              businessEmail,
-              recruiterName,
-              recruiterJobTitle,
-            });
-            router.refresh();
-          } catch (err) {
-            setError(
-              err instanceof ApiRequestError || err instanceof Error
-                ? err.message
-                : "Unable to submit company registration.",
-            );
-            setPending(false);
-          }
-        })();
-      }}
-    >
-      <Field
-        label="Companies House number"
-        value={companyNumber}
-        onChange={(value) => {
-          setCompanyNumber(value.toUpperCase());
-          setPreview(null);
+          })();
         }}
-        placeholder="00000006"
-        required
-      />
-      <Field
-        label="Company website"
-        value={website}
-        onChange={setWebsite}
-        placeholder="https://example.co.uk"
-        required
-      />
-      <Field
-        label="Business email"
-        type="email"
-        value={businessEmail}
-        onChange={setBusinessEmail}
-        required
-      />
-      <Field
-        label="Recruiter name"
-        value={recruiterName}
-        onChange={setRecruiterName}
-        required
-      />
-      <Field
-        label="Recruiter job title"
-        value={recruiterJobTitle}
-        onChange={setRecruiterJobTitle}
-        required
-      />
-
-      {preview ? (
-        <div className="rounded-md border border-[color:var(--line)] bg-white/70 p-4 text-sm">
-          <p className="font-semibold text-brand">Confirm company</p>
-          <p className="mt-2">{preview.companyName}</p>
-          <p className="text-[color:var(--foreground)]/65">
-            Status: {preview.companyStatus}
-          </p>
-          {!preview.valid ? (
-            <p className="mt-2 text-red-700">
-              Only active companies can register.
-            </p>
-          ) : null}
-        </div>
-      ) : null}
-
-      {error ? (
-        <p className="text-sm text-red-700" role="alert">
-          {error}
-        </p>
-      ) : null}
-
-      <button
-        type="submit"
-        disabled={pending || (preview !== null && !preview.valid)}
-        className="rounded-md bg-brand px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
       >
-        {preview ? "Submit for approval" : "Validate with Companies House"}
-      </button>
-      <p className="text-sm text-[color:var(--foreground)]/65">
-        Not a UK company?{" "}
-        <a href="/waitlist" className="font-semibold text-brand underline">
-          Join the waitlist
-        </a>
-        .
-      </p>
-    </form>
+        {step === 1 ? (
+          <>
+            <div>
+              <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
+                Verify your company
+              </h2>
+              <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
+                Enter your UK Companies House number. We’ll confirm the legal
+                name before you continue.
+              </p>
+            </div>
+            <Field
+              label="Companies House number"
+              value={companyNumber}
+              onChange={(value) => {
+                setCompanyNumber(value.toUpperCase());
+                setPreview(null);
+                setStep(1);
+              }}
+              placeholder="00000006"
+              required
+            />
+          </>
+        ) : (
+          <>
+            <div>
+              <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
+                Contact details
+              </h2>
+              <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
+                One submission sends your company for review — no extra save
+                buttons.
+              </p>
+            </div>
+            {preview ? (
+              <div className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3 text-sm">
+                <p className="font-semibold text-brand">{preview.companyName}</p>
+                <p className="text-[color:var(--foreground)]/65">
+                  {preview.companyNumber}
+                  {preview.companyStatus ? ` · ${preview.companyStatus}` : ""}
+                </p>
+                <button
+                  type="button"
+                  className="mt-2 text-sm font-semibold text-brand underline"
+                  onClick={() => {
+                    setStep(1);
+                    setPreview(null);
+                  }}
+                >
+                  Change company number
+                </button>
+              </div>
+            ) : null}
+            <Field
+              label="Company website"
+              value={website}
+              onChange={setWebsite}
+              placeholder="https://example.co.uk"
+              required
+            />
+            <Field
+              label="Business email"
+              type="email"
+              value={businessEmail}
+              onChange={setBusinessEmail}
+              required
+            />
+            <Field
+              label="Recruiter name"
+              value={recruiterName}
+              onChange={setRecruiterName}
+              required
+            />
+            <Field
+              label="Recruiter job title"
+              value={recruiterJobTitle}
+              onChange={setRecruiterJobTitle}
+              required
+            />
+          </>
+        )}
+
+        {error ? (
+          <p className="text-sm text-red-700" role="alert">
+            {error}
+          </p>
+        ) : null}
+
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+        >
+          {pending
+            ? "Please wait…"
+            : step === 1
+              ? "Continue"
+              : "Submit for review"}
+        </button>
+      </form>
+    </div>
   );
 }
 
@@ -143,15 +194,15 @@ function Field({
   label,
   value,
   onChange,
-  type = "text",
   placeholder,
+  type = "text",
   required,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  type?: string;
   placeholder?: string;
+  type?: string;
   required?: boolean;
 }) {
   return (
@@ -159,10 +210,10 @@ function Field({
       <span className="font-medium text-brand">{label}</span>
       <input
         type={type}
-        value={value}
         required={required}
+        value={value}
         placeholder={placeholder}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2"
       />
     </label>

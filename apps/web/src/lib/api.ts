@@ -380,6 +380,21 @@ export function setSkillsByName(token: string, skills: string[]) {
   );
 }
 
+export function searchSkills(token: string, q?: string) {
+  const query = q?.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
+  return apiFetch<Array<{ id: string; name: string; category: string | null }>>(
+    `/users/skills${query}`,
+    { token },
+  );
+}
+
+export function deleteCv(token: string) {
+  return apiFetch<{ user: HorizonUser }>("/users/me/cv", {
+    method: "DELETE",
+    token,
+  });
+}
+
 export function addEmployment(
   token: string,
   body: {
@@ -395,6 +410,28 @@ export function addEmployment(
     "/users/me/employment-history",
     {
       method: "POST",
+      token,
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function updateEmployment(
+  token: string,
+  id: string,
+  body: {
+    employerName: string;
+    jobTitle: string;
+    startDate: string;
+    endDate?: string | null;
+    currentlyWorking?: boolean;
+    description?: string | null;
+  },
+) {
+  return apiFetch<ProfileBundle["employmentHistory"][number]>(
+    `/users/me/employment-history/${id}`,
+    {
+      method: "PATCH",
       token,
       body: JSON.stringify(body),
     },
@@ -425,6 +462,27 @@ export function addEducation(
   });
 }
 
+export function updateEducation(
+  token: string,
+  id: string,
+  body: {
+    institution: string;
+    qualification: string;
+    startDate: string;
+    endDate?: string | null;
+    description?: string | null;
+  },
+) {
+  return apiFetch<ProfileBundle["education"][number]>(
+    `/users/me/education/${id}`,
+    {
+      method: "PATCH",
+      token,
+      body: JSON.stringify(body),
+    },
+  );
+}
+
 export function deleteEducation(token: string, id: string) {
   return apiFetch<{ deleted: boolean }>(`/users/me/education/${id}`, {
     method: "DELETE",
@@ -445,6 +503,26 @@ export function addQualification(
     "/users/me/qualifications",
     {
       method: "POST",
+      token,
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function updateQualification(
+  token: string,
+  id: string,
+  body: {
+    name: string;
+    issuingBody?: string | null;
+    dateAwarded?: string | null;
+    description?: string | null;
+  },
+) {
+  return apiFetch<ProfileBundle["qualifications"][number]>(
+    `/users/me/qualifications/${id}`,
+    {
+      method: "PATCH",
       token,
       body: JSON.stringify(body),
     },

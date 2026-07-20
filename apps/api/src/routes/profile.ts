@@ -9,6 +9,9 @@ import {
   listSkills,
   setUserSkillsByName,
   toPublicUser,
+  updateEducation,
+  updateEmploymentHistory,
+  updateQualification,
   updateUserCv,
 } from "@horizon/database";
 import {
@@ -104,6 +107,36 @@ profileRoutes.post("/me/employment-history", requireRoles("job_seeker"), async (
   return ok(c, row, 201);
 });
 
+profileRoutes.patch(
+  "/me/employment-history/:id",
+  requireRoles("job_seeker"),
+  async (c) => {
+    const appUser = c.get("appUser");
+    if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+    const body = await c.req.json().catch(() => null);
+    const parsed = employmentHistorySchema.safeParse(body);
+    if (!parsed.success) {
+      return fail(
+        c,
+        "VALIDATION_ERROR",
+        parsed.error.issues[0]?.message ?? "Invalid employment history.",
+        400,
+      );
+    }
+    try {
+      const row = await updateEmploymentHistory(
+        getDb(c),
+        appUser.id,
+        c.req.param("id"),
+        parsed.data,
+      );
+      return ok(c, row);
+    } catch {
+      return fail(c, "NOT_FOUND", "Employment history not found.", 404);
+    }
+  },
+);
+
 profileRoutes.delete(
   "/me/employment-history/:id",
   requireRoles("job_seeker"),
@@ -132,6 +165,32 @@ profileRoutes.post("/me/education", requireRoles("job_seeker"), async (c) => {
   return ok(c, row, 201);
 });
 
+profileRoutes.patch("/me/education/:id", requireRoles("job_seeker"), async (c) => {
+  const appUser = c.get("appUser");
+  if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  const body = await c.req.json().catch(() => null);
+  const parsed = educationSchema.safeParse(body);
+  if (!parsed.success) {
+    return fail(
+      c,
+      "VALIDATION_ERROR",
+      parsed.error.issues[0]?.message ?? "Invalid education.",
+      400,
+    );
+  }
+  try {
+    const row = await updateEducation(
+      getDb(c),
+      appUser.id,
+      c.req.param("id"),
+      parsed.data,
+    );
+    return ok(c, row);
+  } catch {
+    return fail(c, "NOT_FOUND", "Education not found.", 404);
+  }
+});
+
 profileRoutes.delete("/me/education/:id", requireRoles("job_seeker"), async (c) => {
   const appUser = c.get("appUser");
   if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
@@ -155,6 +214,36 @@ profileRoutes.post("/me/qualifications", requireRoles("job_seeker"), async (c) =
   const row = await createQualification(getDb(c), appUser.id, parsed.data);
   return ok(c, row, 201);
 });
+
+profileRoutes.patch(
+  "/me/qualifications/:id",
+  requireRoles("job_seeker"),
+  async (c) => {
+    const appUser = c.get("appUser");
+    if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+    const body = await c.req.json().catch(() => null);
+    const parsed = qualificationSchema.safeParse(body);
+    if (!parsed.success) {
+      return fail(
+        c,
+        "VALIDATION_ERROR",
+        parsed.error.issues[0]?.message ?? "Invalid qualification.",
+        400,
+      );
+    }
+    try {
+      const row = await updateQualification(
+        getDb(c),
+        appUser.id,
+        c.req.param("id"),
+        parsed.data,
+      );
+      return ok(c, row);
+    } catch {
+      return fail(c, "NOT_FOUND", "Qualification not found.", 404);
+    }
+  },
+);
 
 profileRoutes.delete(
   "/me/qualifications/:id",
@@ -207,4 +296,16 @@ profileRoutes.post("/me/cv", requireRoles("job_seeker"), async (c) => {
       400,
     );
   }
+});
+
+profileRoutes.delete("/me/cv", requireRoles("job_seeker"), async (c) => {
+  const appUser = c.get("appUser");
+  if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+
+  const updated = await updateUserCv(getDb(c), appUser.id, {
+    cvUrl: null,
+    cvFileName: null,
+  });
+  c.set("appUser", updated);
+  return ok(c, { user: toPublicUser(updated) });
 });

@@ -10,7 +10,16 @@ type UploadResult = {
 };
 
 export function assertCvFile(file: File) {
-  if (!ALLOWED_CV_MIME_TYPES.includes(file.type as (typeof ALLOWED_CV_MIME_TYPES)[number])) {
+  const name = file.name.toLowerCase();
+  const byExtension = name.endsWith(".pdf") || name.endsWith(".docx");
+  const mimeOk =
+    ALLOWED_CV_MIME_TYPES.includes(
+      file.type as (typeof ALLOWED_CV_MIME_TYPES)[number],
+    ) ||
+    ((file.type === "" || file.type === "application/octet-stream") &&
+      byExtension);
+
+  if (!mimeOk) {
     throw new Error("CV must be a PDF or DOCX file.");
   }
   if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
