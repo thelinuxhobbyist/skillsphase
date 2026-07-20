@@ -11,7 +11,7 @@ import {
 } from "@/lib/api";
 
 /**
- * Two-step employer onboarding: verify Companies House number, then confirm details.
+ * Two-step employer onboarding: verify Companies House number, then your contact details.
  */
 export function CompanyRegistrationForm() {
   const { getToken } = useAuth();
@@ -34,20 +34,42 @@ export function CompanyRegistrationForm() {
 
   return (
     <div className="space-y-6">
+      <ol className="space-y-2 rounded-md border border-[color:var(--line)] bg-white/70 px-4 py-3 text-sm text-[color:var(--foreground)]/80">
+        <li>
+          <span className="font-semibold text-brand">1.</span> Look up your{" "}
+          <strong>company</strong> with its Companies House number (legal name
+          comes from Companies House — you don’t type it).
+        </li>
+        <li>
+          <span className="font-semibold text-brand">2.</span> Add{" "}
+          <strong>your</strong> contact details (the person hiring, not the
+          company name again).
+        </li>
+        <li>
+          <span className="font-semibold text-brand">3.</span> Submit — a Horizon{" "}
+          <strong>admin reviews and approves</strong> you before you can post
+          jobs.
+        </li>
+      </ol>
+
       <ol className="flex gap-2 text-xs font-semibold">
         <li
           className={`rounded-md px-2.5 py-1 ${
-            step === 1 ? "bg-brand text-white" : "bg-white text-brand ring-1 ring-[color:var(--line)]"
+            step === 1
+              ? "bg-brand text-white"
+              : "bg-white text-brand ring-1 ring-[color:var(--line)]"
           }`}
         >
-          1. Verify company
+          1. Find company
         </li>
         <li
           className={`rounded-md px-2.5 py-1 ${
-            step === 2 ? "bg-brand text-white" : "bg-white text-brand ring-1 ring-[color:var(--line)]"
+            step === 2
+              ? "bg-brand text-white"
+              : "bg-white text-brand ring-1 ring-[color:var(--line)]"
           }`}
         >
-          2. Contact details
+          2. Your details
         </li>
       </ol>
 
@@ -90,15 +112,17 @@ export function CompanyRegistrationForm() {
           <>
             <div>
               <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
-                Verify your company
+                Find your company
               </h2>
               <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
-                Enter your UK Companies House number. We’ll confirm the legal
-                name before you continue.
+                Enter the UK Companies House registration number. We’ll show the
+                official company name next — that becomes your organisation on
+                Horizon.
               </p>
             </div>
             <Field
               label="Companies House number"
+              hint="8 digits, or 2 letters + 6 digits (e.g. 00000006). Not your company trading name."
               value={companyNumber}
               onChange={(value) => {
                 setCompanyNumber(value.toUpperCase());
@@ -113,16 +137,23 @@ export function CompanyRegistrationForm() {
           <>
             <div>
               <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
-                Contact details
+                Your contact details
               </h2>
               <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
-                One submission sends your company for review — no extra save
-                buttons.
+                These are about <strong>you</strong> (the person registering),
+                not the company name. When you submit, your registration goes to
+                a Horizon admin for approval — you can’t post jobs until they
+                approve you.
               </p>
             </div>
             {preview ? (
               <div className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3 text-sm">
-                <p className="font-semibold text-brand">{preview.companyName}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand-accent">
+                  Company (from Companies House)
+                </p>
+                <p className="mt-1 font-semibold text-brand">
+                  {preview.companyName}
+                </p>
                 <p className="text-[color:var(--foreground)]/65">
                   {preview.companyNumber}
                   {preview.companyStatus ? ` · ${preview.companyStatus}` : ""}
@@ -141,28 +172,34 @@ export function CompanyRegistrationForm() {
             ) : null}
             <Field
               label="Company website"
+              hint="Your organisation’s public website (must start with https://)."
               value={website}
               onChange={setWebsite}
               placeholder="https://example.co.uk"
               required
             />
             <Field
-              label="Business email"
+              label="Work email"
+              hint="Best as a company email (e.g. you@company.co.uk). Used for approval and hiring updates."
               type="email"
               value={businessEmail}
               onChange={setBusinessEmail}
               required
             />
             <Field
-              label="Recruiter name"
+              label="Your full name"
+              hint="The person hiring / registering this company — not the company name."
               value={recruiterName}
               onChange={setRecruiterName}
+              placeholder="Alex Morgan"
               required
             />
             <Field
-              label="Recruiter job title"
+              label="Your job title"
+              hint="Your role at the company (e.g. Hiring Manager, HR Lead)."
               value={recruiterJobTitle}
               onChange={setRecruiterJobTitle}
+              placeholder="Hiring Manager"
               required
             />
           </>
@@ -182,8 +219,8 @@ export function CompanyRegistrationForm() {
           {pending
             ? "Please wait…"
             : step === 1
-              ? "Continue"
-              : "Submit for review"}
+              ? "Look up company"
+              : "Submit for admin approval"}
         </button>
       </form>
     </div>
@@ -192,6 +229,7 @@ export function CompanyRegistrationForm() {
 
 function Field({
   label,
+  hint,
   value,
   onChange,
   placeholder,
@@ -199,6 +237,7 @@ function Field({
   required,
 }: {
   label: string;
+  hint?: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -216,6 +255,11 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2"
       />
+      {hint ? (
+        <span className="mt-1 block text-xs text-[color:var(--foreground)]/55">
+          {hint}
+        </span>
+      ) : null}
     </label>
   );
 }

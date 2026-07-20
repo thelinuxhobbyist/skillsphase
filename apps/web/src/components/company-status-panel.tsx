@@ -14,20 +14,20 @@ const STATUS_COPY: Record<
   { title: string; body: string }
 > = {
   pending_review: {
-    title: "Awaiting approval",
-    body: "Your organisation is awaiting approval. We'll notify you once the review is complete.",
+    title: "Waiting for admin approval",
+    body: "We’ve received your registration. A Horizon administrator will review your company and contact details. You’ll be able to post jobs only after they approve you. (Email notification is sent when email is configured.)",
   },
   approved: {
-    title: "Approved",
-    body: "Your organisation is verified. You can create and publish jobs.",
+    title: "Approved — you can post jobs",
+    body: "Your organisation is verified. Create and publish roles from your employer dashboard.",
   },
   rejected: {
     title: "Not approved",
-    body: "Update your details if needed, then resubmit for another review.",
+    body: "An admin declined this registration. Update your contact details if needed, then resubmit for another review.",
   },
   suspended: {
     title: "Suspended",
-    body: "Recruitment features are disabled while your account is suspended.",
+    body: "An admin has suspended hiring on this account. Job posting is disabled until reinstated.",
   },
 };
 
@@ -58,15 +58,22 @@ export function CompanyStatusPanel({ company }: { company: HorizonCompany }) {
           <dd>{company.companyNumber}</dd>
         </div>
         <div>
+          <dt className="font-semibold text-brand">Registered contact</dt>
+          <dd>
+            {company.recruiterName}
+            {company.recruiterJobTitle ? ` · ${company.recruiterJobTitle}` : ""}
+          </dd>
+        </div>
+        <div>
           <dt className="font-semibold text-brand">Website</dt>
           <dd>{company.website}</dd>
         </div>
         <div>
-          <dt className="font-semibold text-brand">Business email</dt>
+          <dt className="font-semibold text-brand">Work email</dt>
           <dd>
             {company.businessEmail}
             {company.businessEmailIsFreeProvider
-              ? " (free provider — flagged for review)"
+              ? " (personal/free email — flagged for review)"
               : ""}
           </dd>
         </div>

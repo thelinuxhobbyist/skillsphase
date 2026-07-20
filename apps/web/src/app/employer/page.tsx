@@ -77,8 +77,9 @@ export default async function EmployerDashboardPage() {
             Register your UK company
           </h2>
           <p className="mt-2 mb-6 text-[color:var(--foreground)]/75">
-            We validate your Companies House number, then an administrator
-            reviews your registration before you can post jobs.
+            First we identify the company via Companies House. Then you add your
+            personal contact details. After you submit, a Horizon admin must
+            approve the company before you can post jobs.
           </p>
           <CompanyRegistrationForm />
         </section>

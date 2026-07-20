@@ -103,12 +103,12 @@ export function CompanyEditForm({ company }: { company: HorizonCompany }) {
         onChange={setBusinessEmail}
       />
       <Field
-        label="Recruiter name"
+        label="Your full name"
         value={recruiterName}
         onChange={setRecruiterName}
       />
       <Field
-        label="Recruiter job title"
+        label="Your job title"
         value={recruiterJobTitle}
         onChange={setRecruiterJobTitle}
       />
