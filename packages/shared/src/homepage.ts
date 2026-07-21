@@ -1,5 +1,7 @@
 /** Homepage section template — editable from admin when DB is configured. */
 
+import { HOMEPAGE_DEMO_JOBS } from "./demo-jobs";
+
 export const HOMEPAGE_SECTION_TYPES = [
   "hero",
   "trust",
@@ -196,32 +198,16 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       subtitleDemo:
         "Example roles so you can see how listings will look — live vacancies appear here once employers publish.",
       showSearch: true,
-      demoJobs: [
-        {
-          title: "Operations Manager — hybrid",
-          companyName: "Northbridge Retail Group",
-          location: "Manchester",
-          remoteType: "hybrid",
-          blurb:
-            "Lead a regional ops team. Returners with people-leadership experience welcome — career breaks recognised as part of the journey.",
-        },
-        {
-          title: "Finance Business Partner",
-          companyName: "Cedar Health Ltd",
-          location: "Leeds",
-          remoteType: "hybrid",
-          blurb:
-            "Partner with clinical leads on budgets and forecasting. Ideal for experienced accountants returning after parental leave.",
-        },
-        {
-          title: "Customer Success Lead",
-          companyName: "Brightpath Software",
-          location: "Remote (UK)",
-          remoteType: "remote",
-          blurb:
-            "Support B2B customers through onboarding and renewals. Communication skills and sector knowledge valued over continuous timelines.",
-        },
-      ],
+      demoJobs: HOMEPAGE_DEMO_JOBS.map(
+        ({ slug, title, companyName, location, remoteType, blurb }) => ({
+          slug,
+          title,
+          companyName,
+          location,
+          remoteType,
+          blurb,
+        }),
+      ),
     }),
     section("closing_cta", 120, {
       title: "A better way back into work.",

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { HomepageSection } from "@horizon/shared";
+import { HOMEPAGE_DEMO_JOBS } from "@horizon/shared";
 import type { HorizonJob } from "@/lib/api";
 
 function str(value: unknown, fallback = "") {
@@ -8,6 +9,19 @@ function str(value: unknown, fallback = "") {
 
 function arr<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
+}
+
+function demoJobSlug(job: {
+  slug?: string;
+  title: string;
+}): string {
+  if (job.slug) return job.slug;
+  const fromCanon = HOMEPAGE_DEMO_JOBS.find((j) => j.title === job.title);
+  if (fromCanon) return fromCanon.slug;
+  return job.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 export function HomepageSections({
@@ -302,6 +316,7 @@ function HomepageSectionBlock({
     case "featured_jobs": {
       const showDemo = featuredJobs.length === 0;
       const demoJobs = arr<{
+        slug?: string;
         title: string;
         companyName: string;
         location: string;
@@ -356,32 +371,34 @@ function HomepageSectionBlock({
 
           <ul className="mt-8 space-y-4">
             {showDemo
-              ? demoJobs.map((job) => (
-                  <li
-                    key={`${job.title}-${job.companyName}`}
-                    className="rounded-md border border-[color:var(--line)] bg-white/80 p-5"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <h3 className="font-semibold text-brand">{job.title}</h3>
-                      <span className="text-xs font-semibold uppercase tracking-wide text-brand-accent">
-                        Example listing
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
-                      {job.companyName} · {job.location} ·{" "}
-                      {job.remoteType.replace("_", "-")}
-                    </p>
-                    <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/80">
-                      {job.blurb}
-                    </p>
-                    <Link
-                      href="/register?as=seeker"
-                      className="mt-4 inline-block text-sm font-semibold text-brand underline"
-                    >
-                      Register to apply when live roles open
-                    </Link>
-                  </li>
-                ))
+              ? demoJobs.map((job) => {
+                  const slug = demoJobSlug(job);
+                  return (
+                    <li key={`${job.title}-${job.companyName}`}>
+                      <Link
+                        href={`/jobs/examples/${slug}`}
+                        className="block rounded-md border border-[color:var(--line)] bg-white/80 p-5 transition hover:bg-white"
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <h3 className="font-semibold text-brand">{job.title}</h3>
+                          <span className="text-xs font-semibold uppercase tracking-wide text-brand-accent">
+                            Example listing
+                          </span>
+                        </div>
+                        <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
+                          {job.companyName} · {job.location} ·{" "}
+                          {job.remoteType.replace("_", "-")}
+                        </p>
+                        <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/80">
+                          {job.blurb}
+                        </p>
+                        <span className="mt-4 inline-block text-sm font-semibold text-brand underline">
+                          Read full example listing
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })
               : featuredJobs.map((job) => (
                   <li key={job.id}>
                     <Link
