@@ -16,7 +16,9 @@ function demoJobSlug(job: {
   title: string;
 }): string {
   if (job.slug) return job.slug;
-  const fromCanon = HOMEPAGE_DEMO_JOBS.find((j) => j.title === job.title);
+  const fromCanon = HOMEPAGE_DEMO_JOBS.find(
+    (j) => j.title === job.title || j.title === job.title.replace(/ — .+$/, ""),
+  );
   if (fromCanon) return fromCanon.slug;
   return job.title
     .toLowerCase()
@@ -376,8 +378,8 @@ function HomepageSectionBlock({
                   const slug = demoJobSlug(job);
                   const skills =
                     job.skills ??
-                    HOMEPAGE_DEMO_JOBS.find((j) => j.title === job.title)
-                      ?.skills ??
+                    HOMEPAGE_DEMO_JOBS.find((j) => j.title === job.title || j.slug === job.slug)
+                      ?.skills.map((s) => s.name) ??
                     [];
                   return (
                     <li key={`${job.title}-${job.companyName}`}>
