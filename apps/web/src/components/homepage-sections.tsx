@@ -379,7 +379,7 @@ function HomepageSectionBlock({
                   const skills =
                     job.skills ??
                     HOMEPAGE_DEMO_JOBS.find((j) => j.title === job.title || j.slug === job.slug)
-                      ?.skills ??
+                      ?.skills.map((s) => s.name) ??
                     [];
                   return (
                     <li key={`${job.title}-${job.companyName}`}>

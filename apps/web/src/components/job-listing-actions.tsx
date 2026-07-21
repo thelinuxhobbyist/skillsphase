@@ -222,7 +222,7 @@ export function JobListingActions({
           disabled
           className="w-full cursor-not-allowed rounded-md bg-brand/40 px-4 py-3 text-sm font-semibold text-white"
         >
-          Apply (example listing)
+          Apply now (example)
         </button>
       ) : (
         <a

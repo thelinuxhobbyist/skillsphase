@@ -1,7 +1,16 @@
-import type { JobListingContent } from "@horizon/shared";
+import type { JobListingContent, JobListingSkill } from "@horizon/shared";
 import type { HorizonJob } from "@/lib/api";
 
-/** Public job detail — only fields an employer can set when posting. */
+export type SimilarJobCard = {
+  slug: string;
+  title: string;
+  companyName: string;
+  location: string;
+  remoteType: string;
+  href: string;
+  isExample: boolean;
+};
+
 export type JobListingViewModel = {
   slug: string;
   title: string;
@@ -10,14 +19,22 @@ export type JobListingViewModel = {
   remoteType: JobListingContent["remoteType"];
   employmentType: string;
   industry: string | null;
+  companySize: string | null;
+  companyAbout: string | null;
   salaryLabel: string;
   postedLabel: string;
-  skills: string[];
+  skills: JobListingSkill[];
   description: string;
+  benefits: string[];
+  whyReturners: string[];
+  applicationProcess: string[];
+  workingPatternDetail: string | null;
+  contractDetails: string | null;
   jobId: number | null;
   isExample: boolean;
   backHref: string;
   backLabel: string;
+  similarJobs: SimilarJobCard[];
 };
 
 function formatEmploymentType(value: string) {
@@ -25,7 +42,7 @@ function formatEmploymentType(value: string) {
 }
 
 function formatRemote(
-  value: HorizonJob["remoteType"] | JobListingContent["remoteType"],
+  value: HorizonJob["remoteType"] | JobListingContent["remoteType"] | string,
 ) {
   switch (value) {
     case "on_site":
@@ -68,7 +85,10 @@ function formatPosted(iso: string) {
   }
 }
 
-export function listingFromDemo(job: JobListingContent): JobListingViewModel {
+export function listingFromDemo(
+  job: JobListingContent,
+  similarJobs: SimilarJobCard[] = [],
+): JobListingViewModel {
   return {
     slug: job.slug,
     title: job.title,
@@ -77,18 +97,30 @@ export function listingFromDemo(job: JobListingContent): JobListingViewModel {
     remoteType: job.remoteType,
     employmentType: formatEmploymentType(job.employmentType),
     industry: job.industry.trim() ? job.industry.trim() : null,
+    companySize: job.companySize || null,
+    companyAbout: job.companyAbout || null,
     salaryLabel: job.salaryLabel,
     postedLabel: job.postedLabel,
     skills: job.skills,
     description: job.description,
+    benefits: job.benefits,
+    whyReturners: job.whyReturners,
+    applicationProcess: job.applicationProcess,
+    workingPatternDetail: job.workingPatternDetail || null,
+    contractDetails: job.contractDetails || null,
     jobId: null,
     isExample: true,
     backHref: "/#jobs",
     backLabel: "Back to featured jobs",
+    similarJobs,
   };
 }
 
-export function listingFromHorizonJob(job: HorizonJob): JobListingViewModel {
+/** Live jobs: only employer-provided fields; optional sections stay empty until set. */
+export function listingFromHorizonJob(
+  job: HorizonJob,
+  similarJobs: SimilarJobCard[] = [],
+): JobListingViewModel {
   return {
     slug: job.slug,
     title: job.title,
@@ -97,17 +129,56 @@ export function listingFromHorizonJob(job: HorizonJob): JobListingViewModel {
     remoteType: job.remoteType,
     employmentType: formatEmploymentType(job.employmentType),
     industry: job.industry?.trim() ? job.industry.trim() : null,
+    companySize: null,
+    companyAbout: null,
     salaryLabel: formatSalary(job),
     postedLabel: formatPosted(job.createdAt),
-    skills: job.skills.map((s) => s.name),
+    skills: job.skills.map((s) => ({
+      name: s.name,
+      level: "essential" as const,
+    })),
     description: job.description,
+    benefits: [],
+    whyReturners: [],
+    applicationProcess: [],
+    workingPatternDetail: null,
+    contractDetails: null,
     jobId: job.id,
     isExample: false,
     backHref: "/jobs",
     backLabel: "Back to jobs",
+    similarJobs,
   };
 }
 
-export function remoteLabel(value: JobListingViewModel["remoteType"]): string {
+export function remoteLabel(
+  value: JobListingViewModel["remoteType"] | string,
+): string {
   return formatRemote(value);
+}
+
+export function similarCardsFromDemos(
+  jobs: JobListingContent[],
+): SimilarJobCard[] {
+  return jobs.map((job) => ({
+    slug: job.slug,
+    title: job.title,
+    companyName: job.companyName,
+    location: job.location,
+    remoteType: job.remoteType,
+    href: `/jobs/examples/${job.slug}`,
+    isExample: true,
+  }));
+}
+
+export function similarCardsFromLive(jobs: HorizonJob[]): SimilarJobCard[] {
+  return jobs.map((job) => ({
+    slug: job.slug,
+    title: job.title,
+    companyName: job.companyName,
+    location: job.location,
+    remoteType: job.remoteType,
+    href: `/jobs/${job.slug}`,
+    isExample: false,
+  }));
 }

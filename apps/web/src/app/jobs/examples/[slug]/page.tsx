@@ -1,5 +1,10 @@
 import { ExampleJobListingView } from "@/components/job-listing-view";
-import { findHomepageDemoJob, HOMEPAGE_DEMO_JOBS } from "@horizon/shared";
+import { similarCardsFromDemos } from "@/lib/job-listing";
+import {
+  findHomepageDemoJob,
+  HOMEPAGE_DEMO_JOBS,
+  similarHomepageDemoJobs,
+} from "@horizon/shared";
 import { notFound } from "next/navigation";
 
 type Params = Promise<{ slug: string }>;
@@ -12,5 +17,6 @@ export default async function ExampleJobPage({ params }: { params: Params }) {
   const { slug } = await params;
   const job = findHomepageDemoJob(slug);
   if (!job) notFound();
-  return <ExampleJobListingView job={job} />;
+  const similarJobs = similarCardsFromDemos(similarHomepageDemoJobs(slug));
+  return <ExampleJobListingView job={job} similarJobs={similarJobs} />;
 }
