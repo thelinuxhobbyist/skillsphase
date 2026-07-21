@@ -4,6 +4,7 @@ import {
   countPublishedJobs,
   countUsersByRole,
   createAdminAppUser,
+  createJob,
   deleteAdminSessionsForUser,
   findCompanyById,
   findJobById,
@@ -30,6 +31,7 @@ import {
   adminEmployerActionSchema,
   adminUserActionSchema,
   createAdminStaffSchema,
+  createJobSchema,
   resetAdminPasswordSchema,
   updateAdminStaffSchema,
   USER_ROLES,
@@ -595,6 +597,81 @@ secured.get("/audit", async (c) => {
 secured.get("/jobs", async (c) => {
   const jobs = await listJobsForAdmin(getDb(c));
   return ok(c, jobs);
+});
+
+secured.post("/jobs", async (c) => {
+  const admin = c.get("appUser");
+  if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  if (!staffCan(admin, "manage_jobs")) {
+    return fail(c, "FORBIDDEN", "You do not have permission to manage jobs.", 403);
+  }
+
+  const body = await c.req.json().catch(() => null);
+  const parsed = createJobSchema.safeParse(body);
+  if (!parsed.success) {
+    return fail(
+      c,
+      "VALIDATION_ERROR",
+      parsed.error.issues[0]?.message ?? "Invalid job.",
+      400,
+    );
+  }
+
+  if (!parsed.data.companyId) {
+    return fail(
+      c,
+      "VALIDATION_ERROR",
+      "Admins must supply companyId when creating a job.",
+      400,
+    );
+  }
+
+  const db = getDb(c);
+  const company = await findCompanyById(db, parsed.data.companyId);
+  if (!company || company.verificationStatus !== "approved") {
+    return fail(
+      c,
+      "COMPANY_NOT_APPROVED",
+      "Jobs can only be created for approved companies.",
+      400,
+    );
+  }
+
+  const created = await createJob(db, {
+    companyId: parsed.data.companyId,
+    createdByUserId: admin.id,
+    title: parsed.data.title,
+    description: parsed.data.description,
+    salaryMin: parsed.data.salaryMin,
+    salaryMax: parsed.data.salaryMax,
+    salaryCurrency: parsed.data.salaryCurrency,
+    location: parsed.data.location,
+    remoteType: parsed.data.remoteType,
+    employmentType: parsed.data.employmentType,
+    industry: parsed.data.industry,
+    closingDate: parsed.data.closingDate,
+    skillIds: parsed.data.skillIds,
+    skillNames: parsed.data.skillNames,
+    niceToHaveSkillNames: parsed.data.niceToHaveSkillNames,
+    companyAbout: parsed.data.companyAbout,
+    companySize: parsed.data.companySize,
+    benefits: parsed.data.benefits,
+    whyReturners: parsed.data.whyReturners,
+    applicationProcess: parsed.data.applicationProcess,
+    workingPatternDetail: parsed.data.workingPatternDetail,
+    contractDetails: parsed.data.contractDetails,
+    publish: parsed.data.publish ?? true,
+  });
+
+  await writeAdminLog(db, {
+    adminUserId: admin.id,
+    action: "Job Created By Admin",
+    entity: "job",
+    entityId: String(created.id),
+    notes: `company ${parsed.data.companyId}`,
+  });
+
+  return ok(c, created, 201);
 });
 
 secured.delete("/jobs/:id", async (c) => {

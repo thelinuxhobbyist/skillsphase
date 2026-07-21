@@ -225,6 +225,14 @@ jobRoutes.post(
       closingDate: parsed.data.closingDate,
       skillIds: parsed.data.skillIds,
       skillNames: parsed.data.skillNames,
+      niceToHaveSkillNames: parsed.data.niceToHaveSkillNames,
+      companyAbout: parsed.data.companyAbout,
+      companySize: parsed.data.companySize,
+      benefits: parsed.data.benefits,
+      whyReturners: parsed.data.whyReturners,
+      applicationProcess: parsed.data.applicationProcess,
+      workingPatternDetail: parsed.data.workingPatternDetail,
+      contractDetails: parsed.data.contractDetails,
       publish: parsed.data.publish,
     });
 

@@ -31,6 +31,14 @@ export type PublicJob = {
   employmentType: string;
   industry: string;
   closingDate: string | null;
+  companyAbout: string | null;
+  companySize: string | null;
+  benefits: string[];
+  whyReturners: string[];
+  applicationProcess: string[];
+  workingPatternDetail: string | null;
+  contractDetails: string | null;
+  niceToHaveSkills: string[];
   status: JobStatus;
   skills: Array<{ id: string; name: string }>;
   createdAt: string;
@@ -41,6 +49,11 @@ function toNumber(value: string | null): number | null {
   if (value === null || value === undefined) return null;
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
+}
+
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
 }
 
 export function slugifyTitle(title: string) {
@@ -82,6 +95,14 @@ export async function toPublicJob(
     employmentType: job.employmentType,
     industry: job.industry,
     closingDate: job.closingDate,
+    companyAbout: job.companyAbout,
+    companySize: job.companySize,
+    benefits: asStringArray(job.benefits),
+    whyReturners: asStringArray(job.whyReturners),
+    applicationProcess: asStringArray(job.applicationProcess),
+    workingPatternDetail: job.workingPatternDetail,
+    contractDetails: job.contractDetails,
+    niceToHaveSkills: asStringArray(job.niceToHaveSkills),
     status: job.status,
     skills: skillRows,
     createdAt: job.createdAt.toISOString(),
@@ -253,6 +274,14 @@ export async function createJob(
     closingDate?: string | null;
     skillIds?: string[];
     skillNames?: string[];
+    niceToHaveSkillNames?: string[];
+    companyAbout?: string | null;
+    companySize?: string | null;
+    benefits?: string[];
+    whyReturners?: string[];
+    applicationProcess?: string[];
+    workingPatternDetail?: string | null;
+    contractDetails?: string | null;
     publish?: boolean;
   },
 ) {
@@ -284,6 +313,14 @@ export async function createJob(
       employmentType: input.employmentType,
       industry: input.industry,
       closingDate: input.closingDate ?? null,
+      companyAbout: input.companyAbout?.trim() || null,
+      companySize: input.companySize?.trim() || null,
+      benefits: input.benefits ?? [],
+      whyReturners: input.whyReturners ?? [],
+      applicationProcess: input.applicationProcess ?? [],
+      workingPatternDetail: input.workingPatternDetail?.trim() || null,
+      contractDetails: input.contractDetails?.trim() || null,
+      niceToHaveSkills: input.niceToHaveSkillNames ?? [],
       status: input.publish ? "published" : "draft",
     })
     .returning();
@@ -316,6 +353,14 @@ export async function updateJob(
     closingDate?: string | null;
     skillIds?: string[];
     skillNames?: string[];
+    niceToHaveSkillNames?: string[];
+    companyAbout?: string | null;
+    companySize?: string | null;
+    benefits?: string[];
+    whyReturners?: string[];
+    applicationProcess?: string[];
+    workingPatternDetail?: string | null;
+    contractDetails?: string | null;
   },
 ) {
   const [updated] = await db
@@ -342,6 +387,27 @@ export async function updateJob(
       industry: input.industry ?? job.industry,
       closingDate:
         input.closingDate === undefined ? job.closingDate : input.closingDate,
+      companyAbout:
+        input.companyAbout === undefined
+          ? job.companyAbout
+          : input.companyAbout?.trim() || null,
+      companySize:
+        input.companySize === undefined
+          ? job.companySize
+          : input.companySize?.trim() || null,
+      benefits: input.benefits ?? job.benefits,
+      whyReturners: input.whyReturners ?? job.whyReturners,
+      applicationProcess: input.applicationProcess ?? job.applicationProcess,
+      workingPatternDetail:
+        input.workingPatternDetail === undefined
+          ? job.workingPatternDetail
+          : input.workingPatternDetail?.trim() || null,
+      contractDetails:
+        input.contractDetails === undefined
+          ? job.contractDetails
+          : input.contractDetails?.trim() || null,
+      niceToHaveSkills:
+        input.niceToHaveSkillNames ?? job.niceToHaveSkills,
       updatedAt: new Date(),
     })
     .where(eq(jobs.id, job.id))

@@ -2,6 +2,7 @@ import {
   bigint,
   boolean,
   date,
+  jsonb,
   numeric,
   pgTable,
   text,
@@ -31,6 +32,20 @@ export const jobs = pgTable("jobs", {
   employmentType: text("employment_type").notNull(),
   industry: text("industry").notNull(),
   closingDate: date("closing_date"),
+  companyAbout: text("company_about"),
+  companySize: text("company_size"),
+  benefits: jsonb("benefits").$type<string[]>().notNull().default([]),
+  whyReturners: jsonb("why_returners").$type<string[]>().notNull().default([]),
+  applicationProcess: jsonb("application_process")
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  workingPatternDetail: text("working_pattern_detail"),
+  contractDetails: text("contract_details"),
+  niceToHaveSkills: jsonb("nice_to_have_skills")
+    .$type<string[]>()
+    .notNull()
+    .default([]),
   status: jobStatusEnum("status").notNull().default("draft"),
   removedByAdmin: boolean("removed_by_admin").notNull().default(false),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),

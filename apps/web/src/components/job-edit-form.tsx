@@ -4,6 +4,24 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ApiRequestError, updateJob, type HorizonJob } from "@/lib/api";
+import {
+  extrasPayload,
+  JobListingExtrasFields,
+  type JobListingExtrasState,
+} from "@/components/job-listing-extras-fields";
+
+function extrasFromJob(job: HorizonJob): JobListingExtrasState {
+  return {
+    niceToHaveSkills: (job.niceToHaveSkills ?? []).join(", "),
+    companyAbout: job.companyAbout ?? "",
+    companySize: job.companySize ?? "",
+    benefits: (job.benefits ?? []).join("\n"),
+    whyReturners: (job.whyReturners ?? []).join("\n"),
+    applicationProcess: (job.applicationProcess ?? []).join("\n"),
+    workingPatternDetail: job.workingPatternDetail ?? "",
+    contractDetails: job.contractDetails ?? "",
+  };
+}
 
 export function JobEditForm({ job }: { job: HorizonJob }) {
   const { getToken } = useAuth();
@@ -22,6 +40,9 @@ export function JobEditForm({ job }: { job: HorizonJob }) {
     job.salaryMax != null ? String(job.salaryMax) : "",
   );
   const [closingDate, setClosingDate] = useState(job.closingDate ?? "");
+  const [extras, setExtras] = useState<JobListingExtrasState>(() =>
+    extrasFromJob(job),
+  );
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -58,6 +79,7 @@ export function JobEditForm({ job }: { job: HorizonJob }) {
               salaryMax: salaryMax ? Number(salaryMax) : null,
               closingDate: closingDate || null,
               skillNames,
+              ...extrasPayload(extras),
             });
             router.push("/employer/jobs");
             router.refresh();
@@ -76,7 +98,7 @@ export function JobEditForm({ job }: { job: HorizonJob }) {
 
       <label className="block text-sm">
         <span className="font-medium text-brand">
-          Skills required (at least 3)
+          Essential skills (at least 3)
         </span>
         <p className="mt-1 text-[color:var(--foreground)]/70">
           List the abilities this role needs first.
@@ -141,6 +163,9 @@ export function JobEditForm({ job }: { job: HorizonJob }) {
           onChange={setClosingDate}
         />
       </div>
+
+      <JobListingExtrasFields value={extras} onChange={setExtras} />
+
       {error ? (
         <p className="text-sm text-red-700" role="alert">
           {error}

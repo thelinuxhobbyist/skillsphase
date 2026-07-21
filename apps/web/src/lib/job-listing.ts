@@ -116,11 +116,20 @@ export function listingFromDemo(
   };
 }
 
-/** Live jobs: only employer-provided fields; optional sections stay empty until set. */
+/** Live jobs: map employer-provided listing fields (no invented filler). */
 export function listingFromHorizonJob(
   job: HorizonJob,
   similarJobs: SimilarJobCard[] = [],
 ): JobListingViewModel {
+  const essential = job.skills.map((s) => ({
+    name: s.name,
+    level: "essential" as const,
+  }));
+  const nice = (job.niceToHaveSkills ?? []).map((name) => ({
+    name,
+    level: "nice_to_have" as const,
+  }));
+
   return {
     slug: job.slug,
     title: job.title,
@@ -129,20 +138,21 @@ export function listingFromHorizonJob(
     remoteType: job.remoteType,
     employmentType: formatEmploymentType(job.employmentType),
     industry: job.industry?.trim() ? job.industry.trim() : null,
-    companySize: null,
-    companyAbout: null,
+    companySize: job.companySize?.trim() ? job.companySize.trim() : null,
+    companyAbout: job.companyAbout?.trim() ? job.companyAbout.trim() : null,
     salaryLabel: formatSalary(job),
     postedLabel: formatPosted(job.createdAt),
-    skills: job.skills.map((s) => ({
-      name: s.name,
-      level: "essential" as const,
-    })),
+    skills: [...essential, ...nice],
     description: job.description,
-    benefits: [],
-    whyReturners: [],
-    applicationProcess: [],
-    workingPatternDetail: null,
-    contractDetails: null,
+    benefits: job.benefits ?? [],
+    whyReturners: job.whyReturners ?? [],
+    applicationProcess: job.applicationProcess ?? [],
+    workingPatternDetail: job.workingPatternDetail?.trim()
+      ? job.workingPatternDetail.trim()
+      : null,
+    contractDetails: job.contractDetails?.trim()
+      ? job.contractDetails.trim()
+      : null,
     jobId: job.id,
     isExample: false,
     backHref: "/jobs",

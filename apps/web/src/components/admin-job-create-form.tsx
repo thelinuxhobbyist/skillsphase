@@ -4,6 +4,12 @@ import { useAdminToken } from "@/lib/use-admin-token";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ApiRequestError, createJob, type AdminEmployer } from "@/lib/api";
+import {
+  emptyJobListingExtras,
+  extrasPayload,
+  JobListingExtrasFields,
+  type JobListingExtrasState,
+} from "@/components/job-listing-extras-fields";
 
 export function AdminJobCreateForm({
   companies,
@@ -22,6 +28,7 @@ export function AdminJobCreateForm({
   const [remoteType, setRemoteType] = useState<"on_site" | "hybrid" | "remote">(
     "hybrid",
   );
+  const [extras, setExtras] = useState<JobListingExtrasState>(emptyJobListingExtras);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -64,6 +71,7 @@ export function AdminJobCreateForm({
               employmentType,
               remoteType,
               skillNames,
+              ...extrasPayload(extras),
               publish: true,
             });
             router.push("/admin/jobs");
@@ -98,7 +106,7 @@ export function AdminJobCreateForm({
 
       <label className="block text-sm">
         <span className="font-medium text-brand">
-          Skills required (at least 3)
+          Essential skills (at least 3)
         </span>
         <p className="mt-1 text-[color:var(--foreground)]/70">
           Skills first — this is how Project Horizon job posts are meant to
@@ -154,6 +162,9 @@ export function AdminJobCreateForm({
           </select>
         </label>
       </div>
+
+      <JobListingExtrasFields value={extras} onChange={setExtras} />
+
       {error ? (
         <p className="text-sm text-red-700" role="alert">
           {error}

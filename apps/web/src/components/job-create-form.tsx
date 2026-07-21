@@ -4,6 +4,12 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ApiRequestError, createJob } from "@/lib/api";
+import {
+  emptyJobListingExtras,
+  extrasPayload,
+  JobListingExtrasFields,
+  type JobListingExtrasState,
+} from "@/components/job-listing-extras-fields";
 
 export function JobCreateForm() {
   const { getToken } = useAuth();
@@ -20,6 +26,7 @@ export function JobCreateForm() {
   const [salaryMin, setSalaryMin] = useState("");
   const [salaryMax, setSalaryMax] = useState("");
   const [closingDate, setClosingDate] = useState("");
+  const [extras, setExtras] = useState<JobListingExtrasState>(emptyJobListingExtras);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -56,6 +63,7 @@ export function JobCreateForm() {
         salaryCurrency: "GBP",
         closingDate: closingDate || null,
         skillNames: names,
+        ...extrasPayload(extras),
         publish,
       });
       router.push("/employer/jobs");
@@ -82,7 +90,7 @@ export function JobCreateForm() {
 
       <label className="block text-sm">
         <span className="font-medium text-brand">
-          Skills required (at least 3)
+          Essential skills (at least 3)
         </span>
         <p className="mt-1 text-[color:var(--foreground)]/70">
           List the abilities this role needs first. Project Horizon is
@@ -153,6 +161,8 @@ export function JobCreateForm() {
           onChange={setClosingDate}
         />
       </div>
+
+      <JobListingExtrasFields value={extras} onChange={setExtras} />
 
       {error ? (
         <p className="text-sm text-red-700" role="alert">

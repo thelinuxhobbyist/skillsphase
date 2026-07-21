@@ -128,6 +128,20 @@ export const createJobSchema = z
     closingDate: z.string().date().optional().nullable(),
     skillIds: z.array(z.string().uuid()).default([]),
     skillNames: z.array(z.string().trim().min(1).max(80)).max(40).default([]),
+    niceToHaveSkillNames: z
+      .array(z.string().trim().min(1).max(80))
+      .max(40)
+      .default([]),
+    companyAbout: z.string().trim().max(5000).optional().nullable(),
+    companySize: z.string().trim().max(120).optional().nullable(),
+    benefits: z.array(z.string().trim().min(1).max(300)).max(30).default([]),
+    whyReturners: z.array(z.string().trim().min(1).max(500)).max(20).default([]),
+    applicationProcess: z
+      .array(z.string().trim().min(1).max(500))
+      .max(15)
+      .default([]),
+    workingPatternDetail: z.string().trim().max(2000).optional().nullable(),
+    contractDetails: z.string().trim().max(500).optional().nullable(),
     publish: z.boolean().default(false),
   })
   .superRefine((data, ctx) => {
@@ -156,6 +170,23 @@ export const updateJobSchema = z
     closingDate: z.string().date().optional().nullable(),
     skillIds: z.array(z.string().uuid()).optional(),
     skillNames: z.array(z.string().trim().min(1).max(80)).max(40).optional(),
+    niceToHaveSkillNames: z
+      .array(z.string().trim().min(1).max(80))
+      .max(40)
+      .optional(),
+    companyAbout: z.string().trim().max(5000).optional().nullable(),
+    companySize: z.string().trim().max(120).optional().nullable(),
+    benefits: z.array(z.string().trim().min(1).max(300)).max(30).optional(),
+    whyReturners: z
+      .array(z.string().trim().min(1).max(500))
+      .max(20)
+      .optional(),
+    applicationProcess: z
+      .array(z.string().trim().min(1).max(500))
+      .max(15)
+      .optional(),
+    workingPatternDetail: z.string().trim().max(2000).optional().nullable(),
+    contractDetails: z.string().trim().max(500).optional().nullable(),
   })
   .superRefine((data, ctx) => {
     if (data.skillIds !== undefined || data.skillNames !== undefined) {

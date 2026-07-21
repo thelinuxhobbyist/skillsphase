@@ -654,6 +654,14 @@ export type HorizonJob = {
   employmentType: string;
   industry: string;
   closingDate: string | null;
+  companyAbout: string | null;
+  companySize: string | null;
+  benefits: string[];
+  whyReturners: string[];
+  applicationProcess: string[];
+  workingPatternDetail: string | null;
+  contractDetails: string | null;
+  niceToHaveSkills: string[];
   status: "draft" | "published" | "closed";
   skills: Array<{ id: string; name: string }>;
   createdAt: string;
@@ -712,7 +720,8 @@ export function createJob(
   token: string,
   body: Record<string, unknown>,
 ) {
-  return apiFetch<HorizonJob>("/jobs", {
+  const isAdminCreate = typeof body.companyId === "string";
+  return apiFetch<HorizonJob>(isAdminCreate ? "/admin/jobs" : "/jobs", {
     method: "POST",
     token,
     body: JSON.stringify(body),
