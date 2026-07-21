@@ -1,4 +1,5 @@
 import { ProfileEditor } from "@/components/profile-editor";
+import { SiteHeader } from "@/components/site-header";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -26,18 +27,21 @@ export default async function ProfilePage() {
   const profile = await getProfileBundle(token);
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
-      <Link href="/dashboard" className="text-sm text-brand underline">
-        ← Back to dashboard
-      </Link>
-      <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
-        Your profile
-      </h1>
-      <p className="mt-2 mb-8 text-[color:var(--foreground)]/75">
-        Edit anytime — jump between steps, update entries, or remove mistakes.
-        Changes save as you go. To delete your whole account, use Settings.
-      </p>
-      <ProfileEditor initial={profile} />
-    </main>
+    <>
+      <SiteHeader />
+      <main className="mx-auto w-full max-w-3xl min-w-0 px-4 py-10 sm:px-6 sm:py-12">
+        <Link href="/dashboard" className="text-sm text-brand underline">
+          ← Back to dashboard
+        </Link>
+        <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-3xl text-brand sm:text-4xl">
+          Your profile
+        </h1>
+        <p className="mt-2 mb-8 text-[color:var(--foreground)]/75">
+          Edit anytime — jump between steps, update entries, or remove mistakes.
+          Changes save as you go. To delete your whole account, use Settings.
+        </p>
+        <ProfileEditor initial={profile} />
+      </main>
+    </>
   );
 }

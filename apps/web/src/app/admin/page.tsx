@@ -93,7 +93,7 @@ export default async function AdminDashboardPage() {
                   required
                   minLength={2}
                   placeholder="Name or email"
-                  className="min-w-[16rem] flex-1 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
+                  className="min-w-0 w-full flex-1 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm sm:min-w-[16rem]"
                 />
                 <button
                   type="submit"

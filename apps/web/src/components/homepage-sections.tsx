@@ -74,26 +74,26 @@ function HomepageSectionBlock({
             }}
           />
           <div className="absolute inset-0 animate-[horizon-pan_22s_ease-in-out_infinite_alternate] bg-[url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Cpath fill=%22%23ffffff08%22 d=%22M0 40h80M40 0v80%22/%3E%3C/svg%3E')] bg-[length:64px_64px]" />
-          <div className="relative mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col justify-end px-6 pb-14 pt-28 md:min-h-[76vh] md:pb-16 md:pt-32">
+          <div className="relative mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col justify-end px-4 pb-12 pt-24 sm:px-6 sm:pb-14 sm:pt-28 md:min-h-[76vh] md:pb-16 md:pt-32">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/70">
               {str(c.eyebrow, "Career Return Platform")}
             </p>
-            <h1 className="mt-3 max-w-2xl font-[family-name:var(--font-fraunces)] text-5xl leading-[1.02] font-semibold tracking-tight text-white md:text-7xl">
+            <h1 className="mt-3 max-w-2xl font-[family-name:var(--font-fraunces)] text-4xl leading-[1.05] font-semibold tracking-tight break-words text-white sm:text-5xl md:text-7xl">
               {str(c.title, "Project Horizon")}
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-white/85 md:text-lg">
               {str(c.body)}
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="mt-8 flex w-full max-w-lg flex-col gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
               <Link
                 href={str(c.primaryCtaHref, "/register?as=seeker")}
-                className="btn-primary rounded-md bg-brand-accent px-6 py-3.5 text-sm font-semibold text-white transition hover:opacity-90"
+                className="btn-primary w-full rounded-md bg-brand-accent px-5 py-3.5 text-center text-sm font-semibold text-white transition hover:opacity-90 sm:w-auto sm:px-6"
               >
                 {str(c.primaryCtaLabel, "Register as a returner")}
               </Link>
               <Link
                 href={str(c.secondaryCtaHref, "/register?as=employer")}
-                className="rounded-md border border-white/40 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
+                className="w-full rounded-md border border-white/40 bg-white/10 px-5 py-3.5 text-center text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:w-auto sm:px-6"
               >
                 {str(c.secondaryCtaLabel, "Register as an employer")}
               </Link>
@@ -105,11 +105,11 @@ function HomepageSectionBlock({
     case "trust":
       return (
         <section className="border-b border-[color:var(--line)] bg-white/90">
-          <ul className="mx-auto grid max-w-6xl grid-cols-2 gap-px bg-[color:var(--line)] md:grid-cols-4">
+          <ul className="mx-auto grid max-w-6xl grid-cols-1 gap-px bg-[color:var(--line)] sm:grid-cols-2 md:grid-cols-4">
             {arr<string>(c.items).map((item) => (
               <li
                 key={item}
-                className="bg-white px-4 py-5 text-center text-sm font-semibold text-brand"
+                className="bg-white px-4 py-5 text-center text-sm font-semibold break-words text-brand sm:px-5"
               >
                 {item}
               </li>
@@ -133,7 +133,7 @@ function HomepageSectionBlock({
     case "how_it_works":
       return (
         <section className="border-y border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
-          <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
               {str(c.title, "How it works")}
             </h2>
@@ -161,7 +161,7 @@ function HomepageSectionBlock({
 
     case "differentiators":
       return (
-        <section className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+        <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 md:py-20">
           <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
             {str(c.title, "What makes us different")}
           </h2>
@@ -205,7 +205,7 @@ function HomepageSectionBlock({
 
     case "stats":
       return (
-        <section className="mx-auto max-w-6xl px-6 py-16">
+        <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
           <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
             {str(c.title)}
           </h2>
@@ -217,7 +217,7 @@ function HomepageSectionBlock({
           <ul className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
             {arr<{ value: string; label: string }>(c.items).map((stat) => (
               <li key={stat.label}>
-                <p className="font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+                <p className="font-[family-name:var(--font-fraunces)] text-3xl text-brand sm:text-4xl">
                   {stat.value}
                 </p>
                 <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
@@ -237,7 +237,7 @@ function HomepageSectionBlock({
     case "logos":
       return (
         <section className="border-y border-[color:var(--line)] bg-white/70 py-14">
-          <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <h2 className="text-center font-[family-name:var(--font-fraunces)] text-2xl text-brand">
               {str(c.title)}
             </h2>
@@ -250,7 +250,7 @@ function HomepageSectionBlock({
               {arr<string>(c.items).map((name) => (
                 <li
                   key={name}
-                  className="min-w-[7rem] text-center text-sm font-semibold tracking-wide text-brand/45"
+                  className="min-w-0 max-w-[9rem] text-center text-sm font-semibold tracking-wide break-words text-brand/45"
                 >
                   {name}
                 </li>
@@ -262,7 +262,7 @@ function HomepageSectionBlock({
 
     case "testimonials":
       return (
-        <section className="mx-auto max-w-6xl px-6 py-16">
+        <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
           <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
             {str(c.title)}
           </h2>
@@ -292,7 +292,7 @@ function HomepageSectionBlock({
     case "success_stories":
       return (
         <section className="border-y border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
-          <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
               {str(c.title)}
             </h2>
@@ -329,7 +329,7 @@ function HomepageSectionBlock({
       const showSearch = c.showSearch !== false;
 
       return (
-        <section id="jobs" className="mx-auto max-w-6xl px-6 py-16">
+        <section id="jobs" className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">

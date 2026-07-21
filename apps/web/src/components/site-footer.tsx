@@ -3,7 +3,7 @@ import Link from "next/link";
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-[color:var(--line)] bg-brand text-white">
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-6 py-12 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div className="max-w-sm lg:col-span-1">
           <p className="font-[family-name:var(--font-fraunces)] text-xl font-semibold">
             Project Horizon
@@ -93,7 +93,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-white/15">
-        <p className="mx-auto max-w-6xl px-6 py-4 text-xs text-white/55">
+        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-white/55 sm:px-6">
           © {new Date().getFullYear()} Project Horizon (working title). UK only
           for employer registration.
         </p>

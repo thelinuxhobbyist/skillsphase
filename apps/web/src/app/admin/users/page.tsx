@@ -44,7 +44,7 @@ export default async function AdminUsersPage({
             name="q"
             defaultValue={q}
             placeholder="Search name or email (min 2 characters)"
-            className="min-w-[16rem] flex-1 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
+            className="min-w-0 w-full flex-1 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm sm:min-w-[16rem]"
           />
           <select
             name="role"

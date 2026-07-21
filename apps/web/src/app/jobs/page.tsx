@@ -52,8 +52,8 @@ export default async function JobsPage({
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-4xl px-6 py-12">
-      <h1 className="font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+      <main className="mx-auto w-full max-w-4xl min-w-0 px-4 py-10 sm:px-6 sm:py-12">
+      <h1 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand sm:text-4xl">
         Browse jobs
       </h1>
       <p className="mt-2 text-[color:var(--foreground)]/75">

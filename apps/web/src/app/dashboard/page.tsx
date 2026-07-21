@@ -33,12 +33,12 @@ export default async function JobSeekerDashboardPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-4xl px-6 py-12">
+      <main className="mx-auto w-full max-w-4xl min-w-0 px-4 py-10 sm:px-6 sm:py-12">
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand">
             Job seeker
           </p>
-          <h1 className="mt-2 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+          <h1 className="mt-2 font-[family-name:var(--font-fraunces)] text-3xl break-words text-brand sm:text-4xl">
             Welcome{user.firstName ? `, ${user.firstName}` : ""}
           </h1>
         </div>

@@ -18,6 +18,10 @@
   --font-display: var(--font-fraunces);
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   background:
     radial-gradient(circle at top left, rgba(15, 76, 92, 0.16), transparent 40%),
@@ -26,6 +30,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-source-sans), system-ui, sans-serif;
   min-height: 100vh;
+  overflow-x: clip;
+  word-break: break-word;
 }
 
 a {
