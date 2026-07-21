@@ -199,13 +199,14 @@ export function getDefaultHomepageSections(): HomepageSection[] {
         "Example roles so you can see how listings will look — live vacancies appear here once employers publish.",
       showSearch: true,
       demoJobs: HOMEPAGE_DEMO_JOBS.map(
-        ({ slug, title, companyName, location, remoteType, blurb }) => ({
+        ({ slug, title, companyName, location, remoteType, blurb, skills }) => ({
           slug,
           title,
           companyName,
           location,
           remoteType,
           blurb,
+          skills,
         }),
       ),
     }),

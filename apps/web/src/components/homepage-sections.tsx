@@ -322,6 +322,7 @@ function HomepageSectionBlock({
         location: string;
         remoteType: string;
         blurb: string;
+        skills?: string[];
       }>(c.demoJobs);
       const showSearch = c.showSearch !== false;
 
@@ -373,6 +374,11 @@ function HomepageSectionBlock({
             {showDemo
               ? demoJobs.map((job) => {
                   const slug = demoJobSlug(job);
+                  const skills =
+                    job.skills ??
+                    HOMEPAGE_DEMO_JOBS.find((j) => j.title === job.title)
+                      ?.skills ??
+                    [];
                   return (
                     <li key={`${job.title}-${job.companyName}`}>
                       <Link
@@ -389,6 +395,18 @@ function HomepageSectionBlock({
                           {job.companyName} · {job.location} ·{" "}
                           {job.remoteType.replace("_", "-")}
                         </p>
+                        {skills.length > 0 ? (
+                          <ul className="mt-3 flex flex-wrap gap-2 text-xs">
+                            {skills.slice(0, 5).map((skill) => (
+                              <li
+                                key={skill}
+                                className="rounded-md border border-[color:var(--line)] bg-white px-2 py-1 text-brand"
+                              >
+                                {skill}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
                         <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/80">
                           {job.blurb}
                         </p>
@@ -409,6 +427,18 @@ function HomepageSectionBlock({
                       <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
                         {job.companyName} · {job.location}
                       </p>
+                      {job.skills.length > 0 ? (
+                        <ul className="mt-3 flex flex-wrap gap-2 text-xs">
+                          {job.skills.slice(0, 5).map((skill) => (
+                            <li
+                              key={skill.id}
+                              className="rounded-md border border-[color:var(--line)] bg-white px-2 py-1 text-brand"
+                            >
+                              {skill.name}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
                     </Link>
                   </li>
                 ))}

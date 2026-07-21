@@ -32,7 +32,8 @@ export default async function NewJobPage() {
         Create a job
       </h1>
       <p className="mt-2 mb-8 text-[color:var(--foreground)]/75">
-        Draft or publish a vacancy for career returners.
+        Start with the skills this role needs (at least three). Project Horizon
+        is skills-first — lead with abilities, not long employment must-haves.
       </p>
       <JobCreateForm />
     </main>

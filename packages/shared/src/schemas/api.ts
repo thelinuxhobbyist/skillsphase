@@ -113,26 +113,64 @@ export const waitlistSchema = z.object({
   notes: z.string().trim().max(1000).optional(),
 });
 
-export const createJobSchema = z.object({
-  companyId: z.string().uuid().optional(),
-  title: z.string().trim().min(1).max(200),
-  description: z.string().trim().min(1).max(50000),
-  salaryMin: z.number().nonnegative().optional().nullable(),
-  salaryMax: z.number().nonnegative().optional().nullable(),
-  salaryCurrency: z.string().trim().length(3).default("GBP"),
-  location: z.string().trim().min(1).max(200),
-  remoteType: z.enum(REMOTE_TYPES),
-  employmentType: z.string().trim().min(1).max(80),
-  industry: z.string().trim().min(1).max(120),
-  closingDate: z.string().date().optional().nullable(),
-  skillIds: z.array(z.string().uuid()).default([]),
-  skillNames: z.array(z.string().trim().min(1).max(80)).max(40).default([]),
-  publish: z.boolean().default(false),
-});
+export const createJobSchema = z
+  .object({
+    companyId: z.string().uuid().optional(),
+    title: z.string().trim().min(1).max(200),
+    description: z.string().trim().min(1).max(50000),
+    salaryMin: z.number().nonnegative().optional().nullable(),
+    salaryMax: z.number().nonnegative().optional().nullable(),
+    salaryCurrency: z.string().trim().length(3).default("GBP"),
+    location: z.string().trim().min(1).max(200),
+    remoteType: z.enum(REMOTE_TYPES),
+    employmentType: z.string().trim().min(1).max(80),
+    industry: z.string().trim().min(1).max(120),
+    closingDate: z.string().date().optional().nullable(),
+    skillIds: z.array(z.string().uuid()).default([]),
+    skillNames: z.array(z.string().trim().min(1).max(80)).max(40).default([]),
+    publish: z.boolean().default(false),
+  })
+  .superRefine((data, ctx) => {
+    const skillCount = data.skillIds.length + data.skillNames.length;
+    if (skillCount < 3) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["skillNames"],
+        message:
+          "Add at least 3 required skills. Project Horizon is skills-first — lead with abilities, not employment history.",
+      });
+    }
+  });
 
-export const updateJobSchema = createJobSchema
-  .partial()
-  .omit({ companyId: true, publish: true });
+export const updateJobSchema = z
+  .object({
+    title: z.string().trim().min(1).max(200).optional(),
+    description: z.string().trim().min(1).max(50000).optional(),
+    salaryMin: z.number().nonnegative().optional().nullable(),
+    salaryMax: z.number().nonnegative().optional().nullable(),
+    salaryCurrency: z.string().trim().length(3).optional(),
+    location: z.string().trim().min(1).max(200).optional(),
+    remoteType: z.enum(REMOTE_TYPES).optional(),
+    employmentType: z.string().trim().min(1).max(80).optional(),
+    industry: z.string().trim().min(1).max(120).optional(),
+    closingDate: z.string().date().optional().nullable(),
+    skillIds: z.array(z.string().uuid()).optional(),
+    skillNames: z.array(z.string().trim().min(1).max(80)).max(40).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.skillIds !== undefined || data.skillNames !== undefined) {
+      const skillCount =
+        (data.skillIds?.length ?? 0) + (data.skillNames?.length ?? 0);
+      if (skillCount < 3) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["skillNames"],
+          message:
+            "Keep at least 3 required skills. List the abilities this role needs first.",
+        });
+      }
+    }
+  });
 
 
 export const jobListQuerySchema = paginationQuerySchema.extend({

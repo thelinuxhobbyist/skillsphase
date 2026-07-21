@@ -32,14 +32,35 @@ export default async function ExampleJobPage({ params }: { params: Params }) {
           {job.remoteType.replace("_", "-")} · {job.employmentType}
         </p>
 
+        <section className="mt-8">
+          <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
+            Skills required
+          </h2>
+          <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
+            Project Horizon asks employers to lead with abilities — not years in
+            post or unbroken employment history.
+          </p>
+          <ul className="mt-4 flex flex-wrap gap-2 text-sm">
+            {job.skills.map((skill) => (
+              <li
+                key={skill}
+                className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 font-medium text-brand"
+              >
+                {skill}
+              </li>
+            ))}
+          </ul>
+        </section>
+
         <article className="prose mt-8 max-w-none whitespace-pre-wrap text-[color:var(--foreground)]/85">
           {job.description}
         </article>
 
         <div className="mt-10 rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-5">
           <p className="text-sm text-[color:var(--foreground)]/75">
-            This page shows how a real job post will look on Project Horizon.
-            When employers publish live roles, you can apply from the job page.
+            This page shows how a real job post will look on Project Horizon —
+            skills first, then context about the role. When employers publish
+            live roles, you can apply from the job page.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link

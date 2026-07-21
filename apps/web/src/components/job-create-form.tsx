@@ -9,6 +9,7 @@ export function JobCreateForm() {
   const { getToken } = useAuth();
   const router = useRouter();
   const [title, setTitle] = useState("");
+  const [skills, setSkills] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [industry, setIndustry] = useState("");
@@ -19,13 +20,27 @@ export function JobCreateForm() {
   const [salaryMin, setSalaryMin] = useState("");
   const [salaryMax, setSalaryMax] = useState("");
   const [closingDate, setClosingDate] = useState("");
-  const [skills, setSkills] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  function skillNames() {
+    return skills
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
 
   async function submit(publish: boolean) {
     setPending(true);
     setError(null);
+    const names = skillNames();
+    if (names.length < 3) {
+      setError(
+        "Add at least 3 required skills. Lead with abilities, not employment history.",
+      );
+      setPending(false);
+      return;
+    }
     try {
       const token = await getToken();
       if (!token) throw new Error("Missing session token");
@@ -40,10 +55,7 @@ export function JobCreateForm() {
         salaryMax: salaryMax ? Number(salaryMax) : null,
         salaryCurrency: "GBP",
         closingDate: closingDate || null,
-        skillNames: skills
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
+        skillNames: names,
         publish,
       });
       router.push("/employer/jobs");
@@ -60,23 +72,49 @@ export function JobCreateForm() {
 
   return (
     <form
-      className="space-y-3"
+      className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault();
         void submit(false);
       }}
     >
-      <Field label="Title" value={title} onChange={setTitle} required />
+      <Field label="Job title" value={title} onChange={setTitle} required />
+
       <label className="block text-sm">
-        <span className="font-medium text-brand">Description</span>
+        <span className="font-medium text-brand">
+          Skills required (at least 3)
+        </span>
+        <p className="mt-1 text-[color:var(--foreground)]/70">
+          List the abilities this role needs first. Project Horizon is
+          skills-first — avoid long must-have employment timelines.
+        </p>
+        <input
+          required
+          value={skills}
+          onChange={(e) => setSkills(e.target.value)}
+          placeholder="e.g. Stakeholder communication, Budgeting, Excel"
+          className="mt-2 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2"
+        />
+        <p className="mt-1 text-xs text-[color:var(--foreground)]/60">
+          Separate skills with commas.
+        </p>
+      </label>
+
+      <label className="block text-sm">
+        <span className="font-medium text-brand">About the role</span>
+        <p className="mt-1 text-[color:var(--foreground)]/70">
+          Context for the day-to-day work. Skills above do the heavy lifting for
+          who should apply.
+        </p>
         <textarea
           required
           rows={8}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2"
+          className="mt-2 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2"
         />
       </label>
+
       <div className="grid gap-3 md:grid-cols-2">
         <Field label="Location" value={location} onChange={setLocation} required />
         <Field label="Industry" value={industry} onChange={setIndustry} required />
@@ -113,12 +151,6 @@ export function JobCreateForm() {
           label="Closing date (YYYY-MM-DD)"
           value={closingDate}
           onChange={setClosingDate}
-        />
-        <Field
-          label="Skills (comma-separated)"
-          value={skills}
-          onChange={setSkills}
-          placeholder="Excel, Communication"
         />
       </div>
 

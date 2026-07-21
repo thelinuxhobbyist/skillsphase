@@ -6,6 +6,8 @@ export type HomepageDemoJob = {
   remoteType: "on_site" | "hybrid" | "remote";
   employmentType: string;
   blurb: string;
+  /** Required abilities shown first on the listing. */
+  skills: string[];
   description: string;
 };
 
@@ -18,27 +20,30 @@ export const HOMEPAGE_DEMO_JOBS: HomepageDemoJob[] = [
     location: "Manchester",
     remoteType: "hybrid",
     employmentType: "Full-time",
+    skills: [
+      "People leadership",
+      "Operational planning",
+      "Stakeholder communication",
+      "Process improvement",
+      "Retail or multi-site ops",
+    ],
     blurb:
-      "Lead a regional ops team. Returners with people-leadership experience welcome — career breaks recognised as part of the journey.",
+      "Skills-first role: lead regional ops with people leadership and planning ability — career breaks welcome.",
     description: `About the role
 
-Northbridge is hiring an Operations Manager to lead a regional retail ops team across Greater Manchester. You will coach store leaders, improve fulfilment and stock accuracy, and keep customer experience consistent across sites.
+Lead a regional retail operations team across Greater Manchester. Coach store leaders, keep service standards consistent, and improve how work gets done day to day.
 
 This is an example listing so you can see how Project Horizon presents roles. It is not a live vacancy.
 
-What you will do
-• Lead and develop a team of area and store managers
-• Own weekly ops rhythms: stock, labour planning, and service standards
-• Partner with HR and finance on return-to-work friendly scheduling
-• Identify process improvements that reduce friction for customers and staff
+We hire for skills first. Tell us what you can do — a career break for caring, parental leave, or health is context, not a disqualification.
 
-Who this is for
-• Experience leading people in retail, hospitality, logistics, or similar
-• Comfortable with hybrid working (office + store visits)
-• Career breaks for caring, parental leave, or health are welcomed — tell us your story
+Day-to-day
+• Guide and develop store and area managers
+• Run weekly ops rhythms for stock, labour, and service
+• Improve processes that reduce friction for customers and teams
 
 Location & hours
-Hybrid — Manchester base with travel across the region. Full-time; flexible patterns discussed at interview.`,
+Hybrid — Manchester base with regional travel. Full-time; flexible patterns discussed at interview.`,
   },
   {
     slug: "finance-business-partner",
@@ -47,24 +52,27 @@ Hybrid — Manchester base with travel across the region. Full-time; flexible pa
     location: "Leeds",
     remoteType: "hybrid",
     employmentType: "Full-time",
+    skills: [
+      "Management accounting",
+      "Budgeting & forecasting",
+      "Financial storytelling",
+      "Stakeholder partnership",
+      "Excel / financial modelling",
+    ],
     blurb:
-      "Partner with clinical leads on budgets and forecasting. Ideal for experienced accountants returning after parental leave.",
+      "Skills-first FBP role: budgeting, forecasting, and clear insight for clinical leads — returners encouraged.",
     description: `About the role
 
-Cedar Health is looking for a Finance Business Partner to support clinical and operational leads with budgeting, forecasting, and decision-ready insight.
+Partner with clinical and operational leads on budgets, forecasts, and decision-ready insight.
 
 This is an example listing for Project Horizon — not a live vacancy.
 
-What you will do
-• Build and challenge departmental budgets and forecasts
-• Present clear variance analysis to non-finance stakeholders
-• Support business cases for new services and staffing models
-• Help design finance onboarding for colleagues returning from leave
+We lead with required skills, not years in post or unbroken timelines. Parental leave and other career breaks are expected and respected.
 
-Who this is for
-• Qualified accountant (ACA / ACCA / CIMA or equivalent)
-• Experience as an FBP, management accountant, or similar
-• Strong communication skills; career breaks for parental leave are expected and respected
+Day-to-day
+• Build and challenge departmental budgets and forecasts
+• Explain variance clearly to non-finance stakeholders
+• Support business cases for services and staffing
 
 Location & hours
 Hybrid — Leeds. Full-time with part-time or phased return options available.`,
@@ -76,24 +84,27 @@ Hybrid — Leeds. Full-time with part-time or phased return options available.`,
     location: "Remote (UK)",
     remoteType: "remote",
     employmentType: "Full-time",
+    skills: [
+      "Customer relationship management",
+      "Written & verbal communication",
+      "Account health monitoring",
+      "Onboarding & adoption",
+      "Cross-functional collaboration",
+    ],
     blurb:
-      "Support B2B customers through onboarding and renewals. Communication skills and sector knowledge valued over continuous timelines.",
+      "Skills-first CS lead: communication, onboarding, and account health — sector knowledge valued over continuous timelines.",
     description: `About the role
 
-Brightpath Software needs a Customer Success Lead to guide B2B customers from onboarding through renewal, with a focus on clear communication and long-term outcomes.
+Guide B2B customers from onboarding through renewal, with a focus on clear communication and long-term outcomes.
 
 This is an example listing for Project Horizon — not a live vacancy.
 
-What you will do
-• Own a portfolio of mid-market accounts through onboarding and adoption
-• Run QBRs and health checks that surface risk early
-• Work with product and support to close the loop on customer feedback
-• Mentor junior CS colleagues and document playbooks
+Required skills come first. Empathy and sector knowledge matter more than an unbroken CV.
 
-Who this is for
-• Experience in customer success, account management, or client services
-• Excellent written and spoken communication
-• Sector knowledge and empathy matter more than an unbroken CV timeline
+Day-to-day
+• Own a portfolio of mid-market accounts through onboarding and adoption
+• Run health checks that surface risk early
+• Feed customer insight back to product and support
 
 Location & hours
 Remote (UK). Full-time; flexible hours within UK working days.`,

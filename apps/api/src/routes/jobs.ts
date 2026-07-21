@@ -507,6 +507,16 @@ jobRoutes.post(
       );
     }
 
+    const publicJob = await toPublicJob(db, row.job, row.companyName);
+    if (publicJob.skills.length < 3) {
+      return fail(
+        c,
+        "SKILLS_REQUIRED",
+        "Add at least 3 required skills before publishing. Project Horizon is skills-first.",
+        400,
+      );
+    }
+
     const updated = await setJobStatus(db, id, "published");
     if (!updated) return fail(c, "JOB_NOT_FOUND", "Job not found.", 404);
     return ok(c, await toPublicJob(db, updated, row.companyName));
@@ -576,6 +586,16 @@ jobRoutes.post(
         "INVALID_TRANSITION",
         "Only closed jobs can be reopened.",
         409,
+      );
+    }
+
+    const publicJob = await toPublicJob(db, row.job, row.companyName);
+    if (publicJob.skills.length < 3) {
+      return fail(
+        c,
+        "SKILLS_REQUIRED",
+        "Add at least 3 required skills before reopening. Project Horizon is skills-first.",
+        400,
       );
     }
 

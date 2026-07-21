@@ -14,6 +14,7 @@ export function AdminJobCreateForm({
   const router = useRouter();
   const [companyId, setCompanyId] = useState(companies[0]?.id ?? "");
   const [title, setTitle] = useState("");
+  const [skills, setSkills] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [industry, setIndustry] = useState("");
@@ -21,7 +22,6 @@ export function AdminJobCreateForm({
   const [remoteType, setRemoteType] = useState<"on_site" | "hybrid" | "remote">(
     "hybrid",
   );
-  const [skills, setSkills] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -35,12 +35,23 @@ export function AdminJobCreateForm({
 
   return (
     <form
-      className="space-y-3"
+      className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault();
         void (async () => {
           setPending(true);
           setError(null);
+          const skillNames = skills
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+          if (skillNames.length < 3) {
+            setError(
+              "Add at least 3 required skills. Lead with abilities, not employment history.",
+            );
+            setPending(false);
+            return;
+          }
           try {
             const token = await getToken();
             if (!token) throw new Error("Missing session token");
@@ -52,10 +63,7 @@ export function AdminJobCreateForm({
               industry,
               employmentType,
               remoteType,
-              skillNames: skills
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean),
+              skillNames,
               publish: true,
             });
             router.push("/admin/jobs");
@@ -86,17 +94,36 @@ export function AdminJobCreateForm({
           ))}
         </select>
       </label>
-      <Field label="Title" value={title} onChange={setTitle} required />
+      <Field label="Job title" value={title} onChange={setTitle} required />
+
       <label className="block text-sm">
-        <span className="font-medium text-brand">Description</span>
+        <span className="font-medium text-brand">
+          Skills required (at least 3)
+        </span>
+        <p className="mt-1 text-[color:var(--foreground)]/70">
+          Skills first — this is how Project Horizon job posts are meant to
+          work.
+        </p>
+        <input
+          required
+          value={skills}
+          onChange={(e) => setSkills(e.target.value)}
+          placeholder="e.g. Stakeholder communication, Budgeting, Excel"
+          className="mt-2 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2"
+        />
+      </label>
+
+      <label className="block text-sm">
+        <span className="font-medium text-brand">About the role</span>
         <textarea
           required
           rows={8}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2"
+          className="mt-2 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2"
         />
       </label>
+
       <div className="grid gap-3 md:grid-cols-2">
         <Field label="Location" value={location} onChange={setLocation} required />
         <Field label="Industry" value={industry} onChange={setIndustry} required />
@@ -126,11 +153,6 @@ export function AdminJobCreateForm({
             <option value="remote">Remote</option>
           </select>
         </label>
-        <Field
-          label="Skills (comma-separated)"
-          value={skills}
-          onChange={setSkills}
-        />
       </div>
       {error ? (
         <p className="text-sm text-red-700" role="alert">
