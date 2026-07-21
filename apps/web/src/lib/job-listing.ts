@@ -1,6 +1,7 @@
-import type { JobListingContent, JobListingSkill } from "@horizon/shared";
+import type { JobListingContent } from "@horizon/shared";
 import type { HorizonJob } from "@/lib/api";
 
+/** Public job detail — only fields an employer can set when posting. */
 export type JobListingViewModel = {
   slug: string;
   title: string;
@@ -8,19 +9,11 @@ export type JobListingViewModel = {
   location: string;
   remoteType: JobListingContent["remoteType"];
   employmentType: string;
-  /** Employer-provided industry; omit when empty. */
   industry: string | null;
-  companySize: string | null;
-  companyAbout: string | null;
   salaryLabel: string;
   postedLabel: string;
-  skills: JobListingSkill[];
-  goodFitIf: string[];
-  aboutRole: string;
-  benefits: string[];
-  inclusiveHiring: string | null;
-  applicationProcess: string[];
-  whyReturners: string[];
+  skills: string[];
+  description: string;
   jobId: number | null;
   isExample: boolean;
   backHref: string;
@@ -83,18 +76,11 @@ export function listingFromDemo(job: JobListingContent): JobListingViewModel {
     location: job.location,
     remoteType: job.remoteType,
     employmentType: formatEmploymentType(job.employmentType),
-    industry: job.industry || null,
-    companySize: job.companySize || null,
-    companyAbout: job.companyAbout || null,
+    industry: job.industry.trim() ? job.industry.trim() : null,
     salaryLabel: job.salaryLabel,
     postedLabel: job.postedLabel,
     skills: job.skills,
-    goodFitIf: job.goodFitIf,
-    aboutRole: job.aboutRole,
-    benefits: job.benefits,
-    inclusiveHiring: job.inclusiveHiring || null,
-    applicationProcess: job.applicationProcess,
-    whyReturners: job.whyReturners,
+    description: job.description,
     jobId: null,
     isExample: true,
     backHref: "/#jobs",
@@ -102,7 +88,6 @@ export function listingFromDemo(job: JobListingContent): JobListingViewModel {
   };
 }
 
-/** Live jobs: only fields the employer (or company record) actually provides. */
 export function listingFromHorizonJob(job: HorizonJob): JobListingViewModel {
   return {
     slug: job.slug,
@@ -112,20 +97,10 @@ export function listingFromHorizonJob(job: HorizonJob): JobListingViewModel {
     remoteType: job.remoteType,
     employmentType: formatEmploymentType(job.employmentType),
     industry: job.industry?.trim() ? job.industry.trim() : null,
-    companySize: null,
-    companyAbout: null,
     salaryLabel: formatSalary(job),
     postedLabel: formatPosted(job.createdAt),
-    skills: job.skills.map((s) => ({
-      name: s.name,
-      level: "essential" as const,
-    })),
-    goodFitIf: [],
-    aboutRole: job.description,
-    benefits: [],
-    inclusiveHiring: null,
-    applicationProcess: [],
-    whyReturners: [],
+    skills: job.skills.map((s) => s.name),
+    description: job.description,
     jobId: job.id,
     isExample: false,
     backHref: "/jobs",

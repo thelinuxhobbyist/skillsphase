@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { ApplyForm } from "@/components/apply-form";
 import {
   JobListingActions,
@@ -12,67 +11,6 @@ import {
 } from "@/lib/job-listing";
 import type { JobListingContent } from "@horizon/shared";
 import { SiteHeader } from "@/components/site-header";
-
-function SkillChips({
-  title,
-  skills,
-  variant,
-}: {
-  title: string;
-  skills: string[];
-  variant: "essential" | "nice";
-}) {
-  if (skills.length === 0) return null;
-  return (
-    <div>
-      <h3 className="text-sm font-semibold text-brand">{title}</h3>
-      <ul className="mt-2 flex flex-wrap gap-2">
-        {skills.map((skill) => (
-          <li
-            key={skill}
-            className={
-              variant === "essential"
-                ? "rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white break-words"
-                : "rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-medium text-brand break-words"
-            }
-          >
-            {skill}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="border-t border-[color:var(--line)] pt-8">
-      <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand break-words sm:text-[1.65rem]">
-        {title}
-      </h2>
-      <div className="mt-4 min-w-0">{children}</div>
-    </section>
-  );
-}
-
-function BulletList({ items }: { items: string[] }) {
-  return (
-    <ul className="space-y-2 text-[color:var(--foreground)]/80">
-      {items.map((item) => (
-        <li key={item} className="flex gap-2 text-sm leading-relaxed">
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-accent" />
-          <span className="min-w-0 break-words">{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 function SidebarFacts({ listing }: { listing: JobListingViewModel }) {
   const facts: Array<[string, string]> = [
@@ -110,15 +48,10 @@ function ListingSidebarCard({ listing }: { listing: JobListingViewModel }) {
           slug={listing.slug}
         />
       </div>
-      <div className={listing.companyAbout ? "lg:border-t lg:border-[color:var(--line)] lg:pt-4" : ""}>
+      <div className="lg:border-t lg:border-[color:var(--line)] lg:pt-4">
         <p className="text-sm font-semibold break-words text-brand">
           {listing.companyName}
         </p>
-        {listing.companyAbout ? (
-          <p className="mt-1 text-xs break-words text-[color:var(--foreground)]/65 line-clamp-4 lg:line-clamp-3">
-            {listing.companyAbout}
-          </p>
-        ) : null}
       </div>
       <div className="border-t border-[color:var(--line)] pt-4">
         <SidebarFacts listing={listing} />
@@ -128,15 +61,6 @@ function ListingSidebarCard({ listing }: { listing: JobListingViewModel }) {
 }
 
 export function JobListingView({ listing }: { listing: JobListingViewModel }) {
-  const essential = listing.skills
-    .filter((s) => s.level === "essential")
-    .map((s) => s.name);
-  const nice = listing.skills
-    .filter((s) => s.level === "nice_to_have")
-    .map((s) => s.name);
-  const allSkillNames = listing.skills.map((s) => s.name);
-  const hasSkillLevels = nice.length > 0;
-
   return (
     <>
       <SiteHeader />
@@ -150,8 +74,7 @@ export function JobListingView({ listing }: { listing: JobListingViewModel }) {
             className="mt-4 rounded-md border border-brand-accent/40 bg-brand-accent/10 px-4 py-3 text-sm text-brand"
             role="status"
           >
-            Example listing — this is not a live vacancy. It shows how a real
-            Project Horizon job post looks.
+            Example listing — this is not a live vacancy.
           </div>
         ) : null}
 
@@ -185,119 +108,33 @@ export function JobListingView({ listing }: { listing: JobListingViewModel }) {
 
         <div className="mt-8 grid min-w-0 gap-8 lg:mt-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-10">
           <div className="order-2 min-w-0 space-y-8 lg:order-1 lg:space-y-10">
-            {allSkillNames.length > 0 ? (
+            {listing.skills.length > 0 ? (
               <section>
                 <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
                   Skills required
                 </h2>
-                <div className="mt-5 space-y-5">
-                  {hasSkillLevels ? (
-                    <>
-                      <SkillChips
-                        title="Essential skills"
-                        skills={essential}
-                        variant="essential"
-                      />
-                      <SkillChips
-                        title="Nice to have"
-                        skills={nice}
-                        variant="nice"
-                      />
-                    </>
-                  ) : (
-                    <SkillChips
-                      title="Skills"
-                      skills={allSkillNames}
-                      variant="essential"
-                    />
-                  )}
-                </div>
+                <ul className="mt-5 flex flex-wrap gap-2">
+                  {listing.skills.map((skill) => (
+                    <li
+                      key={skill}
+                      className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium break-words text-white"
+                    >
+                      {skill}
+                    </li>
+                  ))}
+                </ul>
               </section>
             ) : null}
 
-            {listing.goodFitIf.length > 0 ? (
-              <Section title="You might be a good fit if…">
-                <BulletList items={listing.goodFitIf} />
-              </Section>
-            ) : null}
-
-            {listing.aboutRole.trim() ? (
-              <Section title="About the role">
-                <article className="whitespace-pre-wrap break-words text-sm leading-relaxed text-[color:var(--foreground)]/85">
-                  {listing.aboutRole}
+            {listing.description.trim() ? (
+              <section className="border-t border-[color:var(--line)] pt-8">
+                <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
+                  About the role
+                </h2>
+                <article className="mt-4 whitespace-pre-wrap break-words text-sm leading-relaxed text-[color:var(--foreground)]/85">
+                  {listing.description}
                 </article>
-              </Section>
-            ) : null}
-
-            {listing.benefits.length > 0 ? (
-              <Section title="Benefits">
-                <BulletList items={listing.benefits} />
-              </Section>
-            ) : null}
-
-            {listing.inclusiveHiring ? (
-              <Section title="Inclusive hiring">
-                <p className="break-words text-sm leading-relaxed text-[color:var(--foreground)]/85">
-                  {listing.inclusiveHiring}
-                </p>
-              </Section>
-            ) : null}
-
-            {listing.applicationProcess.length > 0 ? (
-              <Section title="Application process">
-                <ol className="space-y-3">
-                  {listing.applicationProcess.map((step, index) => (
-                    <li key={step} className="flex gap-3 text-sm">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white">
-                        {index + 1}
-                      </span>
-                      <span className="min-w-0 break-words pt-0.5 text-[color:var(--foreground)]/85">
-                        {step}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
-              </Section>
-            ) : null}
-
-            {listing.companyAbout || listing.industry || listing.companySize ? (
-              <Section title="About the company">
-                {listing.companyAbout ? (
-                  <p className="break-words text-sm leading-relaxed text-[color:var(--foreground)]/85">
-                    {listing.companyAbout}
-                  </p>
-                ) : null}
-                {listing.industry || listing.companySize ? (
-                  <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                    {listing.industry ? (
-                      <div>
-                        <dt className="text-xs font-semibold uppercase tracking-wide text-[color:var(--foreground)]/55">
-                          Industry
-                        </dt>
-                        <dd className="mt-0.5 font-medium break-words text-brand">
-                          {listing.industry}
-                        </dd>
-                      </div>
-                    ) : null}
-                    {listing.companySize ? (
-                      <div>
-                        <dt className="text-xs font-semibold uppercase tracking-wide text-[color:var(--foreground)]/55">
-                          Organisation size
-                        </dt>
-                        <dd className="mt-0.5 font-medium break-words text-brand">
-                          {listing.companySize}
-                        </dd>
-                      </div>
-                    ) : null}
-                  </dl>
-                ) : null}
-              </Section>
-            ) : null}
-
-            {listing.whyReturners.length > 0 ? (
-              <Section title="Why this role suits returners">
-                <BulletList items={listing.whyReturners} />
-              </Section>
+              </section>
             ) : null}
 
             {!listing.isExample && listing.jobId != null ? (
@@ -315,7 +152,7 @@ export function JobListingView({ listing }: { listing: JobListingViewModel }) {
 
           <aside className="order-1 min-w-0 space-y-4 lg:sticky lg:top-6 lg:order-2 lg:self-start">
             <ListingSidebarCard listing={listing} />
-            <SkillsMatchPanel requiredSkills={allSkillNames} />
+            <SkillsMatchPanel requiredSkills={listing.skills} />
           </aside>
         </div>
       </main>

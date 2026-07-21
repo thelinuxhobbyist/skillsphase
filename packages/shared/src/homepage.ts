@@ -214,7 +214,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
           location,
           remoteType,
           blurb,
-          skills: skills.map((s) => s.name),
+          skills,
         }),
       ),
     }),
