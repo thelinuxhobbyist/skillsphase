@@ -4,12 +4,38 @@ import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { getCurrentUser, getProfileBundle, type HorizonUser } from "@/lib/api";
+import { isClerkConfigured } from "@/lib/clerk-config";
 
 function normalize(value: string) {
   return value.trim().toLowerCase();
 }
 
 export function SkillsMatchPanel({
+  requiredSkills,
+}: {
+  requiredSkills: string[];
+}) {
+  if (!isClerkConfigured()) {
+    return (
+      <div className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-4">
+        <p className="text-sm font-semibold text-brand">Skills match</p>
+        <p className="mt-2 text-sm text-[color:var(--foreground)]/75">
+          Create a returner profile to see how your skills line up with this
+          role — a Project Horizon difference versus traditional job boards.
+        </p>
+        <Link
+          href="/register?as=seeker"
+          className="mt-3 inline-block text-sm font-semibold text-brand underline"
+        >
+          Create your profile
+        </Link>
+      </div>
+    );
+  }
+  return <ConfiguredSkillsMatchPanel requiredSkills={requiredSkills} />;
+}
+
+function ConfiguredSkillsMatchPanel({
   requiredSkills,
 }: {
   requiredSkills: string[];

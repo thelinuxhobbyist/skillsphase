@@ -16,12 +16,25 @@ import {
   type BootstrapRole,
 } from "@/lib/roles";
 
+import { isClerkConfigured } from "@/lib/clerk-config";
+
 type AuthSyncProps = {
   redirectOnSuccess?: boolean;
   preferredRole?: BootstrapRole | null;
 };
 
-export function AuthSync({
+export function AuthSync(props: AuthSyncProps) {
+  if (!isClerkConfigured()) {
+    return (
+      <p className="px-6 py-16 text-center text-[color:var(--foreground)]/70">
+        Clerk authentication is not configured.
+      </p>
+    );
+  }
+  return <ConfiguredAuthSync {...props} />;
+}
+
+function ConfiguredAuthSync({
   redirectOnSuccess = true,
   preferredRole = null,
 }: AuthSyncProps) {

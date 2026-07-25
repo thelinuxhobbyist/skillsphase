@@ -5,8 +5,31 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ApiRequestError, applyToJob } from "@/lib/api";
+import { isClerkConfigured } from "@/lib/clerk-config";
 
 export function ApplyForm({
+  jobId,
+  defaultCoverLetter,
+}: {
+  jobId: number;
+  defaultCoverLetter?: string | null;
+}) {
+  if (!isClerkConfigured()) {
+    return (
+      <div className="mt-10">
+        <Link
+          href="/login"
+          className="inline-block rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white"
+        >
+          Sign in to apply
+        </Link>
+      </div>
+    );
+  }
+  return <ConfiguredApplyForm jobId={jobId} defaultCoverLetter={defaultCoverLetter} />;
+}
+
+function ConfiguredApplyForm({
   jobId,
   defaultCoverLetter,
 }: {

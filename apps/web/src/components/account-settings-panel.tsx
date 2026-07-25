@@ -8,8 +8,22 @@ import {
   deleteMyAccount,
   exportMyData,
 } from "@/lib/api";
+import { isClerkConfigured } from "@/lib/clerk-config";
 
-export function AccountSettingsPanel({
+export function AccountSettingsPanel(props: {
+  role: "job_seeker" | "employer";
+}) {
+  if (!isClerkConfigured()) {
+    return (
+      <div className="p-6 text-center text-[color:var(--foreground)]/70">
+        Clerk authentication is not configured.
+      </div>
+    );
+  }
+  return <ConfiguredAccountSettingsPanel {...props} />;
+}
+
+function ConfiguredAccountSettingsPanel({
   role,
 }: {
   role: "job_seeker" | "employer";

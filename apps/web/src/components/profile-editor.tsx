@@ -52,7 +52,20 @@ const STEPS: Array<{ id: StepId; label: string }> = [
   { id: "review", label: "Review" },
 ];
 
+import { isClerkConfigured } from "@/lib/clerk-config";
+
 export function ProfileEditor({ initial }: { initial: ProfileBundle }) {
+  if (!isClerkConfigured()) {
+    return (
+      <div className="p-6 text-center text-[color:var(--foreground)]/70">
+        Clerk authentication is not configured.
+      </div>
+    );
+  }
+  return <ConfiguredProfileEditor initial={initial} />;
+}
+
+function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
   const { getToken } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState<StepId>(() => firstIncompleteStep(initial));
