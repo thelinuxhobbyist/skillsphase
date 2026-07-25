@@ -218,7 +218,24 @@ You will collaborate with Product, Support, and Sales, and report into the Head 
 ];
 
 export function findHomepageDemoJob(slug: string): JobListingContent | undefined {
-  return HOMEPAGE_DEMO_JOBS.find((job) => job.slug === slug);
+  if (!slug) return undefined;
+  const target = slug.trim().toLowerCase();
+
+  const exact = HOMEPAGE_DEMO_JOBS.find((job) => job.slug.toLowerCase() === target);
+  if (exact) return exact;
+
+  const titleMatch = HOMEPAGE_DEMO_JOBS.find((job) => {
+    const titleSlug = job.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    return target.includes(titleSlug) || titleSlug.includes(target);
+  });
+  if (titleMatch) return titleMatch;
+
+  return HOMEPAGE_DEMO_JOBS.find(
+    (job) => job.slug.includes(target) || target.includes(job.slug),
+  );
 }
 
 export function similarHomepageDemoJobs(

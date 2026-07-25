@@ -6,13 +6,18 @@ import { fail } from "../lib/response";
 import { findActiveUserByClerkId } from "../lib/users";
 
 async function resolveClerkUserId(c: {
-  env: AppEnv["Bindings"];
+  env: AppEnv["Bindings"] & { NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?: string };
   req: { raw: Request };
 }): Promise<string | null> {
-  const secretKey = c.env.CLERK_SECRET_KEY;
-  const publishableKey = c.env.CLERK_PUBLISHABLE_KEY;
+  const secretKey = c.env.CLERK_SECRET_KEY?.trim();
+  const publishableKey = (c.env.CLERK_PUBLISHABLE_KEY || c.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY)?.trim();
 
-  if (!secretKey || !publishableKey) {
+  if (
+    !secretKey ||
+    !publishableKey ||
+    secretKey.includes("...") ||
+    publishableKey.includes("...")
+  ) {
     return null;
   }
 

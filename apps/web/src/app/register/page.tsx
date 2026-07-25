@@ -19,9 +19,9 @@ function withChrome(content: React.ReactNode) {
   );
 }
 
-const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim() ?? "";
-const hasClerk =
-  publishableKey.startsWith("pk_") && !publishableKey.includes("...");
+import { isClerkConfigured } from "@/lib/clerk-config";
+
+const hasClerk = isClerkConfigured();
 
 function parseRoleParam(value: string | null): BootstrapRole | null {
   if (value === "job_seeker" || value === "seeker" || value === "returner") {

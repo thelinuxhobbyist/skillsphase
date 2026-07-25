@@ -1,9 +1,8 @@
-"use client";
-
+import { isClerkConfigured } from "@/lib/clerk-config";
 import { UserButton } from "@clerk/nextjs";
 
 export function SafeUserButton() {
-  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+  if (!isClerkConfigured()) {
     return null;
   }
 

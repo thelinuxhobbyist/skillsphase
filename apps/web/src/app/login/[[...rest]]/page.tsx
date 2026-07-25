@@ -1,7 +1,8 @@
+import { isClerkConfigured } from "@/lib/clerk-config";
 import { SignIn } from "@clerk/nextjs";
 
 export default function LoginPage() {
-  const configured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const configured = isClerkConfigured();
 
   return (
     <main className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-6 py-16">

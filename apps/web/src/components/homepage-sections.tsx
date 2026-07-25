@@ -385,36 +385,40 @@ function HomepageSectionBlock({
                     <li key={`${job.title}-${job.companyName}`}>
                       <Link
                         href={`/jobs/examples/${slug}`}
-                        className="block rounded-md border border-[color:var(--line)] bg-white/80 p-5 transition hover:bg-white"
+                        className="group block w-full rounded-lg border border-[color:var(--line)] bg-white/80 p-5 sm:p-6 transition-all duration-200 hover:border-brand hover:bg-white hover:shadow-md cursor-pointer"
                       >
                         <div className="flex flex-wrap items-start justify-between gap-2">
-                          <h3 className="font-semibold text-brand">{job.title}</h3>
-                          <span className="text-xs font-semibold uppercase tracking-wide text-brand-accent">
+                          <h3 className="font-semibold text-lg text-brand group-hover:text-brand-accent transition-colors">
+                            {job.title}
+                          </h3>
+                          <span className="rounded-full bg-brand-accent/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-brand-accent">
                             Example listing
                           </span>
                         </div>
-                        <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
+                        <p className="mt-1 text-sm font-medium text-[color:var(--foreground)]/70">
                           {job.companyName} · {job.location} ·{" "}
                           {job.remoteType.replace("_", "-")}
                         </p>
                         {skills.length > 0 ? (
-                          <ul className="mt-3 flex flex-wrap gap-2 text-xs">
+                          <div className="mt-3 flex flex-wrap gap-2 text-xs">
                             {skills.slice(0, 5).map((skill) => (
-                              <li
+                              <span
                                 key={skill}
-                                className="rounded-md border border-[color:var(--line)] bg-white px-2 py-1 text-brand"
+                                className="rounded-md border border-[color:var(--line)] bg-white px-2.5 py-1 text-brand font-medium pointer-events-none"
                               >
                                 {skill}
-                              </li>
+                              </span>
                             ))}
-                          </ul>
+                          </div>
                         ) : null}
                         <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/80">
                           {job.blurb}
                         </p>
-                        <span className="mt-4 inline-block text-sm font-semibold text-brand underline">
-                          Read full example listing
-                        </span>
+                        <div className="mt-4 flex items-center justify-between border-t border-[color:var(--line)]/60 pt-3">
+                          <span className="text-sm font-semibold text-brand group-hover:text-brand-accent group-hover:underline inline-flex items-center gap-1">
+                            Read full example listing <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                          </span>
+                        </div>
                       </Link>
                     </li>
                   );
@@ -423,24 +427,41 @@ function HomepageSectionBlock({
                   <li key={job.id}>
                     <Link
                       href={`/jobs/${job.slug}`}
-                      className="block rounded-md border border-[color:var(--line)] bg-white/70 p-5 transition hover:bg-white"
+                      className="group block w-full rounded-lg border border-[color:var(--line)] bg-white/80 p-5 sm:p-6 transition-all duration-200 hover:border-brand hover:bg-white hover:shadow-md cursor-pointer"
                     >
-                      <h3 className="font-semibold text-brand">{job.title}</h3>
-                      <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <h3 className="font-semibold text-lg text-brand group-hover:text-brand-accent transition-colors">
+                          {job.title}
+                        </h3>
+                        <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-brand">
+                          {job.remoteType.replace("_", "-")}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm font-medium text-[color:var(--foreground)]/70">
                         {job.companyName} · {job.location}
                       </p>
                       {job.skills.length > 0 ? (
-                        <ul className="mt-3 flex flex-wrap gap-2 text-xs">
+                        <div className="mt-3 flex flex-wrap gap-2 text-xs">
                           {job.skills.slice(0, 5).map((skill) => (
-                            <li
+                            <span
                               key={skill.id}
-                              className="rounded-md border border-[color:var(--line)] bg-white px-2 py-1 text-brand"
+                              className="rounded-md border border-[color:var(--line)] bg-white px-2.5 py-1 text-brand font-medium pointer-events-none"
                             >
                               {skill.name}
-                            </li>
+                            </span>
                           ))}
-                        </ul>
+                        </div>
                       ) : null}
+                      {job.description ? (
+                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-[color:var(--foreground)]/80">
+                          {job.description}
+                        </p>
+                      ) : null}
+                      <div className="mt-4 flex items-center justify-between border-t border-[color:var(--line)]/60 pt-3">
+                        <span className="text-sm font-semibold text-brand group-hover:text-brand-accent group-hover:underline inline-flex items-center gap-1">
+                          View role details <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                        </span>
+                      </div>
                     </Link>
                   </li>
                 ))}

@@ -17,6 +17,6 @@ export default async function ExampleJobPage({ params }: { params: Params }) {
   const { slug } = await params;
   const job = findHomepageDemoJob(slug);
   if (!job) notFound();
-  const similarJobs = similarCardsFromDemos(similarHomepageDemoJobs(slug));
+  const similarJobs = similarCardsFromDemos(similarHomepageDemoJobs(job.slug));
   return <ExampleJobListingView job={job} similarJobs={similarJobs} />;
 }

@@ -12,9 +12,9 @@ const PUBLIC_LINKS = [
   { href: "/waitlist", label: "Waitlist" },
 ] as const;
 
-const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim() ?? "";
-const hasClerk =
-  publishableKey.startsWith("pk_") && !publishableKey.includes("...");
+import { isClerkConfigured } from "@/lib/clerk-config";
+
+const hasClerk = isClerkConfigured();
 
 function linksForUser(user: HorizonUser | null) {
   if (user?.role === "job_seeker") {
