@@ -5,14 +5,13 @@ import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { getCurrentUser, type HorizonUser } from "@/lib/api";
 import { SafeUserButton } from "@/components/safe-user-button";
+import { isClerkConfigured } from "@/lib/clerk-config";
 
 const PUBLIC_LINKS = [
   { href: "/jobs", label: "Jobs" },
   { href: "/about", label: "About" },
   { href: "/waitlist", label: "Waitlist" },
 ] as const;
-
-import { isClerkConfigured } from "@/lib/clerk-config";
 
 const hasClerk = isClerkConfigured();
 

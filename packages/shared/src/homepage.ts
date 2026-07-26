@@ -31,7 +31,7 @@ export const HOMEPAGE_SECTION_LABELS: Record<HomepageSectionType, string> = {
   logos: "Employer logos",
   testimonials: "Testimonials",
   success_stories: "Success stories",
-  featured_jobs: "Featured jobs + search",
+  featured_jobs: "Featured jobs",
   closing_cta: "Closing call-to-action",
   faq: "FAQ",
 };
@@ -67,6 +67,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       eyebrow: "Career Return Platform",
       title: "Project Horizon",
       body: "A career break doesn't erase your experience. Restart, return, and move forward with employers who hire the whole human — not just the uninterrupted timeline.",
+      showSearch: true,
       primaryCtaLabel: "Register as a returner",
       primaryCtaHref: "/register?as=seeker",
       secondaryCtaLabel: "Register as an employer",
@@ -197,7 +198,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       subtitleLive: "Roles from verified UK employers welcoming career returners.",
       subtitleDemo:
         "Example roles so you can see how listings will look — live vacancies appear here once employers publish.",
-      showSearch: true,
+      showSearch: false,
       demoJobs: HOMEPAGE_DEMO_JOBS.map(
         ({
           slug,

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { HomepageSection } from "@horizon/shared";
 import { HOMEPAGE_DEMO_JOBS } from "@horizon/shared";
+import { JobSearchForm } from "@/components/job-search-form";
 import type { HorizonJob } from "@/lib/api";
 
 function str(value: unknown, fallback = "") {
@@ -84,6 +85,29 @@ function HomepageSectionBlock({
             <p className="mt-5 max-w-lg text-base leading-relaxed text-white/85 md:text-lg">
               {str(c.body)}
             </p>
+            {c.showSearch !== false ? (
+              <div className="mt-8 w-full max-w-2xl">
+                <JobSearchForm variant="hero" className="w-full" />
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-white/80">
+                  <span className="font-semibold text-white/90">Popular:</span>
+                  {[
+                    "Flexible Hours",
+                    "Operations",
+                    "Finance",
+                    "Technology",
+                    "Remote",
+                  ].map((tag) => (
+                    <Link
+                      key={tag}
+                      href={`/jobs?keyword=${encodeURIComponent(tag)}`}
+                      className="rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-white transition hover:bg-white/20 backdrop-blur"
+                    >
+                      {tag}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <div className="mt-8 flex w-full max-w-lg flex-col gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
               <Link
                 href={str(c.primaryCtaHref, "/register?as=seeker")}
@@ -326,7 +350,7 @@ function HomepageSectionBlock({
         blurb: string;
         skills?: string[];
       }>(c.demoJobs);
-      const showSearch = c.showSearch !== false;
+      const showSearch = c.showSearch === true;
 
       return (
         <section id="jobs" className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
@@ -347,29 +371,7 @@ function HomepageSectionBlock({
           </div>
 
           {showSearch ? (
-            <form
-              action="/jobs"
-              method="get"
-              className="mt-8 grid gap-3 sm:grid-cols-[1fr_1fr_auto]"
-              aria-label="Search open roles"
-            >
-              <input
-                name="keyword"
-                placeholder="Keyword or skill"
-                className="rounded-md border border-[color:var(--line)] bg-white px-3 py-3 text-sm"
-              />
-              <input
-                name="location"
-                placeholder="Location"
-                className="rounded-md border border-[color:var(--line)] bg-white px-3 py-3 text-sm"
-              />
-              <button
-                type="submit"
-                className="btn-primary rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-              >
-                Search jobs
-              </button>
-            </form>
+            <JobSearchForm className="mt-8 grid gap-3 sm:grid-cols-[1fr_1fr_auto]" />
           ) : null}
 
           <ul className="mt-8 space-y-4">
