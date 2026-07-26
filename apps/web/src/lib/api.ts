@@ -41,18 +41,38 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const { token, headers, ...rest } = options;
 
-  const response = await fetch(`${getApiBaseUrl()}${path}`, {
-    ...rest,
-    headers: {
-      Accept: "application/json",
-      ...(rest.body ? { "Content-Type": "application/json" } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(headers ?? {}),
-    },
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getApiBaseUrl()}${path}`, {
+      ...rest,
+      headers: {
+        Accept: "application/json",
+        ...(rest.body ? { "Content-Type": "application/json" } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(headers ?? {}),
+      },
+      cache: "no-store",
+    });
+  } catch (err) {
+    console.error(`[API Fetch Error] Request to ${path} failed:`, err);
+    throw new ApiRequestError(
+      0,
+      "NETWORK_ERROR",
+      `Unable to connect to the Horizon API server (${getApiBaseUrl()}). Please check your connection or ensure the backend server is running.`,
+    );
+  }
 
-  const payload = (await response.json()) as ApiResponse<T>;
+  let payload: ApiResponse<T>;
+  try {
+    payload = (await response.json()) as ApiResponse<T>;
+  } catch (err) {
+    console.error(`[API Parse Error] Request to ${path} returned invalid JSON:`, err);
+    throw new ApiRequestError(
+      response.status,
+      "INVALID_RESPONSE",
+      `The server returned an invalid response (${response.status} ${response.statusText}).`,
+    );
+  }
 
   if (!response.ok || !payload.success) {
     const errorPayload = payload as ApiError;

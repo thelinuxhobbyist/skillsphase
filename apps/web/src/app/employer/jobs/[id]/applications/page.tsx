@@ -1,4 +1,5 @@
 import { JobApplicantsPanel } from "@/components/job-applicants-panel";
+import { SiteHeader } from "@/components/site-header";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -41,16 +42,19 @@ export default async function JobApplicationsPage({
   const applications = await listJobApplications(token, jobId);
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <Link href="/employer/jobs" className="text-sm text-brand underline">
-        ← Back to jobs
-      </Link>
-      <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
-        Applicants
-      </h1>
-      <div className="mt-8">
-        <JobApplicantsPanel applications={applications} />
-      </div>
-    </main>
+    <>
+      <SiteHeader />
+      <main className="mx-auto max-w-4xl px-6 py-12">
+        <Link href="/employer/jobs" className="text-sm text-brand underline">
+          ← Back to jobs
+        </Link>
+        <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+          Applicants
+        </h1>
+        <div className="mt-8">
+          <JobApplicantsPanel applications={applications} />
+        </div>
+      </main>
+    </>
   );
 }

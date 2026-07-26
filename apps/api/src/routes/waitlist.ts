@@ -8,15 +8,6 @@ import { fail, ok } from "../lib/response";
 export const waitlistRoutes = new Hono<AppEnv>();
 
 waitlistRoutes.post("/", async (c) => {
-  if (!c.env.DATABASE_URL) {
-    return fail(
-      c,
-      "DATABASE_NOT_CONFIGURED",
-      "Database is not configured on this environment.",
-      503,
-    );
-  }
-
   const body = await c.req.json().catch(() => null);
   const parsed = waitlistSchema.safeParse(body);
   if (!parsed.success) {
@@ -28,7 +19,7 @@ waitlistRoutes.post("/", async (c) => {
     );
   }
 
-  const db = getDb(c);
+  const db = await getDb(c);
   const created = await createWaitlistEntry(db, parsed.data);
 
   return ok(

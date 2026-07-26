@@ -49,21 +49,12 @@ userRoutes.get("/me", requireAppUser, async (c) => {
 });
 
 userRoutes.post("/me/bootstrap", async (c) => {
-  if (!c.env.DATABASE_URL) {
-    return fail(
-      c,
-      "DATABASE_NOT_CONFIGURED",
-      "Database is not configured on this environment.",
-      503,
-    );
-  }
-
   const clerkUserId = c.get("clerkUserId");
   if (!clerkUserId) {
     return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
   }
 
-  const db = getDb(c);
+  const db = await getDb(c);
   const existing = await findActiveUserByClerkId(db, clerkUserId);
   if (existing) {
     return ok(c, toPublicUser(existing));
@@ -164,7 +155,7 @@ userRoutes.patch("/me", requireAppUser, async (c) => {
     );
   }
 
-  const db = getDb(c);
+  const db = await getDb(c);
   const result = await updateAppUserProfile(db, appUser, parsed.data);
   c.set("appUser", result);
   return ok(c, toPublicUser(result));
@@ -176,7 +167,8 @@ userRoutes.get("/me/export", requireAppUser, async (c) => {
     return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
   }
 
-  return ok(c, await buildGdprExport(getDb(c), appUser));
+  const db = await getDb(c);
+  return ok(c, await buildGdprExport(db, appUser));
 });
 
 userRoutes.delete("/me", requireAppUser, async (c) => {
@@ -194,7 +186,7 @@ userRoutes.delete("/me", requireAppUser, async (c) => {
     );
   }
 
-  const db = getDb(c);
+  const db = await getDb(c);
 
   if (appUser.role === "employer") {
     const blocked = await employerHasBlockingDependencies(db, appUser.id);

@@ -25,9 +25,25 @@ app.onError((err, c) => {
       level: "error",
       requestId: c.get("requestId"),
       message: err.message,
+      stack: err.stack,
     }),
   );
-  return fail(c, "INTERNAL_ERROR", "An unexpected error occurred.", 500);
+
+  if (err.name === "DatabaseConfigError" || (err as { code?: string }).code === "DATABASE_NOT_CONFIGURED") {
+    return fail(
+      c,
+      "DATABASE_NOT_CONFIGURED",
+      err.message || "Database is not configured.",
+      503,
+    );
+  }
+
+  return fail(
+    c,
+    "INTERNAL_ERROR",
+    err.message ?? "An unexpected server error occurred.",
+    500,
+  );
 });
 
 export default {

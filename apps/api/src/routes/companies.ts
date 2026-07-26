@@ -75,7 +75,7 @@ companyRoutes.get("/me", async (c) => {
     return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
   }
 
-  const db = getDb(c);
+  const db = await getDb(c);
   const company = await findCompanyByOwner(db, appUser.id);
   if (!company) {
     return fail(c, "COMPANY_NOT_FOUND", "No company registration found.", 404);
@@ -110,7 +110,7 @@ companyRoutes.post("/", async (c) => {
     );
   }
 
-  const db = getDb(c);
+  const db = await getDb(c);
   const existingForOwner = await findCompanyByOwner(db, appUser.id);
   if (existingForOwner) {
     return fail(
@@ -172,7 +172,7 @@ companyRoutes.patch("/me", async (c) => {
     return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
   }
 
-  const db = getDb(c);
+  const db = await getDb(c);
   const company = await findCompanyByOwner(db, appUser.id);
   if (!company) {
     return fail(c, "COMPANY_NOT_FOUND", "No company registration found.", 404);
@@ -247,7 +247,7 @@ companyRoutes.post("/me/resubmit", async (c) => {
     return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
   }
 
-  const db = getDb(c);
+  const db = await getDb(c);
   const company = await findCompanyByOwner(db, appUser.id);
   if (!company) {
     return fail(c, "COMPANY_NOT_FOUND", "No company registration found.", 404);

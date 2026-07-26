@@ -51,12 +51,10 @@ export const optionalClerkAuth = createMiddleware<AppEnv>(async (c, next) => {
     if (clerkUserId) {
       c.set("clerkUserId", clerkUserId);
 
-      if (c.env.DATABASE_URL) {
-        const db = getDb(c);
-        const appUser = await findActiveUserByClerkId(db, clerkUserId);
-        if (appUser) {
-          c.set("appUser", appUser);
-        }
+      const db = await getDb(c);
+      const appUser = await findActiveUserByClerkId(db, clerkUserId);
+      if (appUser) {
+        c.set("appUser", appUser);
       }
     }
   } catch (error) {
@@ -102,20 +100,11 @@ export const requireClerkAuth = createMiddleware<AppEnv>(async (c, next) => {
 
 /** Requires Clerk session and a synced application user row. */
 export const requireAppUser = createMiddleware<AppEnv>(async (c, next) => {
-  if (!c.env.DATABASE_URL) {
-    return fail(
-      c,
-      "DATABASE_NOT_CONFIGURED",
-      "Database is not configured on this environment.",
-      503,
-    );
-  }
-
   let appUser = c.get("appUser");
   const clerkUserId = c.get("clerkUserId");
 
   if (!appUser && clerkUserId) {
-    const db = getDb(c);
+    const db = await getDb(c);
     appUser = (await findActiveUserByClerkId(db, clerkUserId)) ?? undefined;
     if (appUser) {
       c.set("appUser", appUser);

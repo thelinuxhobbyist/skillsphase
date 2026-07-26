@@ -1,4 +1,5 @@
 import { JobCreateForm } from "@/components/job-create-form";
+import { SiteHeader } from "@/components/site-header";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -24,18 +25,21 @@ export default async function NewJobPage() {
   if (company.verificationStatus !== "approved") redirect("/employer");
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
-      <Link href="/employer/jobs" className="text-sm text-brand underline">
-        ← Back to jobs
-      </Link>
-      <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
-        Create a job
-      </h1>
-      <p className="mt-2 mb-8 text-[color:var(--foreground)]/75">
-        Start with the skills this role needs (at least three). Project Horizon
-        is skills-first — lead with abilities, not long employment must-haves.
-      </p>
-      <JobCreateForm />
-    </main>
+    <>
+      <SiteHeader />
+      <main className="mx-auto max-w-3xl px-6 py-12">
+        <Link href="/employer/jobs" className="text-sm text-brand underline">
+          ← Back to jobs
+        </Link>
+        <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+          Create a job
+        </h1>
+        <p className="mt-2 mb-8 text-[color:var(--foreground)]/75">
+          Start with the skills this role needs (at least three). Project Horizon
+          is skills-first — lead with abilities, not long employment must-haves.
+        </p>
+        <JobCreateForm />
+      </main>
+    </>
   );
 }
