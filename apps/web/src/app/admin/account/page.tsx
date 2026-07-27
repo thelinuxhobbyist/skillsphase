@@ -10,10 +10,10 @@ export default async function AdminAccountPage() {
     <>
       <AdminHeader />
       <main className="mx-auto max-w-3xl px-6 py-12">
-        <Link href="/admin" className="text-sm text-brand underline">
+        <Link href="/admin" className="text-sm text-primary underline">
           ← Back to dashboard
         </Link>
-        <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+        <h1 className="mt-4 font-display text-4xl text-primary">
           Your admin account
         </h1>
         <p className="mt-2 text-[color:var(--foreground)]/75">

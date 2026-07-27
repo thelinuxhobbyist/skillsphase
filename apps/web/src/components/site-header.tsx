@@ -8,27 +8,33 @@ import { SafeUserButton } from "@/components/safe-user-button";
 import { isClerkConfigured } from "@/lib/clerk-config";
 
 const PUBLIC_LINKS = [
-  { href: "/jobs", label: "Jobs" },
+  { href: "/discover-talent", label: "Browse Talent" },
   { href: "/about", label: "About" },
   { href: "/waitlist", label: "Waitlist" },
 ] as const;
 
 const hasClerk = isClerkConfigured();
 
+const navLinkClass =
+  "text-base text-muted-foreground transition-colors hover:text-foreground";
+const mobileNavLinkClass =
+  "rounded-md px-1 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-surface hover:text-primary";
+
 function linksForUser(user: HorizonUser | null) {
   if (user?.role === "job_seeker") {
     return [
       { href: "/dashboard", label: "Dashboard" },
-      { href: "/jobs", label: "Jobs" },
-      { href: "/applications", label: "Applications" },
-      { href: "/profile", label: "Profile" },
+      { href: "/profile", label: "Skill Profile" },
+      { href: "/contacts", label: "Messages" },
       { href: "/settings", label: "Settings" },
     ];
   }
   if (user?.role === "employer") {
     return [
       { href: "/employer", label: "Dashboard" },
-      { href: "/employer/jobs", label: "Jobs" },
+      { href: "/employer/discover", label: "Discover Talent" },
+      { href: "/employer/saved", label: "Saved" },
+      { href: "/employer/contacts", label: "Contacts" },
       { href: "/employer/company", label: "Company" },
       { href: "/employer/settings", label: "Settings" },
     ];
@@ -36,10 +42,9 @@ function linksForUser(user: HorizonUser | null) {
   if (user?.role === "admin") {
     return [
       { href: "/admin", label: "Dashboard" },
-      { href: "/admin/employers", label: "Employers" },
+      { href: "/admin/employers", label: "Businesses" },
       { href: "/admin/users", label: "Users" },
       { href: "/admin/staff", label: "Admins" },
-      { href: "/admin/jobs", label: "Jobs" },
       { href: "/admin/audit", label: "Audit" },
       { href: "/admin/homepage", label: "Homepage" },
       { href: "/admin/reports", label: "Reports" },
@@ -52,12 +57,12 @@ function linksForUser(user: HorizonUser | null) {
 function GuestActions({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
-      <Link href="/login" className="hover:text-brand" onClick={onNavigate}>
+      <Link href="/login" className={navLinkClass} onClick={onNavigate}>
         Sign in
       </Link>
       <Link
         href="/register"
-        className="btn-primary rounded-md bg-brand-accent px-3 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+        className="btn-primary rounded-lg px-5 py-2.5 font-mono text-xs tracking-wider uppercase"
         onClick={onNavigate}
       >
         Register
@@ -81,13 +86,35 @@ function NavLinks({
         <Link
           key={link.href}
           href={link.href}
-          className={className ?? "hover:text-brand"}
+          className={className ?? navLinkClass}
           onClick={onNavigate}
         >
           {link.label}
         </Link>
       ))}
     </>
+  );
+}
+
+function StampMark({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={`relative inline-flex shrink-0 items-center justify-center rounded-full border-[1.5px] border-current ${className ?? "h-9 w-9"}`}
+    >
+      <span className="absolute inset-[3px] rounded-full border border-dashed border-current opacity-60" />
+      <svg
+        viewBox="0 0 24 24"
+        className="relative h-4 w-4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+    </span>
   );
 }
 
@@ -103,14 +130,15 @@ function HeaderChrome({
   const close = () => setOpen(false);
 
   return (
-    <header className="border-b border-[color:var(--line)]/70 bg-[color:var(--surface)]/80 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
+      <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-4">
         <Link
           href="/"
-          className="shrink-0 font-[family-name:var(--font-fraunces)] text-lg font-semibold tracking-tight text-brand sm:text-xl"
+          className="flex shrink-0 items-center gap-2.5 font-display text-xl font-semibold tracking-tight text-primary sm:text-2xl"
           onClick={close}
         >
-          Project Horizon
+          <StampMark />
+          SkillsPhase
         </Link>
 
         <div className="flex items-center gap-2 md:hidden">
@@ -121,7 +149,7 @@ function HeaderChrome({
           ) : null}
           <button
             type="button"
-            className="rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm font-semibold text-brand"
+            className="rounded-lg border border-border bg-surface px-3.5 py-2 font-mono text-xs tracking-wider uppercase text-foreground"
             aria-expanded={open}
             aria-controls={menuId}
             onClick={() => setOpen((value) => !value)}
@@ -130,7 +158,7 @@ function HeaderChrome({
           </button>
         </div>
 
-        <nav className="hidden min-w-0 items-center justify-end gap-4 text-sm font-medium text-[color:var(--foreground)]/80 md:flex">
+        <nav className="hidden min-w-0 items-center justify-end gap-6 md:flex lg:gap-8">
           {!loadingUser ? <NavLinks user={user} /> : null}
           {hasClerk ? (
             <>
@@ -150,24 +178,24 @@ function HeaderChrome({
       {open ? (
         <div
           id={menuId}
-          className="border-t border-[color:var(--line)]/70 px-4 py-4 md:hidden"
+          className="border-t border-border px-4 py-4 md:hidden"
         >
-          <nav className="mx-auto flex max-w-6xl flex-col gap-3 text-sm font-medium text-[color:var(--foreground)]/85">
+          <nav className="mx-auto flex max-w-6xl flex-col gap-1">
             {!loadingUser ? (
               <NavLinks
                 user={user}
                 onNavigate={close}
-                className="rounded-md px-1 py-1.5 hover:bg-white/70 hover:text-brand"
+                className={mobileNavLinkClass}
               />
             ) : null}
             {hasClerk ? (
               <SignedOut>
-                <div className="mt-2 flex flex-col gap-3 border-t border-[color:var(--line)] pt-3">
+                <div className="mt-2 flex flex-col gap-3 border-t border-border pt-3">
                   <GuestActions onNavigate={close} />
                 </div>
               </SignedOut>
             ) : (
-              <div className="mt-2 flex flex-col gap-3 border-t border-[color:var(--line)] pt-3">
+              <div className="mt-2 flex flex-col gap-3 border-t border-border pt-3">
                 <GuestActions onNavigate={close} />
               </div>
             )}

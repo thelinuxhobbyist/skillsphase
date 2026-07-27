@@ -1,4 +1,4 @@
-/** Common returner-friendly skill suggestions for autocomplete. */
+/** Common skill suggestions for autocomplete on the Skill Profile editor. */
 export const SKILL_SUGGESTIONS = [
   "Project Management",
   "Stakeholder Management",

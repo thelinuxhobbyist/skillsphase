@@ -1,7 +1,17 @@
 CLERK_SECRET_KEY=sk_test_...
 CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_AUTHORIZED_PARTIES=http://localhost:3000
+CLERK_AUTHORIZED_PARTIES=http://localhost:3000,https://horizon-web.yama.workers.dev,https://skillsphase.com,https://www.skillsphase.com
 DATABASE_URL=postgresql://user:pass@host/neondb?sslmode=require
+
+# Companies House REST API key (Basic auth username, password blank).
+# Create at https://developer.company-information.service.gov.uk/
 COMPANIES_HOUSE_API_KEY=
+
+# Resend API key (https://resend.com/api-keys). Without it, emails are logged and skipped.
 EMAIL_API_KEY=
-EMAIL_FROM=noreply@example.com
+
+# Must be a verified Resend sender on skillsphase.com
+EMAIL_FROM=SkillsPhase <noreply@skillsphase.com>
+
+# Used to build activation links in outbound emails
+APP_BASE_URL=http://localhost:3000

@@ -1,6 +1,6 @@
-# Project Horizon
+# SkillsPhase
 
-**Career Return Platform** — connecting verified UK employers with people returning to work after a career break.
+**Skills first. Because life happens.** — a skills-first hiring platform connecting verified UK businesses with capable people through skill profiles and portfolio evidence.
 
 ## Quick start
 

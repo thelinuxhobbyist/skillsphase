@@ -34,7 +34,7 @@ export function AdminHomepagePanel({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftLabel, setDraftLabel] = useState("");
   const [draftContent, setDraftContent] = useState("");
-  const [addType, setAddType] = useState<HomepageSectionType>("story");
+  const [addType, setAddType] = useState<HomepageSectionType>("differentiators");
   const [error, setError] = useState<string | null>(errorMessage ?? null);
   const [pending, setPending] = useState(false);
 
@@ -47,13 +47,13 @@ export function AdminHomepagePanel({
   if (!databaseConfigured) {
     return (
       <div className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-6">
-        <h2 className="font-semibold text-brand">Database required</h2>
+        <h2 className="font-semibold text-primary">Database required</h2>
         <p className="mt-2 text-sm text-[color:var(--foreground)]/75">
           Connect Neon and run migrations (`pnpm db:migrate`) to edit the homepage
           template from admin. Until then the public site uses the built-in default
           template.
         </p>
-        <Link href="/" className="mt-4 inline-block text-sm font-semibold text-brand underline">
+        <Link href="/" className="mt-4 inline-block text-sm font-semibold text-primary underline">
           View public homepage
         </Link>
       </div>
@@ -118,7 +118,7 @@ export function AdminHomepagePanel({
         <button
           type="button"
           disabled={pending}
-          className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-brand disabled:opacity-60"
+          className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary disabled:opacity-60"
           onClick={() => {
             if (
               !window.confirm(
@@ -151,7 +151,7 @@ export function AdminHomepagePanel({
         >
           Reset to defaults
         </button>
-        <Link href="/" className="text-sm font-semibold text-brand underline">
+        <Link href="/" className="text-sm font-semibold text-primary underline">
           Preview site
         </Link>
       </div>
@@ -164,10 +164,10 @@ export function AdminHomepagePanel({
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-brand-accent">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary-accent">
                   {section.type}
                 </p>
-                <h2 className="font-semibold text-brand">{section.label}</h2>
+                <h2 className="font-semibold text-primary">{section.label}</h2>
                 <p className="text-sm text-[color:var(--foreground)]/65">
                   {section.enabled ? "Visible on homepage" : "Hidden"}
                 </p>
@@ -176,7 +176,7 @@ export function AdminHomepagePanel({
                 <button
                   type="button"
                   disabled={pending || index === 0}
-                  className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand disabled:opacity-40"
+                  className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-40"
                   onClick={() => {
                     void (async () => {
                       const next = [...sections];
@@ -211,7 +211,7 @@ export function AdminHomepagePanel({
                 <button
                   type="button"
                   disabled={pending || index === sections.length - 1}
-                  className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand disabled:opacity-40"
+                  className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-40"
                   onClick={() => {
                     void (async () => {
                       const next = [...sections];
@@ -246,7 +246,7 @@ export function AdminHomepagePanel({
                 <button
                   type="button"
                   disabled={pending}
-                  className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand disabled:opacity-60"
+                  className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-60"
                   onClick={() => {
                     void (async () => {
                       setPending(true);
@@ -278,7 +278,7 @@ export function AdminHomepagePanel({
                 <button
                   type="button"
                   disabled={pending}
-                  className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand disabled:opacity-60"
+                  className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-60"
                   onClick={() => startEdit(section)}
                 >
                   Edit
@@ -360,7 +360,7 @@ export function AdminHomepagePanel({
                 }}
               >
                 <label className="block text-sm">
-                  <span className="font-medium text-brand">Label</span>
+                  <span className="font-medium text-primary">Label</span>
                   <input
                     value={draftLabel}
                     onChange={(e) => setDraftLabel(e.target.value)}
@@ -368,7 +368,7 @@ export function AdminHomepagePanel({
                   />
                 </label>
                 <label className="block text-sm">
-                  <span className="font-medium text-brand">
+                  <span className="font-medium text-primary">
                     Content (JSON)
                   </span>
                   <textarea
@@ -388,7 +388,7 @@ export function AdminHomepagePanel({
                   </button>
                   <button
                     type="button"
-                    className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-brand"
+                    className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary"
                     onClick={() => setEditingId(null)}
                   >
                     Cancel

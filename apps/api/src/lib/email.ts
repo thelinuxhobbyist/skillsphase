@@ -51,19 +51,30 @@ export async function sendEmail(input: SendEmailInput): Promise<{ sent: boolean 
   return { sent: true };
 }
 
-export function employerApprovalEmailHtml(companyName: string) {
+export function businessActivationEmailHtml(input: {
+  companyName: string;
+  activateUrl: string;
+}) {
   return `
-    <p>Your organisation <strong>${companyName}</strong> has been approved on Project Horizon.</p>
-    <p>You can now sign in and start posting jobs for career returners.</p>
+    <div style="font-family: system-ui, sans-serif; line-height: 1.5; color: #1a2e35;">
+      <p>Your registration for <strong>${input.companyName}</strong> on SkillsPhase is ready for the final step.</p>
+      <p><a href="${input.activateUrl}" style="display:inline-block;background:#1a2e35;color:#fff;padding:12px 18px;border-radius:6px;text-decoration:none;font-weight:600;">Activate your business account</a></p>
+      <p style="font-size:14px;color:#555;">Or open this link:<br/><a href="${input.activateUrl}">${input.activateUrl}</a></p>
+      <p style="font-size:14px;color:#555;">This link expires in 7 days. If you didn't register on SkillsPhase, you can ignore this email.</p>
+    </div>
   `;
 }
 
-export function applicationConfirmationEmailHtml(input: {
-  jobTitle: string;
+export function contactNotificationEmailHtml(input: {
   companyName: string;
+  message: string;
 }) {
   return `
-    <p>Thanks for applying to <strong>${input.jobTitle}</strong> at <strong>${input.companyName}</strong>.</p>
-    <p>Your application has been received. You can track its status in your Horizon applications dashboard.</p>
+    <div style="font-family: system-ui, sans-serif; line-height: 1.5; color: #1a2e35;">
+      <p><strong>${input.companyName}</strong> is interested in your Skill Profile on SkillsPhase.</p>
+      <p>Their message:</p>
+      <blockquote style="margin:12px 0;padding:12px 16px;border-left:3px solid #e07a3a;background:#f7f4ef;">${input.message}</blockquote>
+      <p><a href="https://skillsphase.com/contacts">Sign in to SkillsPhase to reply</a>.</p>
+    </div>
   `;
 }

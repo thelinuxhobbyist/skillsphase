@@ -23,11 +23,11 @@ export default async function EmployerSettingsPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 py-12">
-        <h1 className="font-[family-name:var(--font-fraunces)] text-4xl text-brand">
-          Employer settings
+        <h1 className="font-display text-4xl text-primary">
+          Business settings
         </h1>
         <p className="mt-2 text-[color:var(--foreground)]/75">
-          Export company-linked account data or delete your employer account.
+          Export company-linked account data or delete your business account.
         </p>
         <div className="mt-8">
           <AccountSettingsPanel role="employer" />

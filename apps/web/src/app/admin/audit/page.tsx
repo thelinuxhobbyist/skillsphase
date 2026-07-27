@@ -11,10 +11,10 @@ export default async function AdminAuditPage() {
     <>
       <AdminHeader />
       <main className="mx-auto max-w-4xl px-6 py-12">
-        <Link href="/admin" className="text-sm text-brand underline">
+        <Link href="/admin" className="text-sm text-primary underline">
           ← Back to dashboard
         </Link>
-        <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+        <h1 className="mt-4 font-display text-4xl text-primary">
           Audit log
         </h1>
         <p className="mt-2 text-[color:var(--foreground)]/75">
@@ -29,7 +29,7 @@ export default async function AdminAuditPage() {
                 key={log.id}
                 className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-4 text-sm"
               >
-                <p className="font-semibold text-brand">{log.action}</p>
+                <p className="font-semibold text-primary">{log.action}</p>
                 <p className="mt-1 text-[color:var(--foreground)]/70">
                   {log.adminName} · {log.entity} {log.entityId}
                 </p>

@@ -20,11 +20,15 @@ app.route("/api/v1", v1Routes);
 app.notFound((c) => fail(c, "NOT_FOUND", "Route not found.", 404));
 
 app.onError((err, c) => {
+  const cause = (err as { cause?: unknown }).cause;
   console.error(
     JSON.stringify({
       level: "error",
       requestId: c.get("requestId"),
+      path: c.req.path,
       message: err.message,
+      // Drizzle wraps driver errors; the actionable detail lives on `cause`.
+      cause: cause instanceof Error ? cause.message : cause,
       stack: err.stack,
     }),
   );
@@ -38,10 +42,11 @@ app.onError((err, c) => {
     );
   }
 
+  // Never surface driver/query internals (SQL text, params) to clients.
   return fail(
     c,
     "INTERNAL_ERROR",
-    err.message ?? "An unexpected server error occurred.",
+    "An unexpected server error occurred. Please try again.",
     500,
   );
 });

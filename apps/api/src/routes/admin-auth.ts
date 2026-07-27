@@ -1,7 +1,7 @@
 import {
   createAdminSession,
   deleteAdminSession,
-  findUserByEmail,
+  findAdminUserByEmail,
   setAdminPasswordHash,
   toAdminUserView,
   touchAdminLogin,
@@ -75,11 +75,10 @@ adminAuthRoutes.post("/login", async (c) => {
   }
 
   const db = getDb(c);
-  const user = await findUserByEmail(db, email);
+  const user = await findAdminUserByEmail(db, email);
 
   if (
     !user ||
-    user.role !== "admin" ||
     user.suspendedAt ||
     !(await verifyPassword(parsed.data.password, user.passwordHash))
   ) {

@@ -8,23 +8,22 @@ export default async function AdminReportsPage() {
   const reports = await getAdminReports(token);
 
   const stats = [
-    ["Pending employers", reports.pendingEmployers],
-    ["Approved employers", reports.approvedEmployers],
-    ["Total employers", reports.totalEmployers],
-    ["Employer users", reports.totalEmployerUsers],
-    ["Job seekers", reports.totalJobSeekers],
-    ["Active jobs", reports.activeJobs],
-    ["Pending applications", reports.pendingApplications],
+    ["Pending businesses", reports.pendingBusinesses],
+    ["Verified businesses", reports.verifiedBusinesses],
+    ["Total businesses", reports.totalBusinesses],
+    ["Business users", reports.totalBusinessUsers],
+    ["Total candidates", reports.totalCandidates],
+    ["Candidates with complete profile", reports.candidatesWithCompleteProfile],
   ] as const;
 
   return (
     <>
       <AdminHeader />
       <main className="mx-auto max-w-4xl px-6 py-12">
-        <Link href="/admin" className="text-sm text-brand underline">
+        <Link href="/admin" className="text-sm text-primary underline">
           ← Back to dashboard
         </Link>
-        <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+        <h1 className="mt-4 font-display text-4xl text-primary">
           Reports
         </h1>
         <p className="mt-2 text-[color:var(--foreground)]/75">{reports.note}</p>
@@ -35,7 +34,7 @@ export default async function AdminReportsPage() {
               className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-4"
             >
               <p className="text-sm text-[color:var(--foreground)]/70">{label}</p>
-              <p className="mt-1 text-3xl font-semibold text-brand">{value}</p>
+              <p className="mt-1 text-3xl font-semibold text-primary">{value}</p>
             </div>
           ))}
         </section>

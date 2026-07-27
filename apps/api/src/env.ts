@@ -9,6 +9,8 @@ export type AppEnv = {
     COMPANIES_HOUSE_API_KEY?: string;
     EMAIL_API_KEY?: string;
     EMAIL_FROM?: string;
+    /** Web app origin used to build links in outbound emails (e.g. business email verification). */
+    APP_BASE_URL?: string;
   };
   Variables: {
     requestId: string;

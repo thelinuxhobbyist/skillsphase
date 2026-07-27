@@ -59,7 +59,7 @@ export function AdminUsersPanel({ users }: { users: AdminUser[] }) {
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="font-semibold text-brand">
+                <h2 className="font-semibold text-primary">
                   {name || user.email}
                 </h2>
                 <p className="text-sm text-[color:var(--foreground)]/70">
@@ -72,7 +72,7 @@ export function AdminUsersPanel({ users }: { users: AdminUser[] }) {
                   <button
                     type="button"
                     disabled={pendingId === user.id}
-                    className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand disabled:opacity-60"
+                    className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-60"
                     onClick={() => void run(user.id, "reactivate")}
                   >
                     Reactivate
@@ -81,7 +81,7 @@ export function AdminUsersPanel({ users }: { users: AdminUser[] }) {
                   <button
                     type="button"
                     disabled={pendingId === user.id}
-                    className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand disabled:opacity-60"
+                    className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-60"
                     onClick={() => void run(user.id, "suspend")}
                   >
                     Suspend

@@ -6,10 +6,10 @@ export default function ForbiddenPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-xl px-6 py-24 text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand">
+        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">
           403
         </p>
-        <h1 className="mt-3 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+        <h1 className="mt-3 font-display text-4xl text-primary">
           Access denied
         </h1>
         <p className="mt-3 text-[color:var(--foreground)]/75">

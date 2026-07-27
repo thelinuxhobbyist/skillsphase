@@ -55,8 +55,9 @@ export async function lookupCompaniesHouseCompany(input: {
   allowMock: boolean;
 }): Promise<CompaniesHouseCompany> {
   const companyNumber = normaliseCompanyNumber(input.companyNumber);
+  const apiKey = input.apiKey?.trim();
 
-  if (!input.apiKey) {
+  if (!apiKey) {
     if (input.allowMock) {
       return mockCompany(companyNumber);
     }
@@ -67,13 +68,15 @@ export async function lookupCompaniesHouseCompany(input: {
     );
   }
 
-  const credentials = btoa(`${input.apiKey}:`);
+  // Basic auth: API key is the username, password is empty → encode "key:"
+  const credentials = btoa(`${apiKey}:`);
   const response = await fetch(
     `https://api.company-information.service.gov.uk/company/${encodeURIComponent(companyNumber)}`,
     {
       headers: {
         Authorization: `Basic ${credentials}`,
         Accept: "application/json",
+        "User-Agent": "SkillsPhase/1.0 (https://skillsphase.com)",
       },
     },
   );
@@ -86,7 +89,40 @@ export async function lookupCompaniesHouseCompany(input: {
     );
   }
 
+  if (response.status === 401) {
+    console.error(
+      JSON.stringify({
+        level: "error",
+        message: "companies_house_unauthorized",
+        companyNumber,
+      }),
+    );
+    throw new CompaniesHouseError(
+      "COMPANIES_HOUSE_UNAUTHORIZED",
+      "Companies House rejected the API key. Re-check COMPANIES_HOUSE_API_KEY on the API worker.",
+      502,
+    );
+  }
+
+  if (response.status === 429) {
+    throw new CompaniesHouseError(
+      "COMPANIES_HOUSE_RATE_LIMITED",
+      "Companies House rate limit hit. Please wait a minute and try again.",
+      429,
+    );
+  }
+
   if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    console.error(
+      JSON.stringify({
+        level: "error",
+        message: "companies_house_error",
+        status: response.status,
+        companyNumber,
+        body: body.slice(0, 300),
+      }),
+    );
     throw new CompaniesHouseError(
       "COMPANIES_HOUSE_ERROR",
       "Companies House validation failed. Please try again shortly.",

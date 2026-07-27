@@ -1,3 +1,4 @@
+import { BusinessEmailVerificationPanel } from "@/components/business-email-verification-panel";
 import { CompanyEditForm } from "@/components/company-edit-form";
 import { CompanyStatusPanel } from "@/components/company-status-panel";
 import { SiteHeader } from "@/components/site-header";
@@ -35,14 +36,15 @@ export default async function EmployerCompanyPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 py-12">
-        <Link href="/employer" className="text-sm text-brand underline">
+        <Link href="/employer" className="text-sm text-primary underline">
           ← Back to dashboard
         </Link>
-        <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+        <h1 className="mt-4 font-display text-4xl text-primary">
           Company profile
         </h1>
-        <div className="mt-8">
+        <div className="mt-8 space-y-6">
           <CompanyStatusPanel company={company} />
+          <BusinessEmailVerificationPanel company={company} />
           <CompanyEditForm company={company} />
         </div>
       </main>

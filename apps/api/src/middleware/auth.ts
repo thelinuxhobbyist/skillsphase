@@ -115,7 +115,7 @@ export const requireAppUser = createMiddleware<AppEnv>(async (c, next) => {
     return fail(
       c,
       "USER_NOT_BOOTSTRAPPED",
-      "Complete role selection to create your Horizon account.",
+      "Complete role selection to create your SkillsPhase account.",
       409,
     );
   }

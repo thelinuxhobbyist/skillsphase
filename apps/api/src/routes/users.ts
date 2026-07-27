@@ -97,7 +97,7 @@ userRoutes.post("/me/bootstrap", async (c) => {
     return fail(
       c,
       "ROLE_REQUIRED",
-      "Choose Job Seeker or Employer to finish creating your account.",
+      "Choose Candidate or Business to finish creating your account.",
       400,
     );
   }
@@ -123,16 +123,40 @@ userRoutes.post("/me/bootstrap", async (c) => {
     lastName: clerkUser.lastName,
   });
 
-  const clerk = createClerkClient({
-    secretKey: c.env.CLERK_SECRET_KEY,
-    publishableKey: c.env.CLERK_PUBLISHABLE_KEY,
-  });
-  await clerk.users.updateUserMetadata(clerkUserId, {
-    publicMetadata: {
-      ...clerkUser.publicMetadata,
-      horizonRole: role,
-    },
-  });
+  // A row can already exist while being soft-deleted, in which case it is not
+  // usable for sign-in and needs support to restore.
+  if (created.deletedAt) {
+    return fail(
+      c,
+      "ACCOUNT_PENDING_DELETION",
+      "This account is scheduled for deletion. Contact support to restore it.",
+      409,
+    );
+  }
+
+  // Best-effort: the account already exists locally, so a metadata sync failure
+  // must not fail the request and strand the user on the onboarding screen.
+  try {
+    const clerk = createClerkClient({
+      secretKey: c.env.CLERK_SECRET_KEY,
+      publishableKey: c.env.CLERK_PUBLISHABLE_KEY,
+    });
+    await clerk.users.updateUserMetadata(clerkUserId, {
+      publicMetadata: {
+        ...clerkUser.publicMetadata,
+        horizonRole: role,
+      },
+    });
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        level: "warn",
+        requestId: c.get("requestId"),
+        message: "clerk_metadata_sync_failed",
+        detail: error instanceof Error ? error.message : String(error),
+      }),
+    );
+  }
 
   c.set("appUser", created);
   return ok(c, toPublicUser(created), 201);
@@ -194,7 +218,7 @@ userRoutes.delete("/me", requireAppUser, async (c) => {
       return fail(
         c,
         "ACCOUNT_DELETE_BLOCKED",
-        "Close all active jobs before deleting your employer account.",
+        "Resolve outstanding account issues before deleting your business account.",
         409,
       );
     }

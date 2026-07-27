@@ -1,15 +1,25 @@
 import { z } from "zod";
 import {
-  EMPLOYER_ASSIGNABLE_STATUSES,
+  AVAILABILITY_OPTIONS,
+  COMPANY_EMAIL_HINT,
+  isCompanyEmailAllowed,
+  PROJECT_MEDIA_TYPES,
   REMOTE_TYPES,
   USER_ROLES,
   VERIFICATION_STATUSES,
 } from "../constants";
 
+export const businessEmailSchema = z
+  .string()
+  .trim()
+  .email()
+  .refine((value) => isCompanyEmailAllowed(value), {
+    message: COMPANY_EMAIL_HINT,
+  });
+
 export const adminPermissionSchema = z.enum([
-  "manage_employers",
+  "manage_businesses",
   "manage_users",
-  "manage_jobs",
   "manage_homepage",
   "manage_admins",
   "view_audit",
@@ -41,20 +51,30 @@ export const paginationQuerySchema = z.object({
   pageSize: z.coerce.number().int().positive().max(100).default(20),
 });
 
-/** Roles a new user may self-assign. Admins are provisioned out-of-band. */
+/** Roles a new user may self-assign: Candidate or Business. Admins are provisioned out-of-band. */
 export const bootstrapRoleSchema = z.object({
   role: z.enum(["job_seeker", "employer"]),
 });
 
+/** Role-agnostic account identity fields (used by both Candidate and Business settings). */
 export const updateUserProfileSchema = z.object({
   firstName: z.string().trim().min(1).max(100).optional(),
   lastName: z.string().trim().min(1).max(100).optional(),
   phoneNumber: z.string().trim().max(40).optional().nullable(),
   city: z.string().trim().max(120).optional().nullable(),
   country: z.string().trim().max(120).optional().nullable(),
-  careerSummary: z.string().trim().max(5000).optional().nullable(),
-  careerGapNarrative: z.string().trim().max(5000).optional().nullable(),
-  coverLetterTemplate: z.string().trim().max(10000).optional().nullable(),
+});
+
+/** Candidate Skill Profile fields (job_seeker role only). */
+export const updateCandidateProfileSchema = z.object({
+  professionalTitle: z.string().trim().max(150).optional().nullable(),
+  careerSummary: z.string().trim().max(3000).optional().nullable(),
+  remotePreference: z.enum(REMOTE_TYPES).optional().nullable(),
+  availability: z.enum(AVAILABILITY_OPTIONS).optional().nullable(),
+  yearsExperience: z.number().int().min(0).max(60).optional().nullable(),
+  salaryMin: z.number().nonnegative().optional().nullable(),
+  salaryMax: z.number().nonnegative().optional().nullable(),
+  salaryCurrency: z.string().trim().length(3).optional(),
 });
 
 export const createCompanySchema = z.object({
@@ -66,7 +86,7 @@ export const createCompanySchema = z.object({
   website: z.string().url().refine((v) => v.startsWith("https://"), {
     message: "Website must use HTTPS",
   }),
-  businessEmail: z.string().email(),
+  businessEmail: businessEmailSchema,
   recruiterName: z.string().trim().min(1).max(120),
   recruiterJobTitle: z.string().trim().min(1).max(120),
   countryCode: z.literal("GB").default("GB"),
@@ -86,7 +106,7 @@ export const updateCompanySchema = z.object({
       message: "Website must use HTTPS",
     })
     .optional(),
-  businessEmail: z.string().email().optional(),
+  businessEmail: businessEmailSchema.optional(),
   recruiterName: z.string().trim().min(1).max(120).optional(),
   recruiterJobTitle: z.string().trim().min(1).max(120).optional(),
 });
@@ -99,6 +119,10 @@ export const verifyCompanySchema = z.object({
     .regex(/^[A-Z0-9]{6,8}$/, "Enter a valid UK Companies House number"),
 });
 
+export const confirmBusinessEmailSchema = z.object({
+  token: z.string().trim().min(10).max(200),
+});
+
 export const waitlistSchema = z.object({
   email: z.string().email(),
   companyName: z.string().trim().max(200).optional(),
@@ -108,116 +132,64 @@ export const waitlistSchema = z.object({
     .toUpperCase()
     .length(2)
     .refine((code) => code !== "GB", {
-      message: "UK employers should register normally, not via the waitlist",
+      message: "UK businesses should register normally, not via the waitlist",
     }),
   notes: z.string().trim().max(1000).optional(),
 });
 
-export const createJobSchema = z
-  .object({
-    companyId: z.string().uuid().optional(),
-    title: z.string().trim().min(1).max(200),
-    description: z.string().trim().min(1).max(50000),
-    salaryMin: z.number().nonnegative().optional().nullable(),
-    salaryMax: z.number().nonnegative().optional().nullable(),
-    salaryCurrency: z.string().trim().length(3).default("GBP"),
-    location: z.string().trim().min(1).max(200),
-    remoteType: z.enum(REMOTE_TYPES),
-    employmentType: z.string().trim().min(1).max(80),
-    industry: z.string().trim().min(1).max(120),
-    closingDate: z.string().date().optional().nullable(),
-    skillIds: z.array(z.string().uuid()).default([]),
-    skillNames: z.array(z.string().trim().min(1).max(80)).max(40).default([]),
-    niceToHaveSkillNames: z
-      .array(z.string().trim().min(1).max(80))
-      .max(40)
-      .default([]),
-    companyAbout: z.string().trim().max(5000).optional().nullable(),
-    companySize: z.string().trim().max(120).optional().nullable(),
-    benefits: z.array(z.string().trim().min(1).max(300)).max(30).default([]),
-    whyReturners: z.array(z.string().trim().min(1).max(500)).max(20).default([]),
-    applicationProcess: z
-      .array(z.string().trim().min(1).max(500))
-      .max(15)
-      .default([]),
-    workingPatternDetail: z.string().trim().max(2000).optional().nullable(),
-    contractDetails: z.string().trim().max(500).optional().nullable(),
-    publish: z.boolean().default(false),
-  })
-  .superRefine((data, ctx) => {
-    const skillCount = data.skillIds.length + data.skillNames.length;
-    if (skillCount < 3) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["skillNames"],
-        message:
-          "Add at least 3 required skills. Project Horizon is skills-first — lead with abilities, not employment history.",
-      });
-    }
-  });
+export const projectMediaItemSchema = z.object({
+  type: z.enum(PROJECT_MEDIA_TYPES),
+  /** Either an absolute link (video/link types) or an internal `/api/v1/media/...` path (uploaded image/document). */
+  url: z.string().trim().min(1).max(2000),
+  label: z.string().trim().max(200).optional().nullable(),
+});
 
-export const updateJobSchema = z
-  .object({
-    title: z.string().trim().min(1).max(200).optional(),
-    description: z.string().trim().min(1).max(50000).optional(),
-    salaryMin: z.number().nonnegative().optional().nullable(),
-    salaryMax: z.number().nonnegative().optional().nullable(),
-    salaryCurrency: z.string().trim().length(3).optional(),
-    location: z.string().trim().min(1).max(200).optional(),
-    remoteType: z.enum(REMOTE_TYPES).optional(),
-    employmentType: z.string().trim().min(1).max(80).optional(),
-    industry: z.string().trim().min(1).max(120).optional(),
-    closingDate: z.string().date().optional().nullable(),
-    skillIds: z.array(z.string().uuid()).optional(),
-    skillNames: z.array(z.string().trim().min(1).max(80)).max(40).optional(),
-    niceToHaveSkillNames: z
-      .array(z.string().trim().min(1).max(80))
-      .max(40)
-      .optional(),
-    companyAbout: z.string().trim().max(5000).optional().nullable(),
-    companySize: z.string().trim().max(120).optional().nullable(),
-    benefits: z.array(z.string().trim().min(1).max(300)).max(30).optional(),
-    whyReturners: z
-      .array(z.string().trim().min(1).max(500))
-      .max(20)
-      .optional(),
-    applicationProcess: z
-      .array(z.string().trim().min(1).max(500))
-      .max(15)
-      .optional(),
-    workingPatternDetail: z.string().trim().max(2000).optional().nullable(),
-    contractDetails: z.string().trim().max(500).optional().nullable(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.skillIds !== undefined || data.skillNames !== undefined) {
-      const skillCount =
-        (data.skillIds?.length ?? 0) + (data.skillNames?.length ?? 0);
-      if (skillCount < 3) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["skillNames"],
-          message:
-            "Keep at least 3 required skills. List the abilities this role needs first.",
-        });
-      }
-    }
-  });
+export const projectSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(5000).optional().nullable(),
+  role: z.string().trim().max(200).optional().nullable(),
+  projectUrl: z.string().url().optional().nullable(),
+  media: z.array(projectMediaItemSchema).max(20).default([]),
+  sortOrder: z.number().int().min(0).max(1000).optional(),
+});
 
-
-export const jobListQuerySchema = paginationQuerySchema.extend({
-  keyword: z.string().trim().max(200).optional(),
-  location: z.string().trim().max(200).optional(),
-  employmentType: z.string().trim().max(80).optional(),
+export const discoveryQuerySchema = z.object({
+  skills: z.string().trim().max(500).optional(),
+  availability: z.enum(AVAILABILITY_OPTIONS).optional(),
   remoteType: z.enum(REMOTE_TYPES).optional(),
-  industry: z.string().trim().max(120).optional(),
+  minYearsExperience: z.coerce.number().int().min(0).max(60).optional(),
+  keyword: z.string().trim().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
-export const applyToJobSchema = z.object({
-  coverLetter: z.string().trim().max(10000).optional().nullable(),
+export const publicDiscoveryQuerySchema = z.object({
+  skills: z.string().trim().max(500).optional(),
+  availability: z.enum(AVAILABILITY_OPTIONS).optional(),
+  remoteType: z.enum(REMOTE_TYPES).optional(),
+  minYearsExperience: z.coerce.number().int().min(0).max(60).optional(),
+  keyword: z.string().trim().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(24).default(12),
+  offset: z.coerce.number().int().min(0).default(0),
 });
 
-export const updateApplicationStatusSchema = z.object({
-  status: z.enum(EMPLOYER_ASSIGNABLE_STATUSES),
+export const reviewCandidateSchema = z.object({
+  action: z.enum(["skip", "viewed"]),
+});
+
+export const saveCandidateSchema = z.object({
+  listId: z.string().uuid().optional().nullable(),
+});
+
+export const createCandidateListSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+});
+
+export const createContactSchema = z.object({
+  message: z.string().trim().min(1).max(3000),
+});
+
+export const sendMessageSchema = z.object({
+  body: z.string().trim().min(1).max(3000),
 });
 
 export const adminEmployerActionSchema = z.object({

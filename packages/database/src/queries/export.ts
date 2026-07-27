@@ -1,12 +1,14 @@
 import type { Database } from "../client";
 import { findCompanyByOwner, toPublicCompany } from "./companies";
-import { listApplicationsForUser } from "./applications";
+import { listContactsForBusiness, listContactsForCandidate } from "./contacts";
+import { listSavedCandidates } from "./discovery";
 import {
   listEducation,
   listEmploymentHistory,
   listQualifications,
   listUserSkills,
 } from "./profile";
+import { listProjectsForUser } from "./projects";
 import { toPublicUser, type AppUser } from "./users";
 
 export async function buildGdprExport(db: Database, user: AppUser) {
@@ -16,13 +18,14 @@ export async function buildGdprExport(db: Database, user: AppUser) {
   };
 
   if (user.role === "job_seeker") {
-    const [employmentHistory, education, qualifications, skills, applications] =
+    const [employmentHistory, education, qualifications, skills, projects, contacts] =
       await Promise.all([
         listEmploymentHistory(db, user.id),
         listEducation(db, user.id),
         listQualifications(db, user.id),
         listUserSkills(db, user.id),
-        listApplicationsForUser(db, user.id),
+        listProjectsForUser(db, user.id),
+        listContactsForCandidate(db, user.id),
       ]);
 
     return {
@@ -32,16 +35,23 @@ export async function buildGdprExport(db: Database, user: AppUser) {
         education,
         qualifications,
         skills,
+        projects,
       },
-      applications,
+      contacts,
     };
   }
 
   if (user.role === "employer") {
     const company = await findCompanyByOwner(db, user.id);
+    const [savedCandidates, contacts] = await Promise.all([
+      company ? listSavedCandidates(db, company.id) : Promise.resolve([]),
+      company ? listContactsForBusiness(db, company.id) : Promise.resolve([]),
+    ]);
     return {
       ...base,
       company: company ? toPublicCompany(company) : null,
+      savedCandidates,
+      contacts,
     };
   }
 

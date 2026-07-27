@@ -30,11 +30,11 @@ export default async function ProfilePage() {
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-3xl min-w-0 px-4 py-10 sm:px-6 sm:py-12">
-        <Link href="/dashboard" className="text-sm text-brand underline">
+        <Link href="/dashboard" className="text-sm text-primary underline">
           ← Back to dashboard
         </Link>
-        <h1 className="mt-4 font-[family-name:var(--font-fraunces)] text-3xl text-brand sm:text-4xl">
-          Your profile
+        <h1 className="mt-4 font-display text-3xl text-primary sm:text-4xl">
+          Your Skill Profile
         </h1>
         <p className="mt-2 mb-8 text-[color:var(--foreground)]/75">
           Edit anytime — jump between steps, update entries, or remove mistakes.

@@ -19,6 +19,7 @@ export type PublicCompany = {
   recruiterJobTitle: string;
   verificationStatus: VerificationStatus;
   companiesHouseVerified: boolean;
+  businessEmailVerified: boolean;
   rejectionReason: string | null;
   countryCode: string;
   businessEmailIsFreeProvider: boolean;
@@ -59,6 +60,7 @@ export function toPublicCompany(company: AppCompany): PublicCompany {
     recruiterJobTitle: company.recruiterJobTitle,
     verificationStatus: company.verificationStatus,
     companiesHouseVerified: company.companiesHouseVerified,
+    businessEmailVerified: company.businessEmailVerified,
     rejectionReason: company.rejectionReason,
     countryCode: company.countryCode,
     businessEmailIsFreeProvider: isFreeEmailProvider(company.businessEmail),
@@ -161,6 +163,10 @@ export async function updateCompany(
     rejectionReason?: string | null;
   },
 ): Promise<AppCompany> {
+  const emailChanged =
+    input.businessEmail !== undefined &&
+    input.businessEmail !== company.businessEmail;
+
   const [updated] = await db
     .update(companies)
     .set({
@@ -170,6 +176,8 @@ export async function updateCompany(
       companyName: input.companyName ?? company.companyName,
       website: input.website ?? company.website,
       businessEmail: input.businessEmail ?? company.businessEmail,
+      businessEmailVerified: emailChanged ? false : company.businessEmailVerified,
+      businessEmailVerifiedAt: emailChanged ? null : company.businessEmailVerifiedAt,
       recruiterName: input.recruiterName ?? company.recruiterName,
       recruiterJobTitle: input.recruiterJobTitle ?? company.recruiterJobTitle,
       companiesHousePayload:

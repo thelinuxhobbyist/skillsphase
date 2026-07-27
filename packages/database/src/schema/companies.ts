@@ -26,6 +26,12 @@ export const companies = pgTable("companies", {
   companiesHouseVerified: boolean("companies_house_verified")
     .notNull()
     .default(false),
+  businessEmailVerified: boolean("business_email_verified")
+    .notNull()
+    .default(false),
+  businessEmailVerifiedAt: timestamp("business_email_verified_at", {
+    withTimezone: true,
+  }),
   companiesHousePayload: jsonb("companies_house_payload"),
   rejectionReason: text("rejection_reason"),
   countryCode: text("country_code").notNull().default("GB"),

@@ -18,9 +18,11 @@
     }
   ],
   "vars": {
-    "ENVIRONMENT": "development",
+    "ENVIRONMENT": "production",
     "DATA_RETENTION_DAYS": "30",
-    "CLERK_AUTHORIZED_PARTIES": "http://localhost:3000,https://horizon-web.yama.workers.dev"
+    "APP_BASE_URL": "https://skillsphase.com",
+    "EMAIL_FROM": "SkillsPhase <noreply@skillsphase.com>",
+    "CLERK_AUTHORIZED_PARTIES": "http://localhost:3000,https://horizon-web.yama.workers.dev,https://skillsphase.com,https://www.skillsphase.com"
   },
   // Enable after deploy; runs daily retention purge for soft-deleted accounts.
   "triggers": {

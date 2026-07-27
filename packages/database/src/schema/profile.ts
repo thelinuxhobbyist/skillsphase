@@ -1,5 +1,4 @@
 import {
-  bigint,
   boolean,
   date,
   pgTable,
@@ -8,7 +7,6 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import { jobs } from "./jobs";
 import { users } from "./users";
 
 export const employmentHistory = pgTable("employment_history", {
@@ -88,17 +86,4 @@ export const userSkills = pgTable(
       .references(() => skills.id, { onDelete: "cascade" }),
   },
   (table) => [primaryKey({ columns: [table.userId, table.skillId] })],
-);
-
-export const jobSkills = pgTable(
-  "job_skills",
-  {
-    jobId: bigint("job_id", { mode: "number" })
-      .notNull()
-      .references(() => jobs.id, { onDelete: "cascade" }),
-    skillId: uuid("skill_id")
-      .notNull()
-      .references(() => skills.id, { onDelete: "cascade" }),
-  },
-  (table) => [primaryKey({ columns: [table.jobId, table.skillId] })],
 );

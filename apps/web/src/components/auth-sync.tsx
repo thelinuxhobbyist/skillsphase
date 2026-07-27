@@ -83,10 +83,12 @@ function ConfiguredAuthSync({
           router.replace(dashboardPathForRole(user.role));
         }
       } catch (err) {
+        const raw =
+          err instanceof Error ? err.message : "Unable to sync your SkillsPhase account.";
         setError(
-          err instanceof Error
-            ? err.message
-            : "Unable to sync your Horizon account.",
+          /Failed query|insert into/i.test(raw)
+            ? "We couldn't finish creating your account. Please try again in a moment."
+            : raw,
         );
       }
     }
@@ -97,8 +99,8 @@ function ConfiguredAuthSync({
   if (needsRole) {
     return (
       <div className="mx-auto max-w-md space-y-4 px-6 py-16 text-center">
-        <h1 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-          Choose how you use Horizon
+        <h1 className="font-display text-3xl text-primary">
+          Choose how you use SkillsPhase
         </h1>
         <p className="text-[color:var(--foreground)]/75">
           Select a role to finish creating your account. This cannot be changed
@@ -106,7 +108,7 @@ function ConfiguredAuthSync({
         </p>
         <div className="flex flex-col gap-3">
           <RoleChoiceButton
-            label="I'm returning to work"
+            label="I'm a candidate"
             role="job_seeker"
             onDone={() => {
               ran.current = false;
@@ -114,7 +116,7 @@ function ConfiguredAuthSync({
             }}
           />
           <RoleChoiceButton
-            label="I'm hiring"
+            label="I'm a business"
             role="employer"
             onDone={() => {
               ran.current = false;
@@ -136,7 +138,7 @@ function ConfiguredAuthSync({
 
   return (
     <p className="px-6 py-16 text-center text-[color:var(--foreground)]/70">
-      Setting up your Horizon account…
+      Setting up your SkillsPhase account…
     </p>
   );
 }

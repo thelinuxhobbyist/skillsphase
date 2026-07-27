@@ -9,7 +9,7 @@ export default function AccessDeniedPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-red-800">
           403
         </p>
-        <h1 className="mt-2 font-[family-name:var(--font-fraunces)] text-4xl text-brand">
+        <h1 className="mt-2 font-display text-4xl text-primary">
           Access denied
         </h1>
         <p className="mt-4 text-[color:var(--foreground)]/75">

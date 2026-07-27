@@ -1,18 +1,13 @@
 import {
-  adminRemoveJob,
-  countPendingApplications,
-  countPublishedJobs,
+  countCandidatesWithCompleteProfile,
   countUsersByRole,
   createAdminAppUser,
-  createJob,
   deleteAdminSessionsForUser,
   findCompanyById,
-  findJobById,
   findUserByEmail,
   findUserById,
   listAdminLogs,
   listCompaniesForAdmin,
-  listJobsForAdmin,
   listRecentAdminLogs,
   listUsersForAdmin,
   reactivateAppUser,
@@ -21,7 +16,6 @@ import {
   suspendAppUser,
   toAdminUserView,
   toPublicCompany,
-  toPublicJob,
   touchAdminLogin,
   updateAdminStaff,
   updateCompany,
@@ -31,7 +25,6 @@ import {
   adminEmployerActionSchema,
   adminUserActionSchema,
   createAdminStaffSchema,
-  createJobSchema,
   resetAdminPasswordSchema,
   updateAdminStaffSchema,
   USER_ROLES,
@@ -41,8 +34,8 @@ import { Hono } from "hono";
 import type { AppEnv } from "../env";
 import { staffCan, wouldRemoveLastRootAdmin } from "../lib/admin-guard";
 import { hashPassword } from "../lib/admin-crypto";
+import { sendBusinessActivationEmail } from "../lib/business-activation";
 import { getDb } from "../lib/db";
-import { employerApprovalEmailHtml, sendEmail } from "../lib/email";
 import { requireAdminAuth } from "../lib/require-admin-auth";
 import { fail, ok } from "../lib/response";
 import { adminAuthRoutes } from "./admin-auth";
@@ -76,46 +69,39 @@ secured.post("/session", async (c) => {
 
 secured.get("/dashboard", async (c) => {
   const db = getDb(c);
-  const employers = await listCompaniesForAdmin(db);
-  const pending = employers.filter((e) => e.verificationStatus === "pending_review");
-  const [
-    activeJobs,
-    totalJobSeekers,
-    pendingApplications,
-    recentActions,
-  ] = await Promise.all([
-    countPublishedJobs(db),
-    countUsersByRole(db, "job_seeker"),
-    countPendingApplications(db),
-    listRecentAdminLogs(db, 8),
-  ]);
+  const businesses = await listCompaniesForAdmin(db);
+  const pending = businesses.filter((e) => e.verificationStatus === "pending_review");
+  const [totalCandidates, candidatesWithCompleteProfile, recentActions] =
+    await Promise.all([
+      countUsersByRole(db, "job_seeker"),
+      countCandidatesWithCompleteProfile(db),
+      listRecentAdminLogs(db, 8),
+    ]);
 
   return ok(c, {
-    pendingEmployers: pending.length,
-    totalEmployers: employers.length,
-    approvedEmployers: employers.filter((e) => e.verificationStatus === "approved")
+    pendingBusinesses: pending.length,
+    totalBusinesses: businesses.length,
+    verifiedBusinesses: businesses.filter((e) => e.verificationStatus === "approved")
       .length,
-    activeJobs,
-    totalJobSeekers,
-    pendingApplications,
+    totalCandidates,
+    candidatesWithCompleteProfile,
     recentActions,
   });
 });
 
 secured.get("/reports", async (c) => {
   const db = getDb(c);
-  const employers = await listCompaniesForAdmin(db);
+  const businesses = await listCompaniesForAdmin(db);
   return ok(c, {
     note: "MVP placeholder — advanced analytics are out of scope.",
-    totalEmployers: employers.length,
-    approvedEmployers: employers.filter((e) => e.verificationStatus === "approved")
+    totalBusinesses: businesses.length,
+    verifiedBusinesses: businesses.filter((e) => e.verificationStatus === "approved")
       .length,
-    pendingEmployers: employers.filter((e) => e.verificationStatus === "pending_review")
+    pendingBusinesses: businesses.filter((e) => e.verificationStatus === "pending_review")
       .length,
-    activeJobs: await countPublishedJobs(db),
-    totalJobSeekers: await countUsersByRole(db, "job_seeker"),
-    totalEmployerUsers: await countUsersByRole(db, "employer"),
-    pendingApplications: await countPendingApplications(db),
+    totalCandidates: await countUsersByRole(db, "job_seeker"),
+    candidatesWithCompleteProfile: await countCandidatesWithCompleteProfile(db),
+    totalBusinessUsers: await countUsersByRole(db, "employer"),
   });
 });
 
@@ -135,11 +121,11 @@ secured.patch("/employers/:id", async (c) => {
   if (!admin) {
     return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
   }
-  if (!staffCan(admin, "manage_employers")) {
+  if (!staffCan(admin, "manage_businesses")) {
     return fail(
       c,
       "FORBIDDEN",
-      "You do not have permission to manage employers.",
+      "You do not have permission to manage businesses.",
       403,
     );
   }
@@ -205,16 +191,9 @@ secured.patch("/employers/:id", async (c) => {
     notes: parsed.data.rejectionReason,
   });
 
-  if (action === "approve") {
-    const owner = await findUserById(db, updated.ownerUserId);
-    if (owner?.email) {
-      await sendEmail({
-        to: owner.email,
-        subject: "Your Project Horizon employer account is approved",
-        html: employerApprovalEmailHtml(updated.companyName),
-        apiKey: c.env.EMAIL_API_KEY,
-        from: c.env.EMAIL_FROM,
-      });
+  if (action === "approve" || action === "reinstate") {
+    if (!updated.businessEmailVerified) {
+      await sendBusinessActivationEmail(db, c, updated);
     }
   }
 
@@ -592,115 +571,6 @@ secured.post("/staff/:id/reset-password", async (c) => {
 
 secured.get("/audit", async (c) => {
   return ok(c, await listAdminLogs(getDb(c), 200));
-});
-
-secured.get("/jobs", async (c) => {
-  const jobs = await listJobsForAdmin(getDb(c));
-  return ok(c, jobs);
-});
-
-secured.post("/jobs", async (c) => {
-  const admin = c.get("appUser");
-  if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
-  if (!staffCan(admin, "manage_jobs")) {
-    return fail(c, "FORBIDDEN", "You do not have permission to manage jobs.", 403);
-  }
-
-  const body = await c.req.json().catch(() => null);
-  const parsed = createJobSchema.safeParse(body);
-  if (!parsed.success) {
-    return fail(
-      c,
-      "VALIDATION_ERROR",
-      parsed.error.issues[0]?.message ?? "Invalid job.",
-      400,
-    );
-  }
-
-  if (!parsed.data.companyId) {
-    return fail(
-      c,
-      "VALIDATION_ERROR",
-      "Admins must supply companyId when creating a job.",
-      400,
-    );
-  }
-
-  const db = getDb(c);
-  const company = await findCompanyById(db, parsed.data.companyId);
-  if (!company || company.verificationStatus !== "approved") {
-    return fail(
-      c,
-      "COMPANY_NOT_APPROVED",
-      "Jobs can only be created for approved companies.",
-      400,
-    );
-  }
-
-  const created = await createJob(db, {
-    companyId: parsed.data.companyId,
-    createdByUserId: admin.id,
-    title: parsed.data.title,
-    description: parsed.data.description,
-    salaryMin: parsed.data.salaryMin,
-    salaryMax: parsed.data.salaryMax,
-    salaryCurrency: parsed.data.salaryCurrency,
-    location: parsed.data.location,
-    remoteType: parsed.data.remoteType,
-    employmentType: parsed.data.employmentType,
-    industry: parsed.data.industry,
-    closingDate: parsed.data.closingDate,
-    skillIds: parsed.data.skillIds,
-    skillNames: parsed.data.skillNames,
-    niceToHaveSkillNames: parsed.data.niceToHaveSkillNames,
-    companyAbout: parsed.data.companyAbout,
-    companySize: parsed.data.companySize,
-    benefits: parsed.data.benefits,
-    whyReturners: parsed.data.whyReturners,
-    applicationProcess: parsed.data.applicationProcess,
-    workingPatternDetail: parsed.data.workingPatternDetail,
-    contractDetails: parsed.data.contractDetails,
-    publish: parsed.data.publish ?? true,
-  });
-
-  await writeAdminLog(db, {
-    adminUserId: admin.id,
-    action: "Job Created By Admin",
-    entity: "job",
-    entityId: String(created.id),
-    notes: `company ${parsed.data.companyId}`,
-  });
-
-  return ok(c, created, 201);
-});
-
-secured.delete("/jobs/:id", async (c) => {
-  const admin = c.get("appUser");
-  if (!admin) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
-  if (!staffCan(admin, "manage_jobs")) {
-    return fail(c, "FORBIDDEN", "You do not have permission to manage jobs.", 403);
-  }
-
-  const id = Number(c.req.param("id"));
-  if (!Number.isFinite(id)) {
-    return fail(c, "VALIDATION_ERROR", "Invalid job id.", 400);
-  }
-
-  const db = getDb(c);
-  const existing = await findJobById(db, id);
-  if (!existing) return fail(c, "JOB_NOT_FOUND", "Job not found.", 404);
-
-  const removed = await adminRemoveJob(db, id);
-  if (!removed) return fail(c, "JOB_NOT_FOUND", "Job not found.", 404);
-
-  await writeAdminLog(db, {
-    adminUserId: admin.id,
-    action: "Job Removed",
-    entity: "job",
-    entityId: String(id),
-  });
-
-  return ok(c, await toPublicJob(db, removed, existing.companyName));
 });
 
 adminRoutes.route("/", secured);

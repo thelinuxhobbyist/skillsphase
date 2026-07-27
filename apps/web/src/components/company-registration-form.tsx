@@ -3,6 +3,7 @@
 import { useAuth } from "@clerk/nextjs";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { COMPANY_EMAIL_HINT, isCompanyEmailAllowed } from "@horizon/shared";
 import {
   ApiRequestError,
   createCompany,
@@ -11,15 +12,15 @@ import {
 } from "@/lib/api";
 
 /**
- * Two-step employer onboarding: verify Companies House number, then your contact details.
+ * Business onboarding: Companies House lookup → company email → contact details.
  */
 export function CompanyRegistrationForm() {
   const { getToken } = useAuth();
   const router = useRouter();
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [companyNumber, setCompanyNumber] = useState("");
-  const [website, setWebsite] = useState("https://");
   const [businessEmail, setBusinessEmail] = useState("");
+  const [website, setWebsite] = useState("https://");
   const [recruiterName, setRecruiterName] = useState("");
   const [recruiterJobTitle, setRecruiterJobTitle] = useState("");
   const [preview, setPreview] = useState<CompaniesHousePreview | null>(null);
@@ -36,41 +37,24 @@ export function CompanyRegistrationForm() {
     <div className="space-y-6">
       <ol className="space-y-2 rounded-md border border-[color:var(--line)] bg-white/70 px-4 py-3 text-sm text-[color:var(--foreground)]/80">
         <li>
-          <span className="font-semibold text-brand">1.</span> Look up your{" "}
-          <strong>company</strong> with its Companies House number (legal name
-          comes from Companies House — you don’t type it).
+          <span className="font-semibold text-primary">1.</span> Look up your UK
+          company with its Companies House number.
         </li>
         <li>
-          <span className="font-semibold text-brand">2.</span> Add{" "}
-          <strong>your</strong> contact details (the person hiring, not the
-          company name again).
+          <span className="font-semibold text-primary">2.</span> Add your{" "}
+          <strong>company email</strong> — we&apos;ll send account activation to
+          this address after admin review.
         </li>
         <li>
-          <span className="font-semibold text-brand">3.</span> Submit — a Horizon{" "}
-          <strong>admin reviews and approves</strong> you before you can post
-          jobs.
+          <span className="font-semibold text-primary">3.</span> Add your contact
+          details and submit for review.
         </li>
       </ol>
 
-      <ol className="flex gap-2 text-xs font-semibold">
-        <li
-          className={`rounded-md px-2.5 py-1 ${
-            step === 1
-              ? "bg-brand text-white"
-              : "bg-white text-brand ring-1 ring-[color:var(--line)]"
-          }`}
-        >
-          1. Find company
-        </li>
-        <li
-          className={`rounded-md px-2.5 py-1 ${
-            step === 2
-              ? "bg-brand text-white"
-              : "bg-white text-brand ring-1 ring-[color:var(--line)]"
-          }`}
-        >
-          2. Your details
-        </li>
+      <ol className="flex flex-wrap gap-2 text-xs font-semibold">
+        <StepBadge active={step === 1} done={step > 1} label="1. Company" />
+        <StepBadge active={step === 2} done={step > 2} label="2. Email" />
+        <StepBadge active={step === 3} done={false} label="3. Details" />
       </ol>
 
       <form
@@ -82,12 +66,23 @@ export function CompanyRegistrationForm() {
             setError(null);
             try {
               const token = await withToken();
-              if (step === 1 || !preview) {
+              if (step === 1) {
                 const result = await verifyCompanyNumber(token, companyNumber);
                 setPreview(result);
                 setStep(2);
                 setPending(false);
                 return;
+              }
+              if (step === 2) {
+                if (!isCompanyEmailAllowed(businessEmail)) {
+                  throw new Error(COMPANY_EMAIL_HINT);
+                }
+                setStep(3);
+                setPending(false);
+                return;
+              }
+              if (!preview) {
+                throw new Error("Company lookup is required.");
               }
               await createCompany(token, {
                 companyNumber,
@@ -111,84 +106,105 @@ export function CompanyRegistrationForm() {
         {step === 1 ? (
           <>
             <div>
-              <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
+              <h2 className="font-display text-2xl text-primary">
                 Find your company
               </h2>
               <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
-                Enter the UK Companies House registration number. We’ll show the
-                official company name next — that becomes your organisation on
-                Horizon.
+                Enter the UK Companies House registration number. We&apos;ll show
+                the official company name from Companies House.
               </p>
             </div>
             <Field
               label="Companies House number"
-              hint="8 digits, or 2 letters + 6 digits (e.g. 00000006). Not your company trading name."
+              hint="8 digits, or 2 letters + 6 digits (e.g. 00000006)."
               value={companyNumber}
               onChange={(value) => {
                 setCompanyNumber(value.toUpperCase());
                 setPreview(null);
-                setStep(1);
+                if (step > 1) setStep(1);
               }}
               placeholder="00000006"
               required
             />
           </>
-        ) : (
+        ) : null}
+
+        {step === 2 ? (
           <>
             <div>
-              <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
-                Your contact details
+              <h2 className="font-display text-2xl text-primary">
+                Company email
               </h2>
               <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
-                These are about <strong>you</strong> (the person registering),
-                not the company name. When you submit, your registration goes to
-                a Horizon admin for approval — you can’t post jobs until they
-                approve you.
+                Use a company email address (e.g. hr@yourcompany.co.uk) — not
+                Gmail, Outlook, or other personal providers. After an admin
+                reviews your registration, we&apos;ll send an activation link to
+                this inbox.
               </p>
             </div>
             {preview ? (
-              <div className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3 text-sm">
-                <p className="text-xs font-semibold uppercase tracking-wide text-brand-accent">
-                  Company (from Companies House)
-                </p>
-                <p className="mt-1 font-semibold text-brand">
-                  {preview.companyName}
-                </p>
-                <p className="text-[color:var(--foreground)]/65">
-                  {preview.companyNumber}
-                  {preview.companyStatus ? ` · ${preview.companyStatus}` : ""}
-                </p>
-                <button
-                  type="button"
-                  className="mt-2 text-sm font-semibold text-brand underline"
-                  onClick={() => {
-                    setStep(1);
-                    setPreview(null);
-                  }}
-                >
-                  Change company number
-                </button>
-              </div>
+              <CompanyPreview
+                preview={preview}
+                onChangeCompany={() => {
+                  setStep(1);
+                  setPreview(null);
+                }}
+              />
             ) : null}
             <Field
+              label="Company email"
+              hint={COMPANY_EMAIL_HINT}
+              type="email"
+              value={businessEmail}
+              onChange={setBusinessEmail}
+              placeholder="hr@company.co.uk"
+              required
+            />
+          </>
+        ) : null}
+
+        {step === 3 ? (
+          <>
+            <div>
+              <h2 className="font-display text-2xl text-primary">
+                Your contact details
+              </h2>
+              <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
+                About you — the person registering this company on SkillsPhase.
+              </p>
+            </div>
+            {preview ? (
+              <CompanyPreview
+                preview={preview}
+                onChangeCompany={() => {
+                  setStep(1);
+                  setPreview(null);
+                }}
+              />
+            ) : null}
+            <div className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary-accent">
+                Activation email will be sent to
+              </p>
+              <p className="mt-1 font-semibold text-primary">{businessEmail}</p>
+              <button
+                type="button"
+                className="mt-2 text-sm font-semibold text-primary underline"
+                onClick={() => setStep(2)}
+              >
+                Change company email
+              </button>
+            </div>
+            <Field
               label="Company website"
-              hint="Your organisation’s public website (must start with https://)."
+              hint="Your organisation's public website (must start with https://)."
               value={website}
               onChange={setWebsite}
               placeholder="https://example.co.uk"
               required
             />
             <Field
-              label="Work email"
-              hint="Best as a company email (e.g. you@company.co.uk). Used for approval and hiring updates."
-              type="email"
-              value={businessEmail}
-              onChange={setBusinessEmail}
-              required
-            />
-            <Field
               label="Your full name"
-              hint="The person hiring / registering this company — not the company name."
               value={recruiterName}
               onChange={setRecruiterName}
               placeholder="Alex Morgan"
@@ -196,14 +212,13 @@ export function CompanyRegistrationForm() {
             />
             <Field
               label="Your job title"
-              hint="Your role at the company (e.g. Hiring Manager, HR Lead)."
               value={recruiterJobTitle}
               onChange={setRecruiterJobTitle}
               placeholder="Hiring Manager"
               required
             />
           </>
-        )}
+        ) : null}
 
         {error ? (
           <p className="text-sm text-red-700" role="alert">
@@ -211,18 +226,83 @@ export function CompanyRegistrationForm() {
           </p>
         ) : null}
 
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
-        >
-          {pending
-            ? "Please wait…"
-            : step === 1
-              ? "Look up company"
-              : "Submit for admin approval"}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          {step > 1 ? (
+            <button
+              type="button"
+              className="rounded-md border border-[color:var(--line)] bg-white px-5 py-2.5 text-sm font-semibold text-primary"
+              onClick={() => setStep((s) => (s === 3 ? 2 : 1))}
+            >
+              Back
+            </button>
+          ) : null}
+          <button
+            type="submit"
+            disabled={pending}
+            className="rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+          >
+            {pending
+              ? "Please wait…"
+              : step === 1
+                ? "Look up company"
+                : step === 2
+                  ? "Continue"
+                  : "Submit for review"}
+          </button>
+        </div>
       </form>
+    </div>
+  );
+}
+
+function StepBadge({
+  active,
+  done,
+  label,
+}: {
+  active: boolean;
+  done: boolean;
+  label: string;
+}) {
+  return (
+    <li
+      className={`rounded-md px-2.5 py-1 ${
+        active
+          ? "bg-brand text-white"
+          : done
+            ? "bg-emerald-50 text-emerald-900 ring-1 ring-emerald-200"
+            : "bg-white text-primary ring-1 ring-[color:var(--line)]"
+      }`}
+    >
+      {label}
+    </li>
+  );
+}
+
+function CompanyPreview({
+  preview,
+  onChangeCompany,
+}: {
+  preview: CompaniesHousePreview;
+  onChangeCompany: () => void;
+}) {
+  return (
+    <div className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3 text-sm">
+      <p className="text-xs font-semibold uppercase tracking-wide text-primary-accent">
+        Company (from Companies House)
+      </p>
+      <p className="mt-1 font-semibold text-primary">{preview.companyName}</p>
+      <p className="text-[color:var(--foreground)]/65">
+        {preview.companyNumber}
+        {preview.companyStatus ? ` · ${preview.companyStatus}` : ""}
+      </p>
+      <button
+        type="button"
+        className="mt-2 text-sm font-semibold text-primary underline"
+        onClick={onChangeCompany}
+      >
+        Change company number
+      </button>
     </div>
   );
 }
@@ -246,7 +326,7 @@ function Field({
 }) {
   return (
     <label className="block text-sm">
-      <span className="font-medium text-brand">{label}</span>
+      <span className="font-medium text-primary">{label}</span>
       <input
         type={type}
         required={required}

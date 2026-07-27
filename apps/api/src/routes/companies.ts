@@ -1,4 +1,5 @@
 import {
+  confirmBusinessEmailSchema,
   createCompanySchema,
   updateCompanySchema,
   verifyCompanySchema,
@@ -10,11 +11,15 @@ import {
   lookupCompaniesHouseCompany,
 } from "../lib/companies-house";
 import { getDb } from "../lib/db";
+import { hashToken } from "../lib/admin-crypto";
 import { fail, ok } from "../lib/response";
 import {
   createCompany,
   findCompanyByNumber,
   findCompanyByOwner,
+  findValidVerificationByTokenHash,
+  markCompanyEmailVerified,
+  markVerificationUsed,
   toPublicCompany,
   updateCompany,
 } from "@horizon/database";
@@ -141,7 +146,7 @@ companyRoutes.post("/", async (c) => {
       return fail(
         c,
         "COMPANY_NOT_ACTIVE",
-        "Only active UK companies can register on Project Horizon.",
+        "Only active UK companies can register on SkillsPhase.",
         400,
       );
     }
@@ -237,6 +242,53 @@ companyRoutes.patch("/me", async (c) => {
     verificationStatus,
     rejectionReason,
   });
+
+  return ok(c, toPublicCompany(updated));
+});
+
+/** Activation emails are sent when an administrator approves the registration. */
+companyRoutes.post("/me/verify-email/send", async (c) => {
+  return fail(
+    c,
+    "ACTIVATION_EMAIL_ADMIN_ONLY",
+    "Your activation email is sent when a SkillsPhase administrator approves your registration. Check your company email inbox.",
+    403,
+  );
+});
+
+/** Confirms a business email using the token from the verification email link. */
+companyRoutes.post("/me/verify-email/confirm", async (c) => {
+  const appUser = c.get("appUser");
+  if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+
+  const body = await c.req.json().catch(() => null);
+  const parsed = confirmBusinessEmailSchema.safeParse(body);
+  if (!parsed.success) {
+    return fail(c, "VALIDATION_ERROR", "A valid token is required.", 400);
+  }
+
+  const db = await getDb(c);
+  const company = await findCompanyByOwner(db, appUser.id);
+  if (!company) {
+    return fail(c, "COMPANY_NOT_FOUND", "No company registration found.", 404);
+  }
+
+  const tokenHash = await hashToken(parsed.data.token);
+  const verification = await findValidVerificationByTokenHash(db, tokenHash);
+  if (!verification || verification.companyId !== company.id) {
+    return fail(
+      c,
+      "INVALID_TOKEN",
+      "This verification link is invalid or has expired.",
+      400,
+    );
+  }
+
+  await markVerificationUsed(db, verification.id);
+  const updated = await markCompanyEmailVerified(db, company.id);
+  if (!updated) {
+    return fail(c, "COMPANY_NOT_FOUND", "No company registration found.", 404);
+  }
 
   return ok(c, toPublicCompany(updated));
 });

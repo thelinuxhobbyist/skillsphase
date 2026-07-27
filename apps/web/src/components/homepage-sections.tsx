@@ -1,8 +1,6 @@
 import Link from "next/link";
 import type { HomepageSection } from "@horizon/shared";
-import { HOMEPAGE_DEMO_JOBS } from "@horizon/shared";
-import { JobSearchForm } from "@/components/job-search-form";
-import type { HorizonJob } from "@/lib/api";
+import { AVAILABILITY_LABELS } from "@horizon/shared";
 
 function str(value: unknown, fallback = "") {
   return typeof value === "string" ? value : fallback;
@@ -12,115 +10,89 @@ function arr<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
 }
 
-function demoJobSlug(job: {
-  slug?: string;
-  title: string;
-}): string {
-  if (job.slug) return job.slug;
-  const fromCanon = HOMEPAGE_DEMO_JOBS.find(
-    (j) => j.title === job.title || j.title === job.title.replace(/ — .+$/, ""),
+function availabilityLabel(value: unknown): string {
+  if (typeof value === "string" && value in AVAILABILITY_LABELS) {
+    return AVAILABILITY_LABELS[value as keyof typeof AVAILABILITY_LABELS];
+  }
+  return typeof value === "string" ? value : "";
+}
+
+function formatHeroTitle(title: string) {
+  const marker = "Because life happens";
+  const idx = title.indexOf(marker);
+  if (idx === -1) {
+    return <>{title}</>;
+  }
+  return (
+    <>
+      {title.slice(0, idx)}
+      <em className="font-medium text-[color:var(--stamp)] italic">
+        {marker}
+      </em>
+      {title.slice(idx + marker.length)}
+    </>
   );
-  if (fromCanon) return fromCanon.slug;
-  return job.title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
 }
 
 export function HomepageSections({
   sections,
-  featuredJobs,
 }: {
   sections: HomepageSection[];
-  featuredJobs: HorizonJob[];
 }) {
   return (
     <>
       {sections.map((section) => (
-        <HomepageSectionBlock
-          key={section.id}
-          section={section}
-          featuredJobs={featuredJobs}
-        />
+        <HomepageSectionBlock key={section.id} section={section} />
       ))}
     </>
   );
 }
 
-function HomepageSectionBlock({
-  section,
-  featuredJobs,
-}: {
-  section: HomepageSection;
-  featuredJobs: HorizonJob[];
-}) {
+function HomepageSectionBlock({ section }: { section: HomepageSection }) {
   const c = section.content;
 
   switch (section.type) {
     case "hero":
       return (
-        <section className="relative min-h-[70vh] overflow-hidden md:min-h-[76vh]">
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(165deg, #0a3a47 0%, #0f4c5c 42%, #1a5f6e 100%)",
-            }}
-          />
-          <div
-            className="absolute inset-0 opacity-40"
-            style={{
-              backgroundImage:
-                "radial-gradient(ellipse 80% 60% at 70% 40%, rgba(227,100,20,0.45), transparent 55%), radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08), transparent 40%)",
-            }}
-          />
-          <div className="absolute inset-0 animate-[horizon-pan_22s_ease-in-out_infinite_alternate] bg-[url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Cpath fill=%22%23ffffff08%22 d=%22M0 40h80M40 0v80%22/%3E%3C/svg%3E')] bg-[length:64px_64px]" />
-          <div className="relative mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col justify-end px-4 pb-12 pt-24 sm:px-6 sm:pb-14 sm:pt-28 md:min-h-[76vh] md:pb-16 md:pt-32">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/70">
-              {str(c.eyebrow, "Career Return Platform")}
-            </p>
-            <h1 className="mt-3 max-w-2xl font-[family-name:var(--font-fraunces)] text-4xl leading-[1.05] font-semibold tracking-tight break-words text-white sm:text-5xl md:text-7xl">
-              {str(c.title, "Project Horizon")}
-            </h1>
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-white/85 md:text-lg">
-              {str(c.body)}
-            </p>
-            {c.showSearch !== false ? (
-              <div className="mt-8 w-full max-w-2xl">
-                <JobSearchForm variant="hero" className="w-full" />
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-white/80">
-                  <span className="font-semibold text-white/90">Popular:</span>
-                  {[
-                    "Flexible Hours",
-                    "Operations",
-                    "Finance",
-                    "Technology",
-                    "Remote",
-                  ].map((tag) => (
-                    <Link
-                      key={tag}
-                      href={`/jobs?keyword=${encodeURIComponent(tag)}`}
-                      className="rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-white transition hover:bg-white/20 backdrop-blur"
-                    >
-                      {tag}
-                    </Link>
-                  ))}
-                </div>
+        <section className="border-b border-[color:var(--line)] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_2%,transparent),transparent_40%),var(--background)] px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-20">
+          <div className="mx-auto grid max-w-[1180px] items-center gap-12 md:grid-cols-[1.05fr_1fr] md:gap-14">
+            <div className="animate-[dossier-rise_0.7s_ease_both]">
+              <p className="eyebrow">{str(c.eyebrow, "Skills-first hiring")}</p>
+              <h1 className="mt-4 max-w-xl font-display text-[clamp(2.25rem,5.2vw,3.75rem)] leading-[1.06] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+                {formatHeroTitle(str(c.title, "Skills first. Because life happens."))}
+              </h1>
+              <p className="mt-5 max-w-[48ch] text-lg leading-relaxed text-[color:var(--ink-soft)]">
+                {str(c.body)}
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3.5">
+                <Link
+                  href={str(c.primaryCtaHref, "/register?as=candidate")}
+                  className="btn-primary inline-flex items-center rounded-[var(--radius)] px-5 py-3 font-mono text-xs font-medium tracking-[0.05em] uppercase"
+                >
+                  {str(c.primaryCtaLabel, "Create your Skill Profile")}
+                </Link>
+                <Link
+                  href={str(c.secondaryCtaHref, "/discover-talent")}
+                  className="inline-flex items-center rounded-[var(--radius)] border border-[color:var(--line-strong)] bg-transparent px-5 py-3 font-mono text-xs font-medium tracking-[0.05em] uppercase text-[color:var(--ink)] transition hover:border-[color:var(--ink)] hover:bg-foreground/5"
+                >
+                  {str(c.secondaryCtaLabel, "Discover talent")}
+                </Link>
               </div>
-            ) : null}
-            <div className="mt-8 flex w-full max-w-lg flex-col gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-              <Link
-                href={str(c.primaryCtaHref, "/register?as=seeker")}
-                className="btn-primary w-full rounded-md bg-brand-accent px-5 py-3.5 text-center text-sm font-semibold text-white transition hover:opacity-90 sm:w-auto sm:px-6"
-              >
-                {str(c.primaryCtaLabel, "Register as a returner")}
-              </Link>
-              <Link
-                href={str(c.secondaryCtaHref, "/register?as=employer")}
-                className="w-full rounded-md border border-white/40 bg-white/10 px-5 py-3.5 text-center text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:w-auto sm:px-6"
-              >
-                {str(c.secondaryCtaLabel, "Register as an employer")}
-              </Link>
+            </div>
+
+            <div className="relative animate-[dossier-rise_0.85s_ease_0.08s_both] rounded-md border border-[color:var(--folder-line)] bg-[color:var(--folder)] px-5 pb-8 pt-7 shadow-lift sm:px-6">
+              <span className="absolute -top-3.5 left-6 rounded-t-[5px] border border-b-0 border-[color:var(--folder-line)] bg-[color:var(--folder)] px-3 py-1.5 font-mono text-xs tracking-[0.08em] text-[color:var(--ink-soft)]">
+                FILE — CAREER TIMELINE
+              </span>
+              <div className="mb-2 flex justify-between font-mono text-xs text-[color:var(--ink-soft)]">
+                <span>CANDIDATE 04471</span>
+                <span>STATUS: ACTIVE</span>
+              </div>
+              <HeroDossierArt />
+              <div className="mt-1 flex justify-between font-mono text-xs text-[color:var(--ink-soft)]">
+                <span>EVIDENCE: 6 PROJECTS · 2 CERTS</span>
+                <span>REF. SP-2026</span>
+              </div>
             </div>
           </div>
         </section>
@@ -128,52 +100,41 @@ function HomepageSectionBlock({
 
     case "trust":
       return (
-        <section className="border-b border-[color:var(--line)] bg-white/90">
-          <ul className="mx-auto grid max-w-6xl grid-cols-1 gap-px bg-[color:var(--line)] sm:grid-cols-2 md:grid-cols-4">
-            {arr<string>(c.items).map((item) => (
+        <section className="overflow-x-auto border-y border-[color:var(--line-strong)] bg-[color:var(--ink)] text-[color:var(--paper)]">
+          <ul className="mx-auto flex min-w-max max-w-[1180px] items-center px-4 py-3.5 font-mono text-xs tracking-[0.06em] sm:px-6 md:min-w-0 md:justify-between">
+            {arr<string>(c.items).map((item, index) => (
               <li
                 key={item}
-                className="bg-white px-4 py-5 text-center text-sm font-semibold break-words text-brand sm:px-5"
+                className={`whitespace-nowrap px-6 md:px-4 ${index === 0 ? "" : "border-l border-white/25"}`}
               >
-                {item}
+                {item.toUpperCase()}
               </li>
             ))}
           </ul>
         </section>
       );
 
-    case "story":
-      return (
-        <section className="mx-auto max-w-3xl px-6 py-16 text-center md:py-20">
-          <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand md:text-4xl">
-            {str(c.title)}
-          </h2>
-          <p className="mt-5 text-lg leading-relaxed text-[color:var(--foreground)]/80">
-            {str(c.body)}
-          </p>
-        </section>
-      );
-
     case "how_it_works":
       return (
-        <section className="border-y border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-              {str(c.title, "How it works")}
+        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-20">
+          <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
+            <p className="eyebrow">{str(c.title, "How it works")}</p>
+            <h2 className="mt-3.5 max-w-2xl font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              {str(c.subtitle, "Three simple steps from profile to conversation.")}
             </h2>
-            {c.subtitle ? (
-              <p className="mt-2 max-w-2xl text-[color:var(--foreground)]/75">
-                {str(c.subtitle)}
-              </p>
-            ) : null}
-            <ol className="mt-8 grid gap-8 md:grid-cols-3">
+            <ol className="mt-12 grid border-t border-[color:var(--line-strong)] md:grid-cols-3">
               {arr<{ title: string; body: string }>(c.steps).map((step, index) => (
-                <li key={`${step.title}-${index}`}>
-                  <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand-accent">
-                    Step {index + 1}
+                <li
+                  key={`${step.title}-${index}`}
+                  className={`border-[color:var(--line-strong)] py-7 md:border-l md:py-8 md:pl-6 ${index === 0 ? "md:border-l-0 md:pl-0" : ""} border-t md:border-t-0 first:border-t-0`}
+                >
+                  <p className="font-mono text-xs tracking-[0.1em] text-[color:var(--stamp)]">
+                    FILE 0{index + 1}
                   </p>
-                  <h3 className="mt-2 font-semibold text-brand">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--foreground)]/75">
+                  <h3 className="mt-2.5 font-display text-[1.35rem] font-semibold text-[color:var(--ink)]">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2.5 text-base leading-relaxed text-[color:var(--ink-soft)]">
                     {step.body}
                   </p>
                 </li>
@@ -183,351 +144,285 @@ function HomepageSectionBlock({
         </section>
       );
 
-    case "differentiators":
+    case "differentiators": {
+      const accents = [
+        "var(--stamp)",
+        "var(--verified)",
+        "var(--mustard)",
+        "var(--ink)",
+      ];
       return (
-        <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 md:py-20">
-          <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-            {str(c.title, "What makes us different")}
-          </h2>
-          {c.subtitle ? (
-            <p className="mt-2 max-w-2xl text-[color:var(--foreground)]/75">
-              {str(c.subtitle)}
+        <section className="py-20">
+          <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
+            <p className="eyebrow">
+              {str(c.title, "What makes SkillsPhase different")}
             </p>
-          ) : null}
-          <ul className="mt-10 grid gap-8 sm:grid-cols-2">
-            {arr<{ title: string; body: string }>(c.items).map((item) => (
-              <li key={item.title} className="border-l-2 border-brand-accent pl-5">
-                <h3 className="font-semibold text-brand">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-[color:var(--foreground)]/75">
-                  {item.body}
-                </p>
-              </li>
-            ))}
-          </ul>
+            <h2 className="mt-3.5 max-w-2xl font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              {str(
+                c.subtitle,
+                "A hiring platform built around skills and evidence.",
+              )}
+            </h2>
+            <ul className="mt-12 grid gap-px border border-[color:var(--line-strong)] bg-[color:var(--line-strong)] sm:grid-cols-2">
+              {arr<{ title: string; body: string }>(c.items).map((item, index) => (
+                <li
+                  key={item.title}
+                  className="border-l-4 bg-[color:var(--paper)] px-6 py-8 sm:px-8 sm:py-9"
+                  style={{ borderLeftColor: accents[index % accents.length] }}
+                >
+                  <h3 className="font-display text-[1.4rem] font-semibold text-[color:var(--ink)] sm:text-[1.5rem]">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-base leading-relaxed text-[color:var(--ink-soft)]">
+                    {item.body}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
         </section>
       );
+    }
 
-    case "employers_cta":
+    case "businesses_cta":
       return (
-        <section className="border-y border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
-          <div className="mx-auto max-w-3xl px-6 text-center">
-            <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand md:text-4xl">
-              {str(c.title)}
-            </h2>
-            <p className="mt-5 text-lg leading-relaxed text-[color:var(--foreground)]/80">
-              {str(c.body)}
-            </p>
-            <Link
-              href={str(c.ctaHref, "/register?as=employer")}
-              className="btn-primary mt-8 inline-block rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              {str(c.ctaLabel, "Register as an employer")}
-            </Link>
-          </div>
+        <section className="bg-[color:var(--ink)] px-4 py-20 text-center text-[color:var(--paper)] sm:px-6">
+          <p className="eyebrow !text-[color:var(--mustard)] justify-center before:!bg-[color:var(--mustard)]">
+            For businesses
+          </p>
+          <h2 className="mx-auto mt-4 max-w-3xl font-display text-[clamp(1.95rem,4vw,2.75rem)] font-medium italic">
+            {str(c.title)}
+          </h2>
+          <p className="mx-auto mt-3.5 max-w-xl text-base leading-relaxed text-ink-foreground/70">
+            {str(c.body)}
+          </p>
+          <Link
+            href={str(c.ctaHref, "/register?as=business")}
+            className="mt-8 inline-flex items-center rounded-[var(--radius)] border border-white/50 px-5 py-3 font-mono text-xs tracking-[0.05em] uppercase text-[color:var(--paper)] transition hover:border-white hover:bg-white/10"
+          >
+            {str(c.ctaLabel, "Register as a business")}
+          </Link>
         </section>
       );
 
     case "stats":
       return (
-        <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
-          <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-            {str(c.title)}
-          </h2>
-          {c.subtitle ? (
-            <p className="mt-2 text-sm text-[color:var(--foreground)]/60">
-              {str(c.subtitle)}
-            </p>
-          ) : null}
-          <ul className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
-            {arr<{ value: string; label: string }>(c.items).map((stat) => (
-              <li key={stat.label}>
-                <p className="font-[family-name:var(--font-fraunces)] text-3xl text-brand sm:text-4xl">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
-                  {stat.label}
-                </p>
-              </li>
-            ))}
-          </ul>
-          {c.footnote ? (
-            <p className="mt-4 text-xs text-[color:var(--foreground)]/50">
-              {str(c.footnote)}
-            </p>
-          ) : null}
-        </section>
-      );
-
-    case "logos":
-      return (
-        <section className="border-y border-[color:var(--line)] bg-white/70 py-14">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="text-center font-[family-name:var(--font-fraunces)] text-2xl text-brand">
+        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-20">
+          <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
+            <p className="eyebrow">The record so far</p>
+            <h2 className="mt-3.5 font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
               {str(c.title)}
             </h2>
             {c.subtitle ? (
-              <p className="mt-2 text-center text-sm text-[color:var(--foreground)]/60">
+              <p className="mt-2 text-base text-[color:var(--ink-soft)]">
                 {str(c.subtitle)}
               </p>
             ) : null}
-            <ul className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
-              {arr<string>(c.items).map((name) => (
+            <ul className="mt-9 grid grid-cols-2 gap-y-8 md:grid-cols-4">
+              {arr<{ value: string; label: string }>(c.items).map((stat, index) => (
                 <li
-                  key={name}
-                  className="min-w-0 max-w-[9rem] text-center text-sm font-semibold tracking-wide break-words text-brand/45"
+                  key={stat.label}
+                  className={
+                    index === 0
+                      ? "md:pl-0"
+                      : "md:border-l md:border-[color:var(--line-strong)] md:pl-6"
+                  }
                 >
-                  {name}
+                  <p className="font-mono text-[clamp(1.875rem,3.4vw,2.6rem)] font-semibold text-[color:var(--stamp)]">
+                    {stat.value}
+                  </p>
+                  <p className="mt-1.5 text-sm text-[color:var(--ink-soft)]">
+                    {stat.label}
+                  </p>
                 </li>
               ))}
             </ul>
-          </div>
-        </section>
-      );
-
-    case "testimonials":
-      return (
-        <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
-          <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-            {str(c.title)}
-          </h2>
-          {c.subtitle ? (
-            <p className="mt-2 text-sm text-[color:var(--foreground)]/60">
-              {str(c.subtitle)}
-            </p>
-          ) : null}
-          <ul className="mt-8 grid gap-8 md:grid-cols-3">
-            {arr<{ quote: string; name: string; role: string }>(c.items).map(
-              (item) => (
-                <li key={item.name}>
-                  <blockquote className="text-base leading-relaxed text-[color:var(--foreground)]/80">
-                    “{item.quote}”
-                  </blockquote>
-                  <p className="mt-4 text-sm font-semibold text-brand">{item.name}</p>
-                  <p className="text-sm text-[color:var(--foreground)]/60">
-                    {item.role}
-                  </p>
-                </li>
-              ),
-            )}
-          </ul>
-        </section>
-      );
-
-    case "success_stories":
-      return (
-        <section className="border-y border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-              {str(c.title)}
-            </h2>
-            {c.subtitle ? (
-              <p className="mt-2 text-sm text-[color:var(--foreground)]/60">
-                {str(c.subtitle)}
+            {c.footnote ? (
+              <p className="mt-6 font-mono text-xs text-[color:var(--ink-soft)] italic opacity-75">
+                {str(c.footnote)}
               </p>
             ) : null}
-            <ul className="mt-8 grid gap-8 md:grid-cols-2">
-              {arr<{ title: string; body: string }>(c.items).map((story) => (
-                <li key={story.title}>
-                  <h3 className="font-semibold text-brand">{story.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--foreground)]/75">
-                    {story.body}
+          </div>
+        </section>
+      );
+
+    case "featured_candidates": {
+      const demoCards = arr<{
+        title: string;
+        skills: string[];
+        yearsExperience: number;
+        topProject: string;
+        availability: string;
+      }>(c.demoCards);
+
+      return (
+        <section className="py-20">
+          <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="eyebrow">See it in action</p>
+                <h2 className="mt-3.5 font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+                  {str(c.title, "Example skill profiles")}
+                </h2>
+                <p className="mt-2 text-base text-[color:var(--ink-soft)]">
+                  {str(c.subtitle)}
+                </p>
+              </div>
+              <Link
+                href="/discover-talent"
+                className="font-mono text-sm text-[color:var(--stamp)] hover:underline"
+              >
+                Browse real Skill Profiles →
+              </Link>
+            </div>
+
+            <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {demoCards.map((card) => (
+                <li
+                  key={card.title}
+                  className="rounded-[5px] border border-[color:var(--folder-line)] bg-[color:var(--folder)] p-5 sm:p-6"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-display text-[1.35rem] font-semibold text-[color:var(--ink)]">
+                      {card.title}
+                    </h3>
+                    <span className="-rotate-3 rounded-full border border-[color:var(--stamp)] px-2.5 py-0.5 font-mono text-xs tracking-[0.08em] text-[color:var(--stamp)] whitespace-nowrap">
+                      EXAMPLE
+                    </span>
+                  </div>
+                  {card.skills.length > 0 ? (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {card.skills.map((skill) => (
+                        <span
+                          key={skill}
+                          className="rounded-full border border-[color:var(--line-strong)] bg-[color:var(--paper)] px-2.5 py-1 font-mono text-xs text-[color:var(--ink-soft)]"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                  <p className="mt-3.5 text-sm text-[color:var(--ink-soft)]">
+                    {card.yearsExperience} years experience
+                  </p>
+                  <p className="mt-1 text-base text-[color:var(--ink)]">
+                    {card.topProject}
+                  </p>
+                  <p className="mt-3.5 flex items-center gap-1.5 font-mono text-sm text-[color:var(--verified)] before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-[color:var(--verified)] before:content-['']">
+                    {availabilityLabel(card.availability)}
                   </p>
                 </li>
               ))}
             </ul>
           </div>
-        </section>
-      );
-
-    case "featured_jobs": {
-      const showDemo = featuredJobs.length === 0;
-      const demoJobs = arr<{
-        slug?: string;
-        title: string;
-        companyName: string;
-        location: string;
-        remoteType: string;
-        blurb: string;
-        skills?: string[];
-      }>(c.demoJobs);
-      const showSearch = c.showSearch === true;
-
-      return (
-        <section id="jobs" className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-                {str(c.title, "Featured jobs")}
-              </h2>
-              <p className="mt-2 text-[color:var(--foreground)]/75">
-                {showDemo
-                  ? str(c.subtitleDemo)
-                  : str(c.subtitleLive)}
-              </p>
-            </div>
-            <Link href="/jobs" className="text-sm font-semibold text-brand underline">
-              View all jobs
-            </Link>
-          </div>
-
-          {showSearch ? (
-            <JobSearchForm className="mt-8 grid gap-3 sm:grid-cols-[1fr_1fr_auto]" />
-          ) : null}
-
-          <ul className="mt-8 space-y-4">
-            {showDemo
-              ? demoJobs.map((job) => {
-                  const slug = demoJobSlug(job);
-                  const skills =
-                    job.skills ??
-                    HOMEPAGE_DEMO_JOBS.find((j) => j.title === job.title || j.slug === job.slug)
-                      ?.skills.map((s) => s.name) ??
-                    [];
-                  return (
-                    <li key={`${job.title}-${job.companyName}`}>
-                      <Link
-                        href={`/jobs/examples/${slug}`}
-                        className="group block w-full rounded-lg border border-[color:var(--line)] bg-white/80 p-5 sm:p-6 transition-all duration-200 hover:border-brand hover:bg-white hover:shadow-md cursor-pointer"
-                      >
-                        <div className="flex flex-wrap items-start justify-between gap-2">
-                          <h3 className="font-semibold text-lg text-brand group-hover:text-brand-accent transition-colors">
-                            {job.title}
-                          </h3>
-                          <span className="rounded-full bg-brand-accent/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-brand-accent">
-                            Example listing
-                          </span>
-                        </div>
-                        <p className="mt-1 text-sm font-medium text-[color:var(--foreground)]/70">
-                          {job.companyName} · {job.location} ·{" "}
-                          {job.remoteType.replace("_", "-")}
-                        </p>
-                        {skills.length > 0 ? (
-                          <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                            {skills.slice(0, 5).map((skill) => (
-                              <span
-                                key={skill}
-                                className="rounded-md border border-[color:var(--line)] bg-white px-2.5 py-1 text-brand font-medium pointer-events-none"
-                              >
-                                {skill}
-                              </span>
-                            ))}
-                          </div>
-                        ) : null}
-                        <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/80">
-                          {job.blurb}
-                        </p>
-                        <div className="mt-4 flex items-center justify-between border-t border-[color:var(--line)]/60 pt-3">
-                          <span className="text-sm font-semibold text-brand group-hover:text-brand-accent group-hover:underline inline-flex items-center gap-1">
-                            Read full example listing <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-                          </span>
-                        </div>
-                      </Link>
-                    </li>
-                  );
-                })
-              : featuredJobs.map((job) => (
-                  <li key={job.id}>
-                    <Link
-                      href={`/jobs/${job.slug}`}
-                      className="group block w-full rounded-lg border border-[color:var(--line)] bg-white/80 p-5 sm:p-6 transition-all duration-200 hover:border-brand hover:bg-white hover:shadow-md cursor-pointer"
-                    >
-                      <div className="flex flex-wrap items-start justify-between gap-2">
-                        <h3 className="font-semibold text-lg text-brand group-hover:text-brand-accent transition-colors">
-                          {job.title}
-                        </h3>
-                        <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-brand">
-                          {job.remoteType.replace("_", "-")}
-                        </span>
-                      </div>
-                      <p className="mt-1 text-sm font-medium text-[color:var(--foreground)]/70">
-                        {job.companyName} · {job.location}
-                      </p>
-                      {job.skills.length > 0 ? (
-                        <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                          {job.skills.slice(0, 5).map((skill) => (
-                            <span
-                              key={skill.id}
-                              className="rounded-md border border-[color:var(--line)] bg-white px-2.5 py-1 text-brand font-medium pointer-events-none"
-                            >
-                              {skill.name}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
-                      {job.description ? (
-                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-[color:var(--foreground)]/80">
-                          {job.description}
-                        </p>
-                      ) : null}
-                      <div className="mt-4 flex items-center justify-between border-t border-[color:var(--line)]/60 pt-3">
-                        <span className="text-sm font-semibold text-brand group-hover:text-brand-accent group-hover:underline inline-flex items-center gap-1">
-                          View role details <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-                        </span>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-          </ul>
         </section>
       );
     }
 
-    case "closing_cta":
+    case "testimonials":
       return (
-        <section className="border-t border-[color:var(--line)] bg-[color:var(--surface)]/60 py-16">
-          <div className="mx-auto max-w-3xl px-6 text-center">
-            <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand md:text-4xl">
+        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-20">
+          <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
+            <p className="eyebrow">Voices from the community</p>
+            <h2 className="mt-3.5 max-w-2xl font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
               {str(c.title)}
             </h2>
-            <p className="mt-5 text-lg leading-relaxed text-[color:var(--foreground)]/80">
-              {str(c.body)}
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link
-                href={str(c.primaryCtaHref, "/register?as=seeker")}
-                className="btn-primary rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-              >
-                {str(c.primaryCtaLabel, "Register as a returner")}
-              </Link>
-              <Link
-                href={str(c.secondaryCtaHref, "/register?as=employer")}
-                className="rounded-md border border-[color:var(--line)] bg-white/70 px-5 py-3 text-sm font-semibold text-brand transition hover:bg-white"
-              >
-                {str(c.secondaryCtaLabel, "Register as an employer")}
-              </Link>
-            </div>
+            {c.subtitle ? (
+              <p className="mt-2 text-base text-[color:var(--ink-soft)]">
+                {str(c.subtitle)}
+              </p>
+            ) : null}
+            <ul className="mt-10 grid gap-5 md:grid-cols-3">
+              {arr<{ quote: string; name: string; role: string }>(c.items).map(
+                (item) => (
+                  <li
+                    key={item.name}
+                    className="relative rounded border border-[color:var(--line)] bg-[color:var(--paper)] px-6 py-6"
+                  >
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute top-1.5 left-4 font-display text-[46px] leading-none text-[color:var(--folder-line)]"
+                    >
+                      “
+                    </span>
+                    <blockquote className="relative mt-3.5 font-display text-lg leading-snug italic text-[color:var(--ink)]">
+                      {item.quote}
+                    </blockquote>
+                    <p className="mt-4 text-sm font-semibold text-[color:var(--ink)]">
+                      {item.name}
+                    </p>
+                    <p className="text-sm text-[color:var(--ink-soft)]">
+                      {item.role}
+                    </p>
+                  </li>
+                ),
+              )}
+            </ul>
+          </div>
+        </section>
+      );
+
+    case "closing_cta":
+      return (
+        <section className="px-4 py-20 text-center sm:px-6">
+          <p className="eyebrow justify-center">Ready when you are</p>
+          <h2 className="mt-4 font-display text-[clamp(1.95rem,4vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+            {str(c.title)}
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[color:var(--ink-soft)]">
+            {str(c.body)}
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3.5">
+            <Link
+              href={str(c.primaryCtaHref, "/register?as=candidate")}
+              className="btn-primary inline-flex items-center rounded-[var(--radius)] px-5 py-3 font-mono text-xs font-medium tracking-[0.05em] uppercase"
+            >
+              {str(c.primaryCtaLabel, "Create your Skill Profile")}
+            </Link>
+            <Link
+              href={str(c.secondaryCtaHref, "/register?as=business")}
+              className="inline-flex items-center rounded-[var(--radius)] border border-[color:var(--line-strong)] px-5 py-3 font-mono text-xs font-medium tracking-[0.05em] uppercase text-[color:var(--ink)] transition hover:border-[color:var(--ink)]"
+            >
+              {str(c.secondaryCtaLabel, "Register as a business")}
+            </Link>
           </div>
         </section>
       );
 
     case "faq":
       return (
-        <section id="faq" className="mx-auto max-w-3xl px-6 py-16">
-          <h2 className="font-[family-name:var(--font-fraunces)] text-3xl text-brand">
-            {str(c.title, "Frequently asked questions")}
-          </h2>
-          {c.subtitle ? (
-            <p className="mt-2 text-[color:var(--foreground)]/75">{str(c.subtitle)}</p>
-          ) : null}
-          <div className="mt-8 space-y-3">
-            {arr<{ q: string; a: string }>(c.items).map((item) => (
-              <details
-                key={item.q}
-                className="group border-b border-[color:var(--line)] py-3"
-              >
-                <summary className="cursor-pointer list-none font-semibold text-brand marker:content-none [&::-webkit-details-marker]:hidden">
-                  <span className="flex items-start justify-between gap-4">
+        <section
+          id="faq"
+          className="border-t border-[color:var(--line)] bg-[color:var(--paper-warm)] py-20"
+        >
+          <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
+            <p className="eyebrow">Frequently asked questions</p>
+            <h2 className="mt-3.5 font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+              {str(c.title, "Frequently asked questions")}
+            </h2>
+            {c.subtitle ? (
+              <p className="mt-2 text-base text-[color:var(--ink-soft)]">
+                {str(c.subtitle)}
+              </p>
+            ) : null}
+            <div className="mt-10 max-w-[820px] border-t border-[color:var(--line-strong)]">
+              {arr<{ q: string; a: string }>(c.items).map((item) => (
+                <details
+                  key={item.q}
+                  className="group border-b border-[color:var(--line-strong)]"
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-display text-[19px] font-semibold text-[color:var(--ink)] marker:content-none [&::-webkit-details-marker]:hidden">
                     {item.q}
-                    <span className="text-brand-accent transition group-open:rotate-45">
+                    <span className="font-mono text-lg text-[color:var(--stamp)] transition group-open:rotate-45">
                       +
                     </span>
-                  </span>
-                </summary>
-                <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/75">
-                  {item.a}
-                </p>
-              </details>
-            ))}
+                  </summary>
+                  <p className="max-w-[70ch] pb-5 text-base leading-relaxed text-[color:var(--ink-soft)]">
+                    {item.a}
+                  </p>
+                </details>
+              ))}
+            </div>
           </div>
         </section>
       );
@@ -535,4 +430,76 @@ function HomepageSectionBlock({
     default:
       return null;
   }
+}
+
+function HeroDossierArt() {
+  return (
+    <svg
+      viewBox="0 0 520 300"
+      className="mt-1.5 w-full"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <line
+        x1="20"
+        y1="150"
+        x2="500"
+        y2="150"
+        stroke="var(--ink)"
+        strokeWidth="1.5"
+        strokeDasharray="1 6"
+        strokeLinecap="round"
+      />
+      <circle cx="20" cy="150" r="4" fill="var(--ink)" />
+      <circle cx="500" cy="150" r="4" fill="var(--ink)" />
+      <rect x="150" y="132" width="150" height="36" rx="2" fill="var(--ink)" />
+      <text
+        x="225"
+        y="155"
+        textAnchor="middle"
+        fontFamily="var(--font-mono), monospace"
+        fontSize="10.5"
+        letterSpacing="1"
+        fill="var(--paper)"
+      >
+        CAREGIVING — 14 MOS
+      </text>
+      <g
+        className="origin-center animate-[stamp-in_0.9s_ease_0.35s_both]"
+        style={{ transformOrigin: "225px 150px" }}
+        transform="translate(225,150) rotate(-9)"
+      >
+        <circle r="34" fill="none" stroke="var(--stamp)" strokeWidth="2" />
+        <circle
+          r="28"
+          fill="none"
+          stroke="var(--stamp)"
+          strokeWidth="1"
+          strokeDasharray="2 3"
+        />
+        <text
+          x="0"
+          y="-3"
+          textAnchor="middle"
+          fontFamily="var(--font-mono), monospace"
+          fontWeight="600"
+          fontSize="9.5"
+          fill="var(--stamp)"
+        >
+          SKILLS
+        </text>
+        <text
+          x="0"
+          y="9"
+          textAnchor="middle"
+          fontFamily="var(--font-mono), monospace"
+          fontWeight="600"
+          fontSize="9.5"
+          fill="var(--stamp)"
+        >
+          VERIFIED
+        </text>
+      </g>
+    </svg>
+  );
 }

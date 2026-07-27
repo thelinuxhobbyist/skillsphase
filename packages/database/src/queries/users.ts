@@ -7,14 +7,11 @@ import {
   isNotNull,
   isNull,
   lt,
-  ne,
   or,
 } from "drizzle-orm";
-import type { UserRole } from "@horizon/shared";
+import type { AvailabilityOption, RemoteType, UserRole } from "@horizon/shared";
 import type { Database } from "../client";
-import { applications } from "../schema/applications";
 import { companies } from "../schema/companies";
-import { jobs } from "../schema/jobs";
 import { userSkills } from "../schema/profile";
 import { users } from "../schema/users";
 
@@ -31,11 +28,14 @@ export type PublicUser = {
   city: string | null;
   country: string | null;
   careerSummary: string | null;
-  careerGapNarrative: string | null;
-  coverLetterTemplate: string | null;
   profilePhotoUrl: string | null;
-  cvUrl: string | null;
-  cvFileName: string | null;
+  professionalTitle: string | null;
+  remotePreference: RemoteType | null;
+  availability: AvailabilityOption | null;
+  yearsExperience: number | null;
+  salaryMin: string | null;
+  salaryMax: string | null;
+  salaryCurrency: string;
   profileCompleted: boolean;
   isRootAdmin: boolean;
   adminRole: string | null;
@@ -62,11 +62,14 @@ export function toPublicUser(user: AppUser): PublicUser {
     city: user.city,
     country: user.country,
     careerSummary: user.careerSummary,
-    careerGapNarrative: user.careerGapNarrative,
-    coverLetterTemplate: user.coverLetterTemplate,
     profilePhotoUrl: user.profilePhotoUrl,
-    cvUrl: user.cvUrl,
-    cvFileName: user.cvFileName,
+    professionalTitle: user.professionalTitle,
+    remotePreference: user.remotePreference,
+    availability: user.availability,
+    yearsExperience: user.yearsExperience,
+    salaryMin: user.salaryMin,
+    salaryMax: user.salaryMax,
+    salaryCurrency: user.salaryCurrency,
     profileCompleted: user.profileCompleted,
     isRootAdmin: user.isRootAdmin,
     adminRole: user.adminRole,
@@ -111,6 +114,10 @@ export async function findUserById(
   return row ?? null;
 }
 
+/**
+ * Idempotent by clerk_user_id: concurrent bootstrap calls (the register page and
+ * the onboarding sync can both fire) must not fail on the unique constraint.
+ */
 export async function createAppUser(
   db: Database,
   input: {
@@ -121,24 +128,74 @@ export async function createAppUser(
     lastName?: string | null;
   },
 ): Promise<AppUser> {
-  const [created] = await db
-    .insert(users)
-    .values({
-      clerkUserId: input.clerkUserId,
-      role: input.role,
-      email: input.email,
-      firstName: input.firstName ?? null,
-      lastName: input.lastName ?? null,
-      country: input.role === "job_seeker" ? "GB" : null,
-      profileCompleted: false,
-    })
-    .returning();
+  // Neon HTTP from Workers can flake on cold starts — retry briefly before failing.
+  const maxAttempts = 3;
+  let lastError: unknown;
 
-  if (!created) {
-    throw new Error("Failed to create application user");
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const [created] = await db
+        .insert(users)
+        .values({
+          clerkUserId: input.clerkUserId,
+          role: input.role,
+          email: input.email,
+          firstName: input.firstName ?? null,
+          lastName: input.lastName ?? null,
+          country: input.role === "job_seeker" ? "GB" : null,
+          profileCompleted: false,
+        })
+        .onConflictDoNothing({ target: users.clerkUserId })
+        .returning();
+
+      if (created) {
+        return created;
+      }
+
+      const existing = await findUserByClerkId(db, input.clerkUserId);
+      if (!existing) {
+        throw new Error("Failed to create application user");
+      }
+
+      return existing;
+    } catch (error) {
+      lastError = error;
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, 150 * attempt));
+        continue;
+      }
+    }
   }
 
-  return created;
+  const cause =
+    lastError && typeof lastError === "object" && "cause" in lastError
+      ? (lastError as { cause?: unknown }).cause
+      : undefined;
+  console.error(
+    JSON.stringify({
+      level: "error",
+      message: "create_app_user_failed",
+      clerkUserId: input.clerkUserId,
+      detail: lastError instanceof Error ? lastError.message : String(lastError),
+      cause: cause instanceof Error ? cause.message : cause,
+    }),
+  );
+
+  throw new Error("Unable to create your account. Please try again.");
+}
+
+/** Lookup by Clerk id regardless of soft-delete state. */
+export async function findUserByClerkId(
+  db: Database,
+  clerkUserId: string,
+): Promise<AppUser | null> {
+  const [row] = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerkUserId, clerkUserId))
+    .limit(1);
+
+  return row ?? null;
 }
 
 /** Provision an administrator row — never callable from public bootstrap. */
@@ -254,25 +311,43 @@ export async function findUserByEmail(
   return row ?? null;
 }
 
+/** Admin login must not pick up a Clerk candidate/business row with the same email. */
+export async function findAdminUserByEmail(
+  db: Database,
+  email: string,
+): Promise<AppUser | null> {
+  const [row] = await db
+    .select()
+    .from(users)
+    .where(
+      and(
+        eq(users.email, email.toLowerCase()),
+        eq(users.role, "admin"),
+        isNull(users.deletedAt),
+      ),
+    )
+    .limit(1);
+  return row ?? null;
+}
+
+/** Minimum skills required before a candidate's Skill Profile counts as complete. */
+export const MIN_PROFILE_SKILLS = 3;
+
 export function isProfileComplete(input: {
   firstName: string | null;
   lastName: string | null;
   email: string;
   city: string | null;
-  country: string | null;
-  careerSummary: string | null;
+  professionalTitle: string | null;
   skillCount: number;
-  hasCv: boolean;
 }): boolean {
   return Boolean(
     input.firstName?.trim() &&
       input.lastName?.trim() &&
       input.email.trim() &&
       input.city?.trim() &&
-      input.country?.trim() &&
-      input.careerSummary?.trim() &&
-      input.skillCount >= 1 &&
-      input.hasCv,
+      input.professionalTitle?.trim() &&
+      input.skillCount >= MIN_PROFILE_SKILLS,
   );
 }
 
@@ -294,10 +369,8 @@ export async function recomputeProfileCompleted(
     lastName: user.lastName,
     email: user.email,
     city: user.city,
-    country: user.country,
-    careerSummary: user.careerSummary,
+    professionalTitle: user.professionalTitle,
     skillCount: Number(skillRow?.value ?? 0),
-    hasCv: Boolean(user.cvUrl),
   });
 }
 
@@ -311,8 +384,13 @@ export async function updateAppUserProfile(
     city?: string | null;
     country?: string | null;
     careerSummary?: string | null;
-    careerGapNarrative?: string | null;
-    coverLetterTemplate?: string | null;
+    professionalTitle?: string | null;
+    remotePreference?: RemoteType | null;
+    availability?: AvailabilityOption | null;
+    yearsExperience?: number | null;
+    salaryMin?: number | null;
+    salaryMax?: number | null;
+    salaryCurrency?: string;
   },
 ): Promise<AppUser> {
   const [updated] = await db
@@ -328,14 +406,33 @@ export async function updateAppUserProfile(
         data.careerSummary === undefined
           ? user.careerSummary
           : data.careerSummary,
-      careerGapNarrative:
-        data.careerGapNarrative === undefined
-          ? user.careerGapNarrative
-          : data.careerGapNarrative,
-      coverLetterTemplate:
-        data.coverLetterTemplate === undefined
-          ? user.coverLetterTemplate
-          : data.coverLetterTemplate,
+      professionalTitle:
+        data.professionalTitle === undefined
+          ? user.professionalTitle
+          : data.professionalTitle,
+      remotePreference:
+        data.remotePreference === undefined
+          ? user.remotePreference
+          : data.remotePreference,
+      availability:
+        data.availability === undefined ? user.availability : data.availability,
+      yearsExperience:
+        data.yearsExperience === undefined
+          ? user.yearsExperience
+          : data.yearsExperience,
+      salaryMin:
+        data.salaryMin === undefined
+          ? user.salaryMin
+          : data.salaryMin === null
+            ? null
+            : String(data.salaryMin),
+      salaryMax:
+        data.salaryMax === undefined
+          ? user.salaryMax
+          : data.salaryMax === null
+            ? null
+            : String(data.salaryMax),
+      salaryCurrency: data.salaryCurrency ?? user.salaryCurrency,
       updatedAt: new Date(),
     })
     .where(eq(users.id, user.id))
@@ -420,19 +517,6 @@ export async function countUsersByRole(db: Database, role: UserRole) {
   return Number(row?.value ?? 0);
 }
 
-export async function countPendingApplications(db: Database) {
-  const [row] = await db
-    .select({ value: count() })
-    .from(applications)
-    .where(
-      and(
-        eq(applications.status, "applied"),
-        isNull(applications.deletedAt),
-      ),
-    );
-  return Number(row?.value ?? 0);
-}
-
 export async function listRecentUsers(db: Database, limit = 8) {
   const rows = await db
     .select()
@@ -444,8 +528,8 @@ export async function listRecentUsers(db: Database, limit = 8) {
 }
 
 /**
- * After retention: remove seeker rows (profile cascades); anonymise employers
- * so FK-restricted company/job history remains auditable without PII.
+ * After retention: remove candidate rows (profile cascades via FKs); anonymise
+ * businesses so FK-restricted company history remains auditable without PII.
  */
 export async function purgeExpiredSoftDeletedUsers(
   db: Database,
@@ -463,7 +547,6 @@ export async function purgeExpiredSoftDeletedUsers(
   let purged = 0;
   for (const user of expired) {
     if (user.role === "job_seeker") {
-      await db.delete(applications).where(eq(applications.userId, user.id));
       await db.delete(users).where(eq(users.id, user.id));
       purged += 1;
       continue;
@@ -483,11 +566,7 @@ export async function purgeExpiredSoftDeletedUsers(
         phoneNumber: null,
         city: null,
         careerSummary: null,
-        careerGapNarrative: null,
-        coverLetterTemplate: null,
         profilePhotoUrl: null,
-        cvUrl: null,
-        cvFileName: null,
         clerkUserId: `deleted_${user.id}`,
         updatedAt: new Date(),
       })
@@ -498,32 +577,12 @@ export async function purgeExpiredSoftDeletedUsers(
   return { scanned: expired.length, purged };
 }
 
+/** Businesses can always delete their account; contacts/saves cascade with the company. */
 export async function employerHasBlockingDependencies(
-  db: Database,
-  userId: string,
+  _db: Database,
+  _userId: string,
 ): Promise<boolean> {
-  const [company] = await db
-    .select()
-    .from(companies)
-    .where(and(eq(companies.ownerUserId, userId), isNull(companies.deletedAt)))
-    .limit(1);
-
-  if (!company) {
-    return false;
-  }
-
-  const [openJobs] = await db
-    .select({ value: count() })
-    .from(jobs)
-    .where(
-      and(
-        eq(jobs.companyId, company.id),
-        isNull(jobs.deletedAt),
-        ne(jobs.status, "closed"),
-      ),
-    );
-
-  return Number(openJobs?.value ?? 0) > 0;
+  return false;
 }
 
 export function extractBootstrapRole(

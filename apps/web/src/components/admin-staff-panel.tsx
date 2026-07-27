@@ -323,7 +323,7 @@ export function AdminStaffPanel({
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <h2 className="font-semibold text-brand">
+                    <h2 className="font-semibold text-primary">
                       {name || user.email}
                       {isSelf ? " (you)" : ""}
                     </h2>
@@ -353,7 +353,7 @@ export function AdminStaffPanel({
                       <button
                         type="button"
                         disabled={pendingId === user.id}
-                        className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand disabled:opacity-60"
+                        className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-60"
                         onClick={() => void changeEmail(user.id, user.email)}
                       >
                         Email
@@ -361,7 +361,7 @@ export function AdminStaffPanel({
                       <button
                         type="button"
                         disabled={pendingId === user.id}
-                        className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand disabled:opacity-60"
+                        className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-60"
                         onClick={() => void resetPassword(user.id)}
                       >
                         Reset password
@@ -370,7 +370,7 @@ export function AdminStaffPanel({
                         <button
                           type="button"
                           disabled={pendingId === user.id}
-                          className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand disabled:opacity-60"
+                          className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-60"
                           onClick={() => void runAction(user.id, "reactivate")}
                         >
                           Reactivate
@@ -379,7 +379,7 @@ export function AdminStaffPanel({
                         <button
                           type="button"
                           disabled={pendingId === user.id}
-                          className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand disabled:opacity-60"
+                          className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-60"
                           onClick={() => void runAction(user.id, "suspend")}
                         >
                           Suspend

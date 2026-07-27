@@ -8,15 +8,41 @@ import { useAdminToken } from "@/lib/use-admin-token";
 
 const ADMIN_LINKS = [
   { href: "/admin", label: "Dashboard" },
-  { href: "/admin/employers", label: "Employers" },
+  { href: "/admin/employers", label: "Businesses" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/staff", label: "Admins" },
-  { href: "/admin/jobs", label: "Jobs" },
   { href: "/admin/audit", label: "Audit" },
   { href: "/admin/homepage", label: "Homepage" },
   { href: "/admin/reports", label: "Reports" },
   { href: "/admin/account", label: "Account" },
 ] as const;
+
+const navLinkClass =
+  "text-base text-muted-foreground transition-colors hover:text-foreground";
+const mobileNavLinkClass =
+  "rounded-md px-1 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-surface hover:text-primary";
+
+function StampMark() {
+  return (
+    <span
+      aria-hidden
+      className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-[1.5px] border-current"
+    >
+      <span className="absolute inset-[3px] rounded-full border border-dashed border-current opacity-60" />
+      <svg
+        viewBox="0 0 24 24"
+        className="relative h-4 w-4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+    </span>
+  );
+}
 
 export function AdminHeader() {
   const router = useRouter();
@@ -48,19 +74,20 @@ export function AdminHeader() {
   }
 
   return (
-    <header className="border-b border-[color:var(--line)]/70 bg-[color:var(--surface)]/80 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
+      <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-4">
         <Link
           href="/admin"
-          className="shrink-0 font-[family-name:var(--font-fraunces)] text-lg font-semibold tracking-tight text-brand sm:text-xl"
+          className="flex shrink-0 items-center gap-2.5 font-display text-xl font-semibold tracking-tight text-primary sm:text-2xl"
           onClick={close}
         >
-          Project Horizon
+          <StampMark />
+          SkillsPhase
         </Link>
 
         <button
           type="button"
-          className="rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm font-semibold text-brand lg:hidden"
+          className="rounded-lg border border-border bg-surface px-3.5 py-2 font-mono text-xs tracking-wider uppercase text-foreground lg:hidden"
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => setOpen((value) => !value)}
@@ -68,19 +95,19 @@ export function AdminHeader() {
           {open ? "Close" : "Menu"}
         </button>
 
-        <nav className="hidden min-w-0 flex-wrap items-center justify-end gap-3 text-sm font-medium text-[color:var(--foreground)]/80 lg:flex">
+        <nav className="hidden min-w-0 flex-wrap items-center justify-end gap-5 lg:flex lg:gap-6">
           {ADMIN_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:text-brand">
+            <Link key={link.href} href={link.href} className={navLinkClass}>
               {link.label}
             </Link>
           ))}
-          <span className="max-w-[12rem] truncate text-xs text-[color:var(--foreground)]/55">
+          <span className="max-w-[12rem] truncate font-mono text-xs tracking-wide text-muted-foreground">
             {user?.email ?? "Admin"}
           </span>
           <button
             type="button"
             onClick={() => void logout()}
-            className="rounded-md border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-semibold text-brand"
+            className="rounded-lg border border-border bg-surface px-3.5 py-2 font-mono text-xs tracking-wider uppercase text-foreground transition hover:border-foreground"
           >
             Sign out
           </button>
@@ -90,26 +117,26 @@ export function AdminHeader() {
       {open ? (
         <div
           id={menuId}
-          className="border-t border-[color:var(--line)]/70 px-4 py-4 lg:hidden"
+          className="border-t border-border px-4 py-4 lg:hidden"
         >
-          <nav className="mx-auto flex max-w-6xl flex-col gap-2 text-sm font-medium text-[color:var(--foreground)]/85">
+          <nav className="mx-auto flex max-w-[1180px] flex-col gap-1">
             {ADMIN_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-md px-1 py-1.5 hover:bg-white/70 hover:text-brand"
+                className={mobileNavLinkClass}
                 onClick={close}
               >
                 {link.label}
               </Link>
             ))}
-            <p className="mt-2 truncate border-t border-[color:var(--line)] pt-3 text-xs text-[color:var(--foreground)]/55">
+            <p className="mt-2 truncate border-t border-border pt-3 font-mono text-xs text-muted-foreground">
               {user?.email ?? "Admin"}
             </p>
             <button
               type="button"
               onClick={() => void logout()}
-              className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-left text-sm font-semibold text-brand"
+              className="mt-2 w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-left font-mono text-xs tracking-wider uppercase text-foreground"
             >
               Sign out
             </button>

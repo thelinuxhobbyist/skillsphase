@@ -80,7 +80,7 @@ export function CompanyEditForm({ company }: { company: HorizonCompany }) {
     <div className="mt-6 space-y-3 rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-5">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h3 className="font-semibold text-brand">Company contact details</h3>
+          <h3 className="font-semibold text-primary">Company contact details</h3>
           <p className="text-sm text-[color:var(--foreground)]/70">
             Company number and legal name stay fixed from Companies House.
             Changes save automatically.
@@ -132,7 +132,7 @@ function Field({
 }) {
   return (
     <label className="block text-sm">
-      <span className="font-medium text-brand">{label}</span>
+      <span className="font-medium text-primary">{label}</span>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}

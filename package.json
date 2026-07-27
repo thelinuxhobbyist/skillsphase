@@ -15,7 +15,10 @@
     "db:generate": "pnpm --filter @horizon/database generate",
     "db:migrate": "pnpm --filter @horizon/database migrate",
     "db:studio": "pnpm --filter @horizon/database studio",
-    "admin:create-root": "node apps/api/scripts/create-root-admin.mjs"
+    "db:reset-homepage": "node packages/database/scripts/reset-homepage.mjs",
+    "admin:create-root": "node apps/api/scripts/create-root-admin.mjs",
+    "deploy:api": "pnpm --filter @horizon/api deploy",
+    "deploy:web": "pnpm --filter @horizon/web deploy"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

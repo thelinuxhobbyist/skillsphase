@@ -8,6 +8,7 @@ import {
   userSkills,
 } from "../schema/profile";
 import { users } from "../schema/users";
+import { listProjectsForUser } from "./projects";
 import { recomputeProfileCompleted } from "./users";
 
 export async function listEmploymentHistory(db: Database, userId: string) {
@@ -292,43 +293,17 @@ export async function setUserSkillsByName(
   return listUserSkills(db, userId);
 }
 
-export async function updateUserCv(
-  db: Database,
-  userId: string,
-  input: { cvUrl: string | null; cvFileName: string | null },
-) {
-  const [updated] = await db
-    .update(users)
-    .set({
-      cvUrl: input.cvUrl,
-      cvFileName: input.cvFileName,
-      updatedAt: new Date(),
-    })
-    .where(eq(users.id, userId))
-    .returning();
-
-  if (!updated) throw new Error("User not found");
-
-  const profileCompleted = await recomputeProfileCompleted(db, updated);
-  const [finalUser] = await db
-    .update(users)
-    .set({ profileCompleted, updatedAt: new Date() })
-    .where(eq(users.id, userId))
-    .returning();
-
-  return finalUser ?? { ...updated, profileCompleted };
-}
-
 export async function getProfileBundle(db: Database, userId: string) {
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user) return null;
 
-  const [employment, educationRows, qualificationRows, skillRows] =
+  const [employment, educationRows, qualificationRows, skillRows, projectRows] =
     await Promise.all([
       listEmploymentHistory(db, userId),
       listEducation(db, userId),
       listQualifications(db, userId),
       listUserSkills(db, userId),
+      listProjectsForUser(db, userId),
     ]);
 
   return {
@@ -337,5 +312,6 @@ export async function getProfileBundle(db: Database, userId: string) {
     education: educationRows,
     qualifications: qualificationRows,
     skills: skillRows,
+    projects: projectRows,
   };
 }

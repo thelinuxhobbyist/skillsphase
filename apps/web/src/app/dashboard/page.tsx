@@ -2,10 +2,11 @@ import { SiteHeader } from "@/components/site-header";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getCurrentUser, listMyApplications } from "@/lib/api";
+import { AVAILABILITY_LABELS } from "@horizon/shared";
+import { getCurrentUser, getProfileBundle, listContacts } from "@/lib/api";
 import { dashboardPathForRole } from "@/lib/roles";
 
-export default async function JobSeekerDashboardPage() {
+export default async function CandidateDashboardPage() {
   const { userId, getToken } = await auth();
   if (!userId) {
     redirect("/login");
@@ -27,83 +28,109 @@ export default async function JobSeekerDashboardPage() {
     redirect(dashboardPathForRole(user.role));
   }
 
-  const applications = await listMyApplications(token).catch(() => []);
-  const recent = applications.slice(0, 5);
+  const [profile, contacts] = await Promise.all([
+    getProfileBundle(token).catch(() => null),
+    listContacts(token).catch(() => []),
+  ]);
+  const recentContacts = contacts.slice(0, 5);
 
   return (
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-4xl min-w-0 px-4 py-10 sm:px-6 sm:py-12">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand">
-            Job seeker
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">
+            Candidate
           </p>
-          <h1 className="mt-2 font-[family-name:var(--font-fraunces)] text-3xl break-words text-brand sm:text-4xl">
+          <h1 className="mt-2 font-display text-3xl break-words text-primary sm:text-4xl">
             Welcome{user.firstName ? `, ${user.firstName}` : ""}
           </h1>
+          <p className="mt-2 text-[color:var(--foreground)]/75">
+            {user.professionalTitle
+              ? user.professionalTitle
+              : "Add a professional title to complete your Skill Profile."}
+            {user.availability
+              ? ` · ${AVAILABILITY_LABELS[user.availability]}`
+              : ""}
+          </p>
         </div>
 
         <section className="grid gap-4 md:grid-cols-3">
           <DashboardCard
-            title="Profile"
+            title="Skill Profile"
             body={
               user.profileCompleted
-                ? "Your profile is ready for applications."
-                : "Complete your profile to apply for jobs."
+                ? "Your Skill Profile is ready to be discovered by businesses."
+                : "Complete your Skill Profile to be discovered by businesses."
             }
             href="/profile"
           />
           <DashboardCard
-            title="Applications"
-            body="Track the status of roles you have applied for."
-            href="/applications"
+            title="Portfolio"
+            body="Showcase projects, links, images, and videos as evidence of your ability."
+            href="/profile"
           />
           <DashboardCard
-            title="Browse jobs"
-            body="Explore published vacancies from verified UK employers."
-            href="/jobs"
+            title="Messages"
+            body="See businesses that have contacted you and reply directly."
+            href="/contacts"
           />
         </section>
 
         <section className="mt-10">
           <div className="flex items-end justify-between gap-3">
-            <h2 className="font-[family-name:var(--font-fraunces)] text-2xl text-brand">
-              Recent applications
+            <h2 className="font-display text-2xl text-primary">
+              Recent contacts
             </h2>
-            <Link href="/applications" className="text-sm text-brand underline">
+            <Link href="/contacts" className="text-sm text-primary underline">
               View all
             </Link>
           </div>
           <ul className="mt-4 space-y-3">
-            {recent.length === 0 ? (
+            {recentContacts.length === 0 ? (
               <li className="text-[color:var(--foreground)]/70">
-                No applications yet.{" "}
-                <Link href="/jobs" className="underline">
-                  Browse jobs
-                </Link>
-                .
+                No businesses have contacted you yet.{" "}
+                <Link href="/profile" className="underline">
+                  Improve your Skill Profile
+                </Link>{" "}
+                to increase your chances of discovery.
               </li>
             ) : (
-              recent.map((application) => (
+              recentContacts.map((contact) => (
                 <li
-                  key={application.id}
+                  key={contact.id}
                   className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-4 text-sm"
                 >
                   <Link
-                    href={`/jobs/${application.jobSlug}`}
-                    className="font-semibold text-brand underline"
+                    href={`/contacts/${contact.id}`}
+                    className="font-semibold text-primary underline"
                   >
-                    {application.jobTitle}
+                    {contact.business?.companyName ?? "A business"}
                   </Link>
                   <p className="mt-1 text-[color:var(--foreground)]/70">
-                    {application.companyName} ·{" "}
-                    {application.status.replace("_", " ")}
+                    Contacted {new Date(contact.createdAt).toLocaleDateString("en-GB")}
                   </p>
                 </li>
               ))
             )}
           </ul>
         </section>
+
+        {!profile || !user.profileCompleted ? (
+          <section className="mt-10 rounded-md border border-brand-accent/30 bg-brand-accent/5 p-5">
+            <h2 className="font-semibold text-primary">Finish your Skill Profile</h2>
+            <p className="mt-2 text-sm text-[color:var(--foreground)]/75">
+              Add a professional title, at least 3 skills, and a portfolio
+              project so businesses can find you in discovery.
+            </p>
+            <Link
+              href="/profile"
+              className="btn-primary mt-4 inline-block rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white"
+            >
+              Continue your profile
+            </Link>
+          </section>
+        ) : null}
       </main>
     </>
   );
@@ -123,7 +150,7 @@ function DashboardCard({
       href={href}
       className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-5 backdrop-blur transition hover:bg-white"
     >
-      <h2 className="font-semibold text-brand">{title}</h2>
+      <h2 className="font-semibold text-primary">{title}</h2>
       <p className="mt-2 text-sm text-[color:var(--foreground)]/75">{body}</p>
     </Link>
   );

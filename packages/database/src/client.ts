@@ -2,8 +2,6 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 
-export type Database = ReturnType<typeof createDb>;
-
 export class DatabaseConfigError extends Error {
   code = "DATABASE_NOT_CONFIGURED";
   constructor(message: string) {
@@ -29,13 +27,15 @@ export function isPlaceholderDb(connectionString: string | undefined): boolean {
 }
 
 /** Create a Drizzle client for Neon (HTTP). */
-export function createDb(connectionString: string): Database {
+export function createDb(connectionString: string) {
   if (isPlaceholderDb(connectionString)) {
     throw new DatabaseConfigError(
       "DATABASE_URL is not configured with a valid PostgreSQL connection string. Please set DATABASE_URL in apps/api/.dev.vars.",
     );
   }
 
-  const sql = neon(connectionString);
+  const sql = neon(connectionString.trim());
   return drizzle(sql, { schema });
 }
+
+export type Database = ReturnType<typeof createDb>;

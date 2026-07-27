@@ -23,10 +23,10 @@ export default async function AdminLoginPage() {
 
   return (
     <main className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-6 py-16">
-      <p className="mb-2 text-sm font-semibold uppercase tracking-[0.16em] text-brand">
-        Project Horizon
+      <p className="mb-2 text-sm font-semibold uppercase tracking-[0.16em] text-primary">
+        SkillsPhase
       </p>
-      <h1 className="mb-2 font-[family-name:var(--font-fraunces)] text-3xl text-brand">
+      <h1 className="mb-2 font-display text-3xl text-primary">
         Administrator sign-in
       </h1>
       <p className="mb-8 text-center text-sm text-[color:var(--foreground)]/70">

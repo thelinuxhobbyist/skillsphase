@@ -9,22 +9,22 @@ import {
   listSkills,
   setUserSkillsByName,
   toPublicUser,
+  updateAppUserProfile,
   updateEducation,
   updateEmploymentHistory,
   updateQualification,
-  updateUserCv,
 } from "@horizon/database";
 import {
   educationSchema,
   employmentHistorySchema,
   qualificationSchema,
   setSkillsByNameSchema,
+  updateCandidateProfileSchema,
 } from "@horizon/shared";
 import { Hono } from "hono";
 import type { AppEnv } from "../env";
 import { getDb } from "../lib/db";
 import { fail, ok } from "../lib/response";
-import { storeCvObject } from "../lib/storage";
 import {
   requireAppUser,
   requireClerkAuth,
@@ -49,19 +49,45 @@ profileRoutes.get("/me/profile", requireRoles("job_seeker"), async (c) => {
     education: bundle.education,
     qualifications: bundle.qualifications,
     skills: bundle.skills,
+    projects: bundle.projects,
     completion: {
       profileCompleted: bundle.user.profileCompleted,
       required: [
         "name",
         "email",
         "location",
-        "careerSummary",
-        "at least one skill",
-        "CV",
+        "professional title",
+        "at least 3 skills",
       ],
     },
   });
 });
+
+/** Candidate Skill Profile fields (professional title, remote preference, availability, salary). */
+profileRoutes.patch(
+  "/me/candidate-profile",
+  requireRoles("job_seeker"),
+  async (c) => {
+    const appUser = c.get("appUser");
+    if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+
+    const body = await c.req.json().catch(() => null);
+    const parsed = updateCandidateProfileSchema.safeParse(body);
+    if (!parsed.success) {
+      return fail(
+        c,
+        "VALIDATION_ERROR",
+        parsed.error.issues[0]?.message ?? "Invalid profile input.",
+        400,
+      );
+    }
+
+    const db = getDb(c);
+    const updated = await updateAppUserProfile(db, appUser, parsed.data);
+    c.set("appUser", updated);
+    return ok(c, toPublicUser(updated));
+  },
+);
 
 profileRoutes.get("/skills", async (c) => {
   const db = getDb(c);
@@ -255,57 +281,3 @@ profileRoutes.delete(
     return ok(c, { deleted: true });
   },
 );
-
-profileRoutes.post("/me/cv", requireRoles("job_seeker"), async (c) => {
-  const appUser = c.get("appUser");
-  if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
-
-  const form = await c.req.parseBody();
-  const file = form.file;
-  if (!(file instanceof File)) {
-    return fail(c, "VALIDATION_ERROR", "Upload a CV file using the `file` field.", 400);
-  }
-
-  try {
-    const stored = await storeCvObject({
-      userId: appUser.id,
-      file,
-      bucket: c.env.UPLOADS,
-      environment: c.env.ENVIRONMENT ?? "development",
-    });
-
-    const db = getDb(c);
-    const updated = await updateUserCv(db, appUser.id, {
-      cvUrl: stored.url,
-      cvFileName: stored.fileName,
-    });
-    c.set("appUser", updated);
-
-    return ok(c, {
-      user: toPublicUser(updated),
-      upload: {
-        fileName: stored.fileName,
-        storage: stored.storage,
-      },
-    });
-  } catch (error) {
-    return fail(
-      c,
-      "UPLOAD_FAILED",
-      error instanceof Error ? error.message : "CV upload failed.",
-      400,
-    );
-  }
-});
-
-profileRoutes.delete("/me/cv", requireRoles("job_seeker"), async (c) => {
-  const appUser = c.get("appUser");
-  if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
-
-  const updated = await updateUserCv(getDb(c), appUser.id, {
-    cvUrl: null,
-    cvFileName: null,
-  });
-  c.set("appUser", updated);
-  return ok(c, { user: toPublicUser(updated) });
-});

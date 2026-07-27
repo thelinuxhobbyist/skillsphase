@@ -33,13 +33,19 @@ export class ApiRequestError extends Error {
 
 type ApiFetchOptions = RequestInit & {
   token?: string | null;
+  /**
+   * Seconds to cache the response for. Only for unauthenticated public reads;
+   * everything else stays uncached so users never see another user's data.
+   */
+  revalidate?: number;
 };
 
 export async function apiFetch<T>(
   path: string,
   options: ApiFetchOptions = {},
 ): Promise<T> {
-  const { token, headers, ...rest } = options;
+  const { token, headers, revalidate, ...rest } = options;
+  const isCacheable = typeof revalidate === "number" && !token;
 
   let response: Response;
   try {
@@ -51,14 +57,16 @@ export async function apiFetch<T>(
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(headers ?? {}),
       },
-      cache: "no-store",
+      ...(isCacheable
+        ? { next: { revalidate } }
+        : { cache: "no-store" as const }),
     });
   } catch (err) {
     console.error(`[API Fetch Error] Request to ${path} failed:`, err);
     throw new ApiRequestError(
       0,
       "NETWORK_ERROR",
-      `Unable to connect to the Horizon API server (${getApiBaseUrl()}). Please check your connection or ensure the backend server is running.`,
+      `Unable to connect to the SkillsPhase API server (${getApiBaseUrl()}). Please check your connection or ensure the backend server is running.`,
     );
   }
 
@@ -86,6 +94,7 @@ export async function apiFetch<T>(
   return payload.data;
 }
 
+/** Internal role identifiers: job_seeker = Candidate, employer = Business. */
 export type HorizonUser = {
   id: string;
   clerkUserId: string;
@@ -97,11 +106,14 @@ export type HorizonUser = {
   city: string | null;
   country: string | null;
   careerSummary: string | null;
-  careerGapNarrative: string | null;
-  coverLetterTemplate: string | null;
   profilePhotoUrl: string | null;
-  cvUrl: string | null;
-  cvFileName: string | null;
+  professionalTitle: string | null;
+  remotePreference: "on_site" | "hybrid" | "remote" | null;
+  availability: "immediate" | "within_one_month" | "freelance" | "permanent" | null;
+  yearsExperience: number | null;
+  salaryMin: string | null;
+  salaryMax: string | null;
+  salaryCurrency: string;
   profileCompleted: boolean;
   isRootAdmin: boolean;
   adminRole: string | null;
@@ -195,6 +207,17 @@ export function updateCurrentUser(
   });
 }
 
+export function updateCandidateProfile(
+  token: string,
+  body: Record<string, unknown>,
+) {
+  return apiFetch<HorizonUser>("/users/me/candidate-profile", {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
 export type HorizonCompany = {
   id: string;
   ownerUserId: string;
@@ -210,6 +233,7 @@ export type HorizonCompany = {
     | "rejected"
     | "suspended";
   companiesHouseVerified: boolean;
+  businessEmailVerified: boolean;
   rejectionReason: string | null;
   countryCode: string;
   businessEmailIsFreeProvider: boolean;
@@ -279,6 +303,21 @@ export function resubmitCompany(token: string) {
   });
 }
 
+export function sendBusinessEmailVerification(token: string) {
+  return apiFetch<{ sent: boolean; alreadyVerified?: boolean }>(
+    "/companies/me/verify-email/send",
+    { method: "POST", token },
+  );
+}
+
+export function confirmBusinessEmailVerification(token: string, verifyToken: string) {
+  return apiFetch<HorizonCompany>("/companies/me/verify-email/confirm", {
+    method: "POST",
+    token,
+    body: JSON.stringify({ token: verifyToken }),
+  });
+}
+
 export function joinWaitlist(body: {
   email: string;
   companyName?: string;
@@ -314,12 +353,11 @@ export function adminEmployerAction(
 
 export function getAdminDashboard(token: string) {
   return apiFetch<{
-    pendingEmployers: number;
-    totalEmployers: number;
-    approvedEmployers: number;
-    activeJobs: number;
-    totalJobSeekers: number;
-    pendingApplications: number;
+    pendingBusinesses: number;
+    totalBusinesses: number;
+    verifiedBusinesses: number;
+    totalCandidates: number;
+    candidatesWithCompleteProfile: number;
     recentActions: AdminAuditLog[];
   }>("/admin/dashboard", { token });
 }
@@ -418,13 +456,12 @@ export function listAdminAudit(token: string) {
 export function getAdminReports(token: string) {
   return apiFetch<{
     note: string;
-    totalEmployers: number;
-    approvedEmployers: number;
-    pendingEmployers: number;
-    activeJobs: number;
-    totalJobSeekers: number;
-    totalEmployerUsers: number;
-    pendingApplications: number;
+    totalBusinesses: number;
+    verifiedBusinesses: number;
+    pendingBusinesses: number;
+    totalCandidates: number;
+    candidatesWithCompleteProfile: number;
+    totalBusinessUsers: number;
   }>("/admin/reports", { token });
 }
 
@@ -439,21 +476,26 @@ export function deleteMyAccount(token: string) {
   });
 }
 
-export function getJobById(token: string, id: number) {
-  return apiFetch<HorizonJob>(`/jobs/${id}`, { token });
-}
+export type SkillRef = { id: string; name: string; category: string | null };
 
-export function updateJob(
-  token: string,
-  id: number,
-  body: Record<string, unknown>,
-) {
-  return apiFetch<HorizonJob>(`/jobs/${id}`, {
-    method: "PATCH",
-    token,
-    body: JSON.stringify(body),
-  });
-}
+export type ProjectMediaItem = {
+  type: "image" | "video" | "document" | "link";
+  url: string;
+  label?: string | null;
+};
+
+export type Project = {
+  id: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  role: string | null;
+  projectUrl: string | null;
+  media: ProjectMediaItem[];
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+};
 
 export type ProfileBundle = {
   user: HorizonUser;
@@ -481,7 +523,8 @@ export type ProfileBundle = {
     dateAwarded: string | null;
     description: string | null;
   }>;
-  skills: Array<{ id: string; name: string; category: string | null }>;
+  skills: SkillRef[];
+  projects: Project[];
   completion: {
     profileCompleted: boolean;
     required: string[];
@@ -493,29 +536,16 @@ export function getProfileBundle(token: string) {
 }
 
 export function setSkillsByName(token: string, skills: string[]) {
-  return apiFetch<Array<{ id: string; name: string; category: string | null }>>(
-    "/users/me/skills",
-    {
-      method: "PUT",
-      token,
-      body: JSON.stringify({ skills }),
-    },
-  );
+  return apiFetch<SkillRef[]>("/users/me/skills", {
+    method: "PUT",
+    token,
+    body: JSON.stringify({ skills }),
+  });
 }
 
 export function searchSkills(token: string, q?: string) {
   const query = q?.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
-  return apiFetch<Array<{ id: string; name: string; category: string | null }>>(
-    `/users/skills${query}`,
-    { token },
-  );
-}
-
-export function deleteCv(token: string) {
-  return apiFetch<{ user: HorizonUser }>("/users/me/cv", {
-    method: "DELETE",
-    token,
-  });
+  return apiFetch<SkillRef[]>(`/users/skills${query}`, { token });
 }
 
 export function addEmployment(
@@ -659,197 +689,258 @@ export function deleteQualification(token: string, id: string) {
   });
 }
 
-export type HorizonJob = {
-  id: number;
-  companyId: string;
-  companyName: string;
-  title: string;
-  slug: string;
-  description: string;
-  salaryMin: number | null;
-  salaryMax: number | null;
-  salaryCurrency: string;
-  location: string;
-  remoteType: "on_site" | "hybrid" | "remote";
-  employmentType: string;
-  industry: string;
-  closingDate: string | null;
-  companyAbout: string | null;
-  companySize: string | null;
-  benefits: string[];
-  whyReturners: string[];
-  applicationProcess: string[];
-  workingPatternDetail: string | null;
-  contractDetails: string | null;
-  niceToHaveSkills: string[];
-  status: "draft" | "published" | "closed";
-  skills: Array<{ id: string; name: string }>;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type JobListResult = {
-  jobs: HorizonJob[];
-  meta: { page: number; pageSize: number; total: number };
-};
-
-export async function listPublishedJobs(params: {
-  keyword?: string;
-  location?: string;
-  employmentType?: string;
-  remoteType?: string;
-  industry?: string;
-  page?: number;
-  pageSize?: number;
-}): Promise<JobListResult> {
-  const search = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== "") search.set(key, String(value));
-  }
-  const query = search.toString();
-  const response = await fetch(
-    `${getApiBaseUrl()}/jobs${query ? `?${query}` : ""}`,
-    { headers: { Accept: "application/json" }, cache: "no-store" },
-  );
-  const payload = (await response.json()) as ApiResponse<HorizonJob[]> & {
-    meta?: JobListResult["meta"];
-  };
-  if (!response.ok || !payload.success) {
-    const errorPayload = payload as ApiError;
-    throw new ApiRequestError(
-      response.status,
-      errorPayload.error?.code ?? "REQUEST_FAILED",
-      errorPayload.error?.message ?? "Failed to load jobs",
-    );
-  }
-  return {
-    jobs: payload.data,
-    meta: payload.meta ?? { page: 1, pageSize: 20, total: payload.data.length },
-  };
+export function listMyProjects(token: string) {
+  return apiFetch<Project[]>("/projects", { token });
 }
 
-export function getJobBySlug(slug: string) {
-  return apiFetch<HorizonJob>(`/jobs/by-slug/${encodeURIComponent(slug)}`);
-}
-
-export function listMyJobs(token: string) {
-  return apiFetch<HorizonJob[]>("/jobs/mine", { token });
-}
-
-export function createJob(
+export function createProject(
   token: string,
-  body: Record<string, unknown>,
+  body: {
+    title: string;
+    description?: string | null;
+    role?: string | null;
+    projectUrl?: string | null;
+    media?: ProjectMediaItem[];
+  },
 ) {
-  const isAdminCreate = typeof body.companyId === "string";
-  return apiFetch<HorizonJob>(isAdminCreate ? "/admin/jobs" : "/jobs", {
+  return apiFetch<Project>("/projects", {
     method: "POST",
     token,
     body: JSON.stringify(body),
   });
 }
 
-export function publishJob(token: string, id: number) {
-  return apiFetch<HorizonJob>(`/jobs/${id}/publish`, { method: "POST", token });
-}
-
-export function closeJob(token: string, id: number) {
-  return apiFetch<HorizonJob>(`/jobs/${id}/close`, { method: "POST", token });
-}
-
-export function reopenJob(token: string, id: number) {
-  return apiFetch<HorizonJob>(`/jobs/${id}/reopen`, { method: "POST", token });
-}
-
-export function deleteDraftJob(token: string, id: number) {
-  return apiFetch<{ deleted: boolean }>(`/jobs/${id}`, {
-    method: "DELETE",
-    token,
-  });
-}
-
-export function listAdminJobs(token: string) {
-  return apiFetch<HorizonJob[]>("/admin/jobs", { token });
-}
-
-export function adminRemoveJob(token: string, id: number) {
-  return apiFetch<HorizonJob>(`/admin/jobs/${id}`, {
-    method: "DELETE",
-    token,
-  });
-}
-
-export type HorizonApplication = {
-  id: string;
-  jobId: number;
-  jobTitle: string;
-  jobSlug: string;
-  companyName: string;
-  userId: string;
-  candidateName: string;
-  candidateEmail: string;
-  coverLetter: string | null;
-  cvUrl: string;
-  cvFileName: string | null;
-  status:
-    | "applied"
-    | "under_review"
-    | "interview"
-    | "offer"
-    | "hired"
-    | "rejected"
-    | "withdrawn";
-  createdAt: string;
-  updatedAt: string;
-  careerSummary?: string | null;
-  location?: string | null;
-};
-
-export function applyToJob(
-  token: string,
-  jobId: number,
-  coverLetter?: string | null,
-) {
-  return apiFetch<HorizonApplication>(`/jobs/${jobId}/apply`, {
-    method: "POST",
-    token,
-    body: JSON.stringify({ coverLetter: coverLetter ?? null }),
-  });
-}
-
-export function listMyApplications(token: string) {
-  return apiFetch<HorizonApplication[]>("/applications/me", { token });
-}
-
-export function withdrawApplication(token: string, id: string) {
-  return apiFetch<HorizonApplication>(`/applications/${id}`, {
-    method: "DELETE",
-    token,
-  });
-}
-
-export function listJobApplications(token: string, jobId: number) {
-  return apiFetch<HorizonApplication[]>(`/jobs/${jobId}/applications`, {
-    token,
-  });
-}
-
-export function updateApplicationStatus(
+export function updateProject(
   token: string,
   id: string,
-  status: Exclude<
-    HorizonApplication["status"],
-    "applied" | "withdrawn"
-  >,
+  body: Partial<{
+    title: string;
+    description: string | null;
+    role: string | null;
+    projectUrl: string | null;
+    media: ProjectMediaItem[];
+  }>,
 ) {
-  return apiFetch<HorizonApplication>(`/applications/${id}`, {
+  return apiFetch<Project>(`/projects/${id}`, {
     method: "PATCH",
     token,
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(body),
   });
 }
 
-export function applicationCvUrl(id: string) {
-  return `${getApiBaseUrl()}/applications/${id}/cv`;
+export function deleteProject(token: string, id: string) {
+  return apiFetch<{ deleted: boolean }>(`/projects/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export async function uploadProjectMedia(token: string, file: File) {
+  const form = new FormData();
+  form.append("file", file);
+
+  const response = await fetch(`${getApiBaseUrl()}/projects/media`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
+
+  const payload = (await response.json()) as ApiResponse<ProjectMediaItem>;
+  if (!response.ok || !payload.success) {
+    const errorPayload = payload as ApiError;
+    throw new ApiRequestError(
+      response.status,
+      errorPayload.error?.code ?? "UPLOAD_FAILED",
+      errorPayload.error?.message ?? "Upload failed",
+    );
+  }
+  return payload.data;
+}
+
+export function mediaUrl(relativeUrl: string) {
+  if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
+    return relativeUrl;
+  }
+  const base = getApiBaseUrl().replace(/\/api\/v1$/, "");
+  return `${base}${relativeUrl}`;
+}
+
+export type CandidateCard = {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  professionalTitle: string | null;
+  city: string | null;
+  remotePreference: "on_site" | "hybrid" | "remote" | null;
+  availability: "immediate" | "within_one_month" | "freelance" | "permanent" | null;
+  yearsExperience: number | null;
+  profilePhotoUrl: string | null;
+  skills: string[];
+  topProject: string | null;
+};
+
+export type CandidateDetail = {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  professionalTitle: string | null;
+  city: string | null;
+  country: string | null;
+  careerSummary: string | null;
+  profilePhotoUrl: string | null;
+  remotePreference: "on_site" | "hybrid" | "remote" | null;
+  availability: "immediate" | "within_one_month" | "freelance" | "permanent" | null;
+  yearsExperience: number | null;
+  salaryMin: string | null;
+  salaryMax: string | null;
+  salaryCurrency: string;
+  skills: SkillRef[];
+  projects: Project[];
+  employmentHistory: ProfileBundle["employmentHistory"];
+  education: ProfileBundle["education"];
+  qualifications: ProfileBundle["qualifications"];
+};
+
+export function getDiscoveryFeed(
+  token: string,
+  filters: {
+    skills?: string;
+    availability?: string;
+    remoteType?: string;
+    minYearsExperience?: number;
+    keyword?: string;
+    limit?: number;
+  } = {},
+) {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value !== undefined && value !== "") search.set(key, String(value));
+  }
+  const query = search.toString();
+  return apiFetch<CandidateCard[]>(`/discover${query ? `?${query}` : ""}`, { token });
+}
+
+export type PublicCandidateCard = CandidateCard;
+
+export function getPublicCandidates(
+  filters: {
+    skills?: string;
+    availability?: string;
+    remoteType?: string;
+    minYearsExperience?: number;
+    keyword?: string;
+    limit?: number;
+    offset?: number;
+  } = {},
+) {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value !== undefined && value !== "") search.set(key, String(value));
+  }
+  const query = search.toString();
+  return apiFetch<{ candidates: PublicCandidateCard[]; total: number }>(
+    `/public/candidates${query ? `?${query}` : ""}`,
+  );
+}
+
+export type PublicCandidateDetail = CandidateDetail;
+
+export function getPublicCandidateDetail(candidateId: string) {
+  return apiFetch<PublicCandidateDetail>(`/public/candidates/${candidateId}`);
+}
+
+export function getCandidateDetail(token: string, candidateId: string) {
+  return apiFetch<CandidateDetail>(`/discover/${candidateId}`, { token });
+}
+
+export function reviewCandidate(
+  token: string,
+  candidateId: string,
+  action: "skip" | "viewed",
+) {
+  return apiFetch<{ reviewed: boolean }>(`/discover/${candidateId}/review`, {
+    method: "POST",
+    token,
+    body: JSON.stringify({ action }),
+  });
+}
+
+export function saveCandidate(token: string, candidateId: string, listId?: string | null) {
+  return apiFetch<{ id: string }>(`/discover/${candidateId}/save`, {
+    method: "POST",
+    token,
+    body: JSON.stringify({ listId: listId ?? null }),
+  });
+}
+
+export function unsaveCandidate(token: string, candidateId: string) {
+  return apiFetch<{ deleted: boolean }>(`/discover/${candidateId}/save`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export type SavedCandidateEntry = {
+  savedAt: string;
+  listId: string | null;
+  candidate: CandidateCard;
+};
+
+export function listSavedCandidates(token: string) {
+  return apiFetch<SavedCandidateEntry[]>("/saved-candidates", { token });
+}
+
+export type CandidateList = { id: string; companyId: string; name: string; createdAt: string };
+
+export function listCandidateLists(token: string) {
+  return apiFetch<CandidateList[]>("/candidate-lists", { token });
+}
+
+export function createCandidateList(token: string, name: string) {
+  return apiFetch<CandidateList>("/candidate-lists", {
+    method: "POST",
+    token,
+    body: JSON.stringify({ name }),
+  });
+}
+
+export type ContactSummary = {
+  id: string;
+  createdAt: string;
+  candidate?: { id: string; firstName: string | null; lastName: string | null; professionalTitle: string | null };
+  business?: { id: string; companyName: string };
+};
+
+export function listContacts(token: string) {
+  return apiFetch<ContactSummary[]>("/contacts", { token });
+}
+
+export function createContact(token: string, candidateId: string, message: string) {
+  return apiFetch<{ id: string }>(`/contacts/${candidateId}`, {
+    method: "POST",
+    token,
+    body: JSON.stringify({ message }),
+  });
+}
+
+export type Message = {
+  id: string;
+  contactId: string;
+  senderUserId: string;
+  body: string;
+  createdAt: string;
+};
+
+export function listMessages(token: string, contactId: string) {
+  return apiFetch<Message[]>(`/contacts/${contactId}/messages`, { token });
+}
+
+export function sendMessage(token: string, contactId: string, body: string) {
+  return apiFetch<Message>(`/contacts/${contactId}/messages`, {
+    method: "POST",
+    token,
+    body: JSON.stringify({ body }),
+  });
 }
 
 export type HomepageSectionDto = {
@@ -865,7 +956,7 @@ export async function getHomepageContent() {
   return apiFetch<{
     source: "database" | "defaults";
     sections: HomepageSectionDto[];
-  }>("/content/homepage");
+  }>("/content/homepage", { revalidate: 60 });
 }
 
 export function listAdminHomepageSections(token: string) {
@@ -921,33 +1012,4 @@ export function resetAdminHomepageSections(token: string) {
     method: "POST",
     token,
   });
-}
-
-export async function uploadCv(token: string, file: File) {
-  const form = new FormData();
-  form.append("file", file);
-
-  const response = await fetch(`${getApiBaseUrl()}/users/me/cv`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: form,
-  });
-
-  const payload = (await response.json()) as ApiResponse<{
-    user: HorizonUser;
-    upload: { fileName: string; storage: "r2" | "dev" };
-  }>;
-
-  if (!response.ok || !payload.success) {
-    const errorPayload = payload as ApiError;
-    throw new ApiRequestError(
-      response.status,
-      errorPayload.error?.code ?? "UPLOAD_FAILED",
-      errorPayload.error?.message ?? "CV upload failed",
-    );
-  }
-
-  return payload.data;
 }
