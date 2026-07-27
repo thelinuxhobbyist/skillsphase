@@ -41,11 +41,12 @@ function section(
   type: HomepageSectionType,
   sortOrder: number,
   content: Record<string, unknown>,
+  enabled = true,
 ): HomepageSection {
   return {
     id: `default-${type}`,
     type,
-    enabled: true,
+    enabled,
     sortOrder,
     label: HOMEPAGE_SECTION_LABELS[type],
     content,
@@ -56,7 +57,6 @@ function section(
 export function getDefaultHomepageSections(): HomepageSection[] {
   return [
     section("hero", 10, {
-      eyebrow: "Skills-first hiring · UK",
       title: "Skills first. Because life happens.",
       body: "People should be hired for what they can do today — not for whether their career ran in a straight line. Build a profile around skills, experience, and real evidence of your work, so employers see ability first.",
       primaryCtaLabel: "Create your Skill Profile",
@@ -118,68 +118,9 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       ctaLabel: "Register as a business",
       ctaHref: "/register?as=business",
     }),
-    section("stats", 60, {
-      title: "Growing with candidates and businesses",
-      subtitle: "Figures update as SkillsPhase grows.",
-      footnote: "*Placeholder social proof until live metrics are ready.",
-      items: [
-        { value: "8k+", label: "Skill profiles created" },
-        { value: "320+", label: "Verified UK businesses" },
-        { value: "1.9k", label: "Portfolio projects shared" },
-        { value: "92%", label: "Would recommend us*" },
-      ],
-    }),
-    section("featured_candidates", 70, {
-      title: "Example skill profiles",
-      subtitle: "Real candidates appear once people join SkillsPhase.",
-      demoCards: [
-        {
-          title: "Senior React Developer",
-          skills: ["React", "TypeScript", "Node.js", "AWS"],
-          yearsExperience: 8,
-          topProject: "Led frontend delivery on two long-term client projects",
-          availability: "immediate",
-        },
-        {
-          title: "Brand & Marketing Lead",
-          skills: ["Marketing", "Content Strategy", "SEO", "Figma"],
-          yearsExperience: 5,
-          topProject: "Grew organic traffic 4x for a D2C retailer",
-          availability: "within_one_month",
-        },
-        {
-          title: "Full-Stack Product Designer",
-          skills: ["Figma", "Design Systems", "React", "User Research"],
-          yearsExperience: 6,
-          topProject: "Designed and shipped a fintech mobile app",
-          availability: "freelance",
-        },
-      ],
-    }),
-    section("testimonials", 80, {
-      title: "What people are saying",
-      subtitle: "From candidates and hiring teams who put skills first.",
-      items: [
-        {
-          quote:
-            "I took three years out to care for family. SkillsPhase let my projects and certifications lead — not the gap on my timeline.",
-          name: "Amira K.",
-          role: "Candidate · Product Designer",
-        },
-        {
-          quote:
-            "We stopped obsessing over uninterrupted employment history and started hiring on demonstrated skills. It changed who we found.",
-          name: "James O.",
-          role: "Hiring manager · Cedar Health",
-        },
-        {
-          quote:
-            "My portfolio said more in five minutes than my old CV ever did. Judged on ability, not on how I explained my career break.",
-          name: "Priya S.",
-          role: "Candidate · Marketing",
-        },
-      ],
-    }),
+    section("stats", 60, { title: "", items: [] }, false),
+    section("featured_candidates", 70, { title: "", demoCards: [] }, false),
+    section("testimonials", 80, { title: "", items: [] }, false),
     section("closing_cta", 90, {
       title: "Skills first. Because life happens.",
       body: "Whether you’re showcasing what you can do, or looking for people who can do it — start with skills and evidence.",

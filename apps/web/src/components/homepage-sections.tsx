@@ -57,8 +57,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
         <section className="border-b border-[color:var(--line)] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_2%,transparent),transparent_40%),var(--background)] px-4 pb-14 pt-12 sm:px-6 sm:pb-16 sm:pt-16 lg:pt-20">
           <div className="mx-auto max-w-[1180px]">
             <div className="animate-[dossier-rise_0.7s_ease_both] max-w-2xl">
-              <p className="eyebrow">{str(c.eyebrow, "Skills-first hiring")}</p>
-              <h1 className="mt-4 font-sans text-[clamp(2rem,5vw,3.5rem)] leading-[1.08] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              <h1 className="font-sans text-[clamp(2rem,5vw,3.5rem)] leading-[1.08] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
                 {formatHeroTitle(str(c.title, "Skills first. Because life happens."))}
               </h1>
               <p className="mt-5 max-w-[48ch] text-base leading-relaxed text-[color:var(--ink-soft)] sm:text-lg">
@@ -103,10 +102,12 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
       return (
         <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
-            <p className="eyebrow">{str(c.title, "How it works")}</p>
-            <h2 className="mt-3.5 max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
-              {str(c.subtitle, "Three simple steps from profile to conversation.")}
+            <h2 className="max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              {str(c.title, "How it works")}
             </h2>
+            <p className="mt-3.5 max-w-2xl text-base text-[color:var(--ink-soft)]">
+              {str(c.subtitle, "Three simple steps from profile to conversation.")}
+            </p>
             <ol className="mt-12 grid border-t border-[color:var(--line-strong)] md:grid-cols-3">
               {arr<{ title: string; body: string }>(c.steps).map((step, index) => (
                 <li
@@ -139,15 +140,15 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
       return (
         <section className="py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
-            <p className="eyebrow">
+            <h2 className="max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
               {str(c.title, "What makes SkillsPhase different")}
-            </p>
-            <h2 className="mt-3.5 max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+            </h2>
+            <p className="mt-3.5 max-w-2xl text-base text-[color:var(--ink-soft)]">
               {str(
                 c.subtitle,
                 "A hiring platform built around skills and evidence.",
               )}
-            </h2>
+            </p>
             <ul className="mt-12 grid gap-px border border-[color:var(--line-strong)] bg-[color:var(--line-strong)] sm:grid-cols-2">
               {arr<{ title: string; body: string }>(c.items).map((item, index) => (
                 <li
@@ -172,10 +173,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
     case "businesses_cta":
       return (
         <section className="bg-[color:var(--ink)] px-4 py-14 sm:py-20 text-center text-[color:var(--paper)] sm:px-6">
-          <p className="eyebrow !text-[color:var(--mustard)] justify-center before:!bg-[color:var(--mustard)]">
-            For businesses
-          </p>
-          <h2 className="mx-auto mt-4 max-w-3xl font-sans text-[clamp(1.95rem,4vw,2.75rem)] font-medium italic">
+          <h2 className="mx-auto max-w-3xl font-sans text-[clamp(1.95rem,4vw,2.75rem)] font-medium italic">
             {str(c.title)}
           </h2>
           <p className="mx-auto mt-3.5 max-w-xl text-base leading-relaxed text-ink-foreground/70">
@@ -194,8 +192,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
       return (
         <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
-            <p className="eyebrow">The record so far</p>
-            <h2 className="mt-3.5 font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+            <h2 className="font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
               {str(c.title)}
             </h2>
             {c.subtitle ? (
@@ -245,8 +242,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="eyebrow">See it in action</p>
-                <h2 className="mt-3.5 font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+                <h2 className="font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
                   {str(c.title, "Example skill profiles")}
                 </h2>
                 <p className="mt-2 text-base text-[color:var(--ink-soft)]">
@@ -308,8 +304,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
       return (
         <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
-            <p className="eyebrow">Voices from the community</p>
-            <h2 className="mt-3.5 max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+            <h2 className="max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
               {str(c.title)}
             </h2>
             {c.subtitle ? (
@@ -350,8 +345,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
     case "closing_cta":
       return (
         <section className="px-4 py-14 sm:py-20 text-center sm:px-6">
-          <p className="eyebrow justify-center">Ready when you are</p>
-          <h2 className="mt-4 font-sans text-[clamp(1.95rem,4vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+          <h2 className="font-sans text-[clamp(1.95rem,4vw,2.65rem)] font-semibold text-[color:var(--ink)]">
             {str(c.title)}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[color:var(--ink-soft)]">
@@ -381,8 +375,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
           className="border-t border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20"
         >
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
-            <p className="eyebrow">Frequently asked questions</p>
-            <h2 className="mt-3.5 font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+            <h2 className="font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
               {str(c.title, "Frequently asked questions")}
             </h2>
             {c.subtitle ? (

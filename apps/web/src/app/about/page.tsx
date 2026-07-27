@@ -6,8 +6,7 @@ export default function AboutPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <p className="eyebrow">Skills-first hiring</p>
-        <h1 className="mt-3 font-sans text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
+        <h1 className="font-sans text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
           About SkillsPhase
         </h1>
         <p className="mt-6 text-xl font-sans leading-snug text-[color:var(--stamp)]">
