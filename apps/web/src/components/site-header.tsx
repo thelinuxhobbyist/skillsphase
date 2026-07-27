@@ -18,7 +18,7 @@ const hasClerk = isClerkConfigured();
 const navLinkClass =
   "text-base text-muted-foreground transition-colors hover:text-foreground";
 const mobileNavLinkClass =
-  "rounded-md px-1 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-surface hover:text-primary";
+  "block rounded-md px-3 py-3 text-base font-medium text-foreground transition-colors hover:bg-surface hover:text-primary";
 
 function linksForUser(user: HorizonUser | null) {
   if (user?.role === "job_seeker") {
@@ -54,20 +54,30 @@ function linksForUser(user: HorizonUser | null) {
   return [...PUBLIC_LINKS];
 }
 
-function GuestActions({ onNavigate }: { onNavigate?: () => void }) {
+function GuestActions({
+  onNavigate,
+  stacked = false,
+}: {
+  onNavigate?: () => void;
+  stacked?: boolean;
+}) {
+  const layoutClass = stacked
+    ? "flex flex-col gap-3"
+    : "flex items-center gap-4";
+
   return (
-    <>
+    <div className={layoutClass}>
       <Link href="/login" className={navLinkClass} onClick={onNavigate}>
         Sign in
       </Link>
       <Link
         href="/register"
-        className="btn-primary rounded-lg px-5 py-2.5 text-sm font-medium"
+        className={`btn-primary rounded-lg px-5 py-2.5 text-sm font-medium ${stacked ? "text-center" : ""}`}
         onClick={onNavigate}
       >
         Register
       </Link>
-    </>
+    </div>
   );
 }
 
@@ -93,6 +103,33 @@ function NavLinks({
         </Link>
       ))}
     </>
+  );
+}
+
+function MenuIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden
+    >
+      {open ? (
+        <>
+          <path d="M6 6l12 12" />
+          <path d="M18 6 6 18" />
+        </>
+      ) : (
+        <>
+          <path d="M4 7h16" />
+          <path d="M4 12h16" />
+          <path d="M4 17h16" />
+        </>
+      )}
+    </svg>
   );
 }
 
@@ -129,16 +166,32 @@ function HeaderChrome({
   const menuId = useId();
   const close = () => setOpen(false);
 
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
-      <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-4">
+      <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2.5 font-sans text-xl font-semibold tracking-tight text-primary sm:text-2xl"
+          className="flex min-w-0 shrink items-center gap-2.5 font-sans text-lg font-semibold tracking-tight text-primary sm:text-xl md:text-2xl"
           onClick={close}
         >
-          <StampMark />
-          SkillsPhase
+          <StampMark className="h-8 w-8 sm:h-9 sm:w-9" />
+          <span className="truncate">SkillsPhase</span>
         </Link>
 
         <div className="flex items-center gap-2 md:hidden">
@@ -149,16 +202,20 @@ function HeaderChrome({
           ) : null}
           <button
             type="button"
-            className="rounded-lg border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground"
+            className="inline-flex items-center justify-center rounded-lg border border-border bg-surface p-2.5 text-foreground"
             aria-expanded={open}
             aria-controls={menuId}
+            aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((value) => !value)}
           >
-            {open ? "Close" : "Menu"}
+            <MenuIcon open={open} />
           </button>
         </div>
 
-        <nav className="hidden min-w-0 items-center justify-end gap-6 md:flex lg:gap-8">
+        <nav
+          className="hidden min-w-0 items-center justify-end gap-5 md:flex lg:gap-8"
+          aria-label="Main"
+        >
           {!loadingUser ? <NavLinks user={user} /> : null}
           {hasClerk ? (
             <>
@@ -178,9 +235,12 @@ function HeaderChrome({
       {open ? (
         <div
           id={menuId}
-          className="border-t border-border px-4 py-4 md:hidden"
+          className="border-t border-border bg-background md:hidden"
         >
-          <nav className="mx-auto flex max-w-6xl flex-col gap-1">
+          <nav
+            className="mx-auto flex max-h-[calc(100dvh-4.5rem)] max-w-[1180px] flex-col overflow-y-auto px-4 py-4"
+            aria-label="Mobile"
+          >
             {!loadingUser ? (
               <NavLinks
                 user={user}
@@ -190,13 +250,13 @@ function HeaderChrome({
             ) : null}
             {hasClerk ? (
               <SignedOut>
-                <div className="mt-2 flex flex-col gap-3 border-t border-border pt-3">
-                  <GuestActions onNavigate={close} />
+                <div className="mt-3 border-t border-border pt-4">
+                  <GuestActions onNavigate={close} stacked />
                 </div>
               </SignedOut>
             ) : (
-              <div className="mt-2 flex flex-col gap-3 border-t border-border pt-3">
-                <GuestActions onNavigate={close} />
+              <div className="mt-3 border-t border-border pt-4">
+                <GuestActions onNavigate={close} stacked />
               </div>
             )}
           </nav>

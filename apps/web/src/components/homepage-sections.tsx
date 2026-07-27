@@ -54,44 +54,29 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
   switch (section.type) {
     case "hero":
       return (
-        <section className="border-b border-[color:var(--line)] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_2%,transparent),transparent_40%),var(--background)] px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-20">
-          <div className="mx-auto grid max-w-[1180px] items-center gap-12 md:grid-cols-[1.05fr_1fr] md:gap-14">
-            <div className="animate-[dossier-rise_0.7s_ease_both]">
+        <section className="border-b border-[color:var(--line)] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_2%,transparent),transparent_40%),var(--background)] px-4 pb-14 pt-12 sm:px-6 sm:pb-16 sm:pt-16 lg:pt-20">
+          <div className="mx-auto max-w-[1180px]">
+            <div className="animate-[dossier-rise_0.7s_ease_both] max-w-2xl">
               <p className="eyebrow">{str(c.eyebrow, "Skills-first hiring")}</p>
-              <h1 className="mt-4 max-w-xl font-sans text-[clamp(2.25rem,5.2vw,3.75rem)] leading-[1.06] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              <h1 className="mt-4 font-sans text-[clamp(2rem,5vw,3.5rem)] leading-[1.08] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
                 {formatHeroTitle(str(c.title, "Skills first. Because life happens."))}
               </h1>
-              <p className="mt-5 max-w-[48ch] text-lg leading-relaxed text-[color:var(--ink-soft)]">
+              <p className="mt-5 max-w-[48ch] text-base leading-relaxed text-[color:var(--ink-soft)] sm:text-lg">
                 {str(c.body)}
               </p>
-              <div className="mt-8 flex flex-wrap gap-3.5">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-3.5">
                 <Link
                   href={str(c.primaryCtaHref, "/register?as=candidate")}
-                  className="btn-primary inline-flex items-center rounded-[var(--radius)] px-5 py-3 text-sm font-medium"
+                  className="btn-primary inline-flex items-center justify-center rounded-[var(--radius)] px-5 py-3 text-sm font-medium"
                 >
                   {str(c.primaryCtaLabel, "Create your Skill Profile")}
                 </Link>
                 <Link
                   href={str(c.secondaryCtaHref, "/discover-talent")}
-                  className="inline-flex items-center rounded-[var(--radius)] border border-[color:var(--line-strong)] bg-transparent px-5 py-3 text-sm font-medium text-[color:var(--ink)] transition hover:border-[color:var(--ink)] hover:bg-foreground/5"
+                  className="inline-flex items-center justify-center rounded-[var(--radius)] border border-[color:var(--line-strong)] bg-transparent px-5 py-3 text-sm font-medium text-[color:var(--ink)] transition hover:border-[color:var(--ink)] hover:bg-foreground/5"
                 >
                   {str(c.secondaryCtaLabel, "Discover talent")}
                 </Link>
-              </div>
-            </div>
-
-            <div className="relative animate-[dossier-rise_0.85s_ease_0.08s_both] rounded-md border border-[color:var(--folder-line)] bg-[color:var(--folder)] px-5 pb-8 pt-7 shadow-lift sm:px-6">
-              <span className="absolute -top-3.5 left-6 rounded-t-[5px] border border-b-0 border-[color:var(--folder-line)] bg-[color:var(--folder)] px-3 py-1.5 text-xs text-[color:var(--ink-soft)]">
-                FILE — CAREER TIMELINE
-              </span>
-              <div className="mb-2 flex justify-between text-xs text-muted-foreground">
-                <span>CANDIDATE 04471</span>
-                <span>STATUS: ACTIVE</span>
-              </div>
-              <HeroDossierArt />
-              <div className="mt-1 flex justify-between text-xs text-muted-foreground">
-                <span>EVIDENCE: 6 PROJECTS · 2 CERTS</span>
-                <span>REF. SP-2026</span>
               </div>
             </div>
           </div>
@@ -116,7 +101,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
 
     case "how_it_works":
       return (
-        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-20">
+        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
             <p className="eyebrow">{str(c.title, "How it works")}</p>
             <h2 className="mt-3.5 max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
@@ -152,7 +137,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
         "var(--ink)",
       ];
       return (
-        <section className="py-20">
+        <section className="py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
             <p className="eyebrow">
               {str(c.title, "What makes SkillsPhase different")}
@@ -186,7 +171,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
 
     case "businesses_cta":
       return (
-        <section className="bg-[color:var(--ink)] px-4 py-20 text-center text-[color:var(--paper)] sm:px-6">
+        <section className="bg-[color:var(--ink)] px-4 py-14 sm:py-20 text-center text-[color:var(--paper)] sm:px-6">
           <p className="eyebrow !text-[color:var(--mustard)] justify-center before:!bg-[color:var(--mustard)]">
             For businesses
           </p>
@@ -207,7 +192,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
 
     case "stats":
       return (
-        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-20">
+        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
             <p className="eyebrow">The record so far</p>
             <h2 className="mt-3.5 font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
@@ -256,7 +241,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
       }>(c.demoCards);
 
       return (
-        <section className="py-20">
+        <section className="py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
@@ -321,7 +306,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
 
     case "testimonials":
       return (
-        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-20">
+        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
             <p className="eyebrow">Voices from the community</p>
             <h2 className="mt-3.5 max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
@@ -364,7 +349,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
 
     case "closing_cta":
       return (
-        <section className="px-4 py-20 text-center sm:px-6">
+        <section className="px-4 py-14 sm:py-20 text-center sm:px-6">
           <p className="eyebrow justify-center">Ready when you are</p>
           <h2 className="mt-4 font-sans text-[clamp(1.95rem,4vw,2.65rem)] font-semibold text-[color:var(--ink)]">
             {str(c.title)}
@@ -393,7 +378,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
       return (
         <section
           id="faq"
-          className="border-t border-[color:var(--line)] bg-[color:var(--paper-warm)] py-20"
+          className="border-t border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20"
         >
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
             <p className="eyebrow">Frequently asked questions</p>
@@ -430,76 +415,4 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
     default:
       return null;
   }
-}
-
-function HeroDossierArt() {
-  return (
-    <svg
-      viewBox="0 0 520 300"
-      className="mt-1.5 w-full"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <line
-        x1="20"
-        y1="150"
-        x2="500"
-        y2="150"
-        stroke="var(--ink)"
-        strokeWidth="1.5"
-        strokeDasharray="1 6"
-        strokeLinecap="round"
-      />
-      <circle cx="20" cy="150" r="4" fill="var(--ink)" />
-      <circle cx="500" cy="150" r="4" fill="var(--ink)" />
-      <rect x="150" y="132" width="150" height="36" rx="2" fill="var(--ink)" />
-      <text
-        x="225"
-        y="155"
-        textAnchor="middle"
-        fontFamily="var(--font-inter), ui-sans-serif, system-ui, sans-serif"
-        fontSize="10.5"
-        letterSpacing="1"
-        fill="var(--paper)"
-      >
-        CAREGIVING — 14 MOS
-      </text>
-      <g
-        className="origin-center animate-[stamp-in_0.9s_ease_0.35s_both]"
-        style={{ transformOrigin: "225px 150px" }}
-        transform="translate(225,150) rotate(-9)"
-      >
-        <circle r="34" fill="none" stroke="var(--stamp)" strokeWidth="2" />
-        <circle
-          r="28"
-          fill="none"
-          stroke="var(--stamp)"
-          strokeWidth="1"
-          strokeDasharray="2 3"
-        />
-        <text
-          x="0"
-          y="-3"
-          textAnchor="middle"
-          fontFamily="var(--font-inter), ui-sans-serif, system-ui, sans-serif"
-          fontWeight="600"
-          fontSize="9.5"
-          fill="var(--stamp)"
-        >
-          SKILLS
-        </text>
-        <text
-          x="0"
-          y="9"
-          textAnchor="middle"
-          fontFamily="var(--font-inter), ui-sans-serif, system-ui, sans-serif"
-          fontWeight="600"
-          fontSize="9.5"
-          fill="var(--stamp)"
-        >
-          VERIFIED
-        </text>
-      </g>
-    </svg>
-  );
 }

@@ -20,13 +20,40 @@ const ADMIN_LINKS = [
 const navLinkClass =
   "text-base text-muted-foreground transition-colors hover:text-foreground";
 const mobileNavLinkClass =
-  "rounded-md px-1 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-surface hover:text-primary";
+  "block rounded-md px-3 py-3 text-base font-medium text-foreground transition-colors hover:bg-surface hover:text-primary";
+
+function MenuIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden
+    >
+      {open ? (
+        <>
+          <path d="M6 6l12 12" />
+          <path d="M18 6 6 18" />
+        </>
+      ) : (
+        <>
+          <path d="M4 7h16" />
+          <path d="M4 12h16" />
+          <path d="M4 17h16" />
+        </>
+      )}
+    </svg>
+  );
+}
 
 function StampMark() {
   return (
     <span
       aria-hidden
-      className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-[1.5px] border-current"
+      className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-current sm:h-9 sm:w-9"
     >
       <span className="absolute inset-[3px] rounded-full border border-dashed border-current opacity-60" />
       <svg
@@ -63,6 +90,22 @@ export function AdminHeader() {
     })();
   }, [getToken]);
 
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
   async function logout() {
     await fetch("/api/admin/logout", { method: "POST" });
     router.replace("/admin/login");
@@ -78,24 +121,28 @@ export function AdminHeader() {
       <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-4">
         <Link
           href="/admin"
-          className="flex shrink-0 items-center gap-2.5 font-sans text-xl font-semibold tracking-tight text-primary sm:text-2xl"
+          className="flex min-w-0 shrink items-center gap-2.5 font-sans text-lg font-semibold tracking-tight text-primary sm:text-xl lg:text-2xl"
           onClick={close}
         >
           <StampMark />
-          SkillsPhase
+          <span className="truncate">SkillsPhase</span>
         </Link>
 
         <button
           type="button"
-          className="rounded-lg border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground lg:hidden"
+          className="inline-flex items-center justify-center rounded-lg border border-border bg-surface p-2.5 text-foreground lg:hidden"
           aria-expanded={open}
           aria-controls={menuId}
+          aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((value) => !value)}
         >
-          {open ? "Close" : "Menu"}
+          <MenuIcon open={open} />
         </button>
 
-        <nav className="hidden min-w-0 flex-wrap items-center justify-end gap-5 lg:flex lg:gap-6">
+        <nav
+          className="hidden min-w-0 flex-wrap items-center justify-end gap-5 lg:flex lg:gap-6"
+          aria-label="Admin"
+        >
           {ADMIN_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className={navLinkClass}>
               {link.label}
@@ -117,9 +164,12 @@ export function AdminHeader() {
       {open ? (
         <div
           id={menuId}
-          className="border-t border-border px-4 py-4 lg:hidden"
+          className="border-t border-border bg-background lg:hidden"
         >
-          <nav className="mx-auto flex max-w-[1180px] flex-col gap-1">
+          <nav
+            className="mx-auto flex max-h-[calc(100dvh-4.5rem)] max-w-[1180px] flex-col overflow-y-auto px-4 py-4"
+            aria-label="Admin mobile"
+          >
             {ADMIN_LINKS.map((link) => (
               <Link
                 key={link.href}
@@ -130,13 +180,13 @@ export function AdminHeader() {
                 {link.label}
               </Link>
             ))}
-            <p className="mt-2 truncate border-t border-border pt-3 font-mono text-xs text-muted-foreground">
+            <p className="mt-3 truncate border-t border-border pt-3 text-xs text-muted-foreground">
               {user?.email ?? "Admin"}
             </p>
             <button
               type="button"
               onClick={() => void logout()}
-              className="mt-2 w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-left text-sm font-medium text-foreground"
+              className="mt-3 w-full rounded-lg border border-border bg-surface px-3 py-3 text-left text-sm font-medium text-foreground"
             >
               Sign out
             </button>
