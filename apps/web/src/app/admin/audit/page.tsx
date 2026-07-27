@@ -14,7 +14,7 @@ export default async function AdminAuditPage() {
         <Link href="/admin" className="text-sm text-primary underline">
           ← Back to dashboard
         </Link>
-        <h1 className="mt-4 font-display text-4xl text-primary">
+        <h1 className="mt-4 font-sans text-4xl text-primary">
           Audit log
         </h1>
         <p className="mt-2 text-[color:var(--foreground)]/75">

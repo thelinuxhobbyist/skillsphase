@@ -198,7 +198,7 @@ function PublicCandidateCardView({ card }: { card: PublicCandidateCard }) {
             ) : null}
           </div>
           {card.availability ? (
-            <span className="shrink-0 rounded-full bg-brand-accent/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-primary-accent">
+            <span className="shrink-0 rounded-full bg-brand-accent/10 px-2.5 py-0.5 text-xs font-medium text-primary-accent">
               {AVAILABILITY_LABELS[card.availability]}
             </span>
           ) : null}

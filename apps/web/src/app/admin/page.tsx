@@ -18,7 +18,7 @@ export default async function AdminDashboardPage() {
       <main className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6">
         <div className="mb-10">
           <p className="eyebrow">Administrator</p>
-          <h1 className="mt-3 font-display text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
+          <h1 className="mt-3 font-sans text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
             Admin dashboard
           </h1>
         </div>
@@ -56,7 +56,7 @@ export default async function AdminDashboardPage() {
 
         <div className="grid gap-12 lg:grid-cols-2">
           <section>
-            <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
+            <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
               Pending business approvals
             </h2>
             <div className="mt-5">
@@ -65,7 +65,7 @@ export default async function AdminDashboardPage() {
           </section>
           <section className="space-y-10">
             <div>
-              <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
+              <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
                 Find a user
               </h2>
               <p className="mt-2 text-base text-[color:var(--ink-soft)]">
@@ -86,14 +86,14 @@ export default async function AdminDashboardPage() {
                 />
                 <button
                   type="submit"
-                  className="btn-primary rounded-[var(--radius)] px-4 py-2.5 font-mono text-xs tracking-[0.05em] uppercase"
+                  className="btn-primary rounded-[var(--radius)] px-4 py-2.5 text-sm font-medium"
                 >
                   Search
                 </button>
               </form>
             </div>
             <div>
-              <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
+              <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
                 Your account
               </h2>
               <p className="mt-2 text-base text-[color:var(--ink-soft)]">
@@ -101,13 +101,13 @@ export default async function AdminDashboardPage() {
               </p>
               <Link
                 href="/admin/account"
-                className="btn-primary mt-4 inline-block rounded-[var(--radius)] px-4 py-2.5 font-mono text-xs tracking-[0.05em] uppercase"
+                className="btn-primary mt-4 inline-block rounded-[var(--radius)] px-4 py-2.5 text-sm font-medium"
               >
                 Manage password &amp; profile
               </Link>
             </div>
             <div>
-              <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
+              <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
                 Recent admin actions
               </h2>
               <ul className="mt-4 space-y-2 text-sm">
@@ -127,7 +127,7 @@ export default async function AdminDashboardPage() {
               </ul>
               <Link
                 href="/admin/audit"
-                className="mt-3 inline-block font-mono text-sm text-[color:var(--stamp)] hover:underline"
+                className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
               >
                 Full audit log →
               </Link>
@@ -143,7 +143,7 @@ function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="bg-[color:var(--paper)] px-5 py-5">
       <p className="text-sm text-[color:var(--ink-soft)]">{label}</p>
-      <p className="mt-1.5 font-mono text-[2rem] font-semibold text-[color:var(--stamp)]">
+      <p className="mt-1.5 text-[2rem] font-semibold text-[color:var(--stamp)]">
         {value}
       </p>
     </div>

@@ -99,7 +99,7 @@ function ConfiguredAuthSync({
   if (needsRole) {
     return (
       <div className="mx-auto max-w-md space-y-4 px-6 py-16 text-center">
-        <h1 className="font-display text-3xl text-primary">
+        <h1 className="font-sans text-3xl text-primary">
           Choose how you use SkillsPhase
         </h1>
         <p className="text-[color:var(--foreground)]/75">

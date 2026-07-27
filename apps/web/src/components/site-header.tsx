@@ -62,7 +62,7 @@ function GuestActions({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
       <Link
         href="/register"
-        className="btn-primary rounded-lg px-5 py-2.5 font-mono text-xs tracking-wider uppercase"
+        className="btn-primary rounded-lg px-5 py-2.5 text-sm font-medium"
         onClick={onNavigate}
       >
         Register
@@ -134,7 +134,7 @@ function HeaderChrome({
       <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-4">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2.5 font-display text-xl font-semibold tracking-tight text-primary sm:text-2xl"
+          className="flex shrink-0 items-center gap-2.5 font-sans text-xl font-semibold tracking-tight text-primary sm:text-2xl"
           onClick={close}
         >
           <StampMark />
@@ -149,7 +149,7 @@ function HeaderChrome({
           ) : null}
           <button
             type="button"
-            className="rounded-lg border border-border bg-surface px-3.5 py-2 font-mono text-xs tracking-wider uppercase text-foreground"
+            className="rounded-lg border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground"
             aria-expanded={open}
             aria-controls={menuId}
             onClick={() => setOpen((value) => !value)}

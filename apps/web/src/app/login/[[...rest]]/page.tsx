@@ -23,7 +23,7 @@ export default async function LoginPage() {
     <>
       <SiteHeader />
       <main className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-6 py-16">
-        <h1 className="mb-6 font-display text-3xl text-primary">
+        <h1 className="mb-6 font-sans text-3xl text-primary">
           Sign in
         </h1>
         {configured ? (

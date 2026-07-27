@@ -39,10 +39,10 @@ export default async function CandidateDashboardPage() {
       <SiteHeader />
       <main className="mx-auto w-full max-w-4xl min-w-0 px-4 py-10 sm:px-6 sm:py-12">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">
+          <p className="text-sm font-medium text-primary">
             Candidate
           </p>
-          <h1 className="mt-2 font-display text-3xl break-words text-primary sm:text-4xl">
+          <h1 className="mt-2 font-sans text-3xl break-words text-primary sm:text-4xl">
             Welcome{user.firstName ? `, ${user.firstName}` : ""}
           </h1>
           <p className="mt-2 text-[color:var(--foreground)]/75">
@@ -79,7 +79,7 @@ export default async function CandidateDashboardPage() {
 
         <section className="mt-10">
           <div className="flex items-end justify-between gap-3">
-            <h2 className="font-display text-2xl text-primary">
+            <h2 className="font-sans text-2xl text-primary">
               Recent contacts
             </h2>
             <Link href="/contacts" className="text-sm text-primary underline">

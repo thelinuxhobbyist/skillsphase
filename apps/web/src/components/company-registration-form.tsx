@@ -106,7 +106,7 @@ export function CompanyRegistrationForm() {
         {step === 1 ? (
           <>
             <div>
-              <h2 className="font-display text-2xl text-primary">
+              <h2 className="font-sans text-2xl text-primary">
                 Find your company
               </h2>
               <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
@@ -132,7 +132,7 @@ export function CompanyRegistrationForm() {
         {step === 2 ? (
           <>
             <div>
-              <h2 className="font-display text-2xl text-primary">
+              <h2 className="font-sans text-2xl text-primary">
                 Company email
               </h2>
               <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
@@ -166,7 +166,7 @@ export function CompanyRegistrationForm() {
         {step === 3 ? (
           <>
             <div>
-              <h2 className="font-display text-2xl text-primary">
+              <h2 className="font-sans text-2xl text-primary">
                 Your contact details
               </h2>
               <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
@@ -183,7 +183,7 @@ export function CompanyRegistrationForm() {
               />
             ) : null}
             <div className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3 text-sm">
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary-accent">
+              <p className="text-xs font-medium text-primary-accent">
                 Activation email will be sent to
               </p>
               <p className="mt-1 font-semibold text-primary">{businessEmail}</p>
@@ -288,7 +288,7 @@ function CompanyPreview({
 }) {
   return (
     <div className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3 text-sm">
-      <p className="text-xs font-semibold uppercase tracking-wide text-primary-accent">
+      <p className="text-xs font-medium text-primary-accent">
         Company (from Companies House)
       </p>
       <p className="mt-1 font-semibold text-primary">{preview.companyName}</p>

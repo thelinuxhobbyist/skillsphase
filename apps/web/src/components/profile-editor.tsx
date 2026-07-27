@@ -498,7 +498,7 @@ function ProfileProgress({
     <section className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="font-display text-2xl text-primary">
+          <h2 className="font-sans text-2xl text-primary">
             Skill Profile progress
           </h2>
           <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
@@ -1419,7 +1419,7 @@ function EducationStep({
             >
               <div className="flex justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary-accent">
+                  <p className="text-xs font-medium text-primary-accent">
                     Education
                   </p>
                   <p className="font-semibold text-primary">{row.qualification}</p>
@@ -1468,7 +1468,7 @@ function EducationStep({
             >
               <div className="flex justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary-accent">
+                  <p className="text-xs font-medium text-primary-accent">
                     Certification
                   </p>
                   <p className="font-semibold text-primary">{row.name}</p>
@@ -1825,7 +1825,7 @@ function ReviewItem({
         className="flex w-full items-start justify-between gap-3 px-3 py-3 text-left transition hover:bg-brand/[0.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
       >
         <span>
-          <span className="block text-xs font-semibold uppercase tracking-wide text-primary-accent">
+          <span className="block text-xs font-medium text-primary-accent">
             {label}
           </span>
           <span className="mt-1 block font-medium text-primary">{value}</span>
@@ -1850,7 +1850,7 @@ function StepShell({
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-display text-2xl text-primary">
+        <h2 className="font-sans text-2xl text-primary">
           {title}
         </h2>
         <p className="mt-1 text-sm text-[color:var(--foreground)]/70">{body}</p>

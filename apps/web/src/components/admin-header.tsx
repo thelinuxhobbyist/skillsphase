@@ -78,7 +78,7 @@ export function AdminHeader() {
       <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-4">
         <Link
           href="/admin"
-          className="flex shrink-0 items-center gap-2.5 font-display text-xl font-semibold tracking-tight text-primary sm:text-2xl"
+          className="flex shrink-0 items-center gap-2.5 font-sans text-xl font-semibold tracking-tight text-primary sm:text-2xl"
           onClick={close}
         >
           <StampMark />
@@ -87,7 +87,7 @@ export function AdminHeader() {
 
         <button
           type="button"
-          className="rounded-lg border border-border bg-surface px-3.5 py-2 font-mono text-xs tracking-wider uppercase text-foreground lg:hidden"
+          className="rounded-lg border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground lg:hidden"
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => setOpen((value) => !value)}
@@ -101,13 +101,13 @@ export function AdminHeader() {
               {link.label}
             </Link>
           ))}
-          <span className="max-w-[12rem] truncate font-mono text-xs tracking-wide text-muted-foreground">
+          <span className="max-w-[12rem] truncate text-xs text-muted-foreground">
             {user?.email ?? "Admin"}
           </span>
           <button
             type="button"
             onClick={() => void logout()}
-            className="rounded-lg border border-border bg-surface px-3.5 py-2 font-mono text-xs tracking-wider uppercase text-foreground transition hover:border-foreground"
+            className="rounded-lg border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground transition hover:border-foreground"
           >
             Sign out
           </button>
@@ -136,7 +136,7 @@ export function AdminHeader() {
             <button
               type="button"
               onClick={() => void logout()}
-              className="mt-2 w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-left font-mono text-xs tracking-wider uppercase text-foreground"
+              className="mt-2 w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-left text-sm font-medium text-foreground"
             >
               Sign out
             </button>

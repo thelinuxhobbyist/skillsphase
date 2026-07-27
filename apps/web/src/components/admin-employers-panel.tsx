@@ -83,14 +83,14 @@ export function AdminEmployersPanel({
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <h2 className="font-display text-[1.35rem] font-semibold text-[color:var(--ink)]">
+                  <h2 className="font-sans text-[1.35rem] font-semibold text-[color:var(--ink)]">
                     {employer.companyName}
                   </h2>
-                  <span className="font-mono text-xs tracking-[0.08em] uppercase text-[color:var(--stamp)]">
+                  <span className="text-xs uppercase text-[color:var(--stamp)]">
                     {employer.verificationStatus.replaceAll("_", " ")}
                   </span>
                 </div>
-                <p className="mt-1 font-mono text-sm text-[color:var(--ink-soft)]">
+                <p className="mt-1 text-sm text-[color:var(--ink-soft)]">
                   {employer.companyNumber}
                 </p>
                 <p className="mt-3 text-base text-[color:var(--ink)]">
@@ -105,7 +105,7 @@ export function AdminEmployersPanel({
                   </p>
                 ) : null}
                 {employer.businessEmailIsFreeProvider ? (
-                  <p className="mt-2 font-mono text-xs tracking-[0.04em] text-[color:var(--mustard)]">
+                  <p className="mt-2 text-xs text-[color:var(--mustard)]">
                     Free email provider flagged for review
                   </p>
                 ) : null}
@@ -179,7 +179,7 @@ function ActionButton({
   variant?: "primary" | "outline";
 }) {
   const base =
-    "rounded-[var(--radius)] px-4 py-2.5 font-mono text-xs tracking-[0.05em] uppercase disabled:opacity-60";
+    "rounded-[var(--radius)] px-4 py-2.5 text-sm font-medium disabled:opacity-60";
   const styles =
     variant === "primary"
       ? "btn-primary text-white"

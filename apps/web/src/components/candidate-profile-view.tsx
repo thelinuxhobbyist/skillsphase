@@ -29,7 +29,7 @@ export function CandidateProfileView({
     <>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-primary sm:text-4xl">
+          <h1 className="font-sans text-3xl text-primary sm:text-4xl">
             {candidate.professionalTitle || name || fallbackTitle}
           </h1>
           <p className="mt-1 text-[color:var(--foreground)]/75">
@@ -40,12 +40,12 @@ export function CandidateProfileView({
         </div>
         <div className="flex flex-wrap gap-2 text-xs">
           {candidate.availability ? (
-            <span className="rounded-full bg-brand-accent/10 px-3 py-1 font-semibold uppercase tracking-wide text-primary-accent">
+            <span className="rounded-full bg-brand-accent/10 px-3 py-1 font-medium text-primary-accent">
               {AVAILABILITY_LABELS[candidate.availability]}
             </span>
           ) : null}
           {candidate.remotePreference ? (
-            <span className="rounded-full bg-brand/10 px-3 py-1 font-semibold uppercase tracking-wide text-primary">
+            <span className="rounded-full bg-brand/10 px-3 py-1 font-medium text-primary">
               {REMOTE_TYPE_LABELS[candidate.remotePreference]}
             </span>
           ) : null}
@@ -60,7 +60,7 @@ export function CandidateProfileView({
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-accent">
             What they can do
           </p>
-          <h2 className="mt-1 font-display text-xl text-primary">
+          <h2 className="mt-1 font-sans text-xl text-primary">
             Skills
           </h2>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -109,7 +109,7 @@ export function CandidateProfileView({
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-accent">
             Proof of ability
           </p>
-          <h2 className="mt-1 font-display text-xl text-primary">
+          <h2 className="mt-1 font-sans text-xl text-primary">
             Evidence
           </h2>
 
@@ -191,7 +191,7 @@ export function CandidateProfileView({
       {/* Work history — a simple timeline, no long descriptions. */}
       {candidate.employmentHistory.length > 0 ? (
         <section className="mt-10">
-          <h2 className="font-display text-xl text-primary">
+          <h2 className="font-sans text-xl text-primary">
             Work history
           </h2>
           <ul className="mt-4 space-y-4 border-l border-[color:var(--line)] pl-4">

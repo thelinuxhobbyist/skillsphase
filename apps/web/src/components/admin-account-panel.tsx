@@ -109,7 +109,7 @@ export function AdminAccountPanel() {
       ) : null}
 
       <form onSubmit={(e) => void saveProfile(e)} className="space-y-3">
-        <h2 className="font-display text-2xl text-primary">
+        <h2 className="font-sans text-2xl text-primary">
           Profile
         </h2>
         <label className="block text-sm">
@@ -150,7 +150,7 @@ export function AdminAccountPanel() {
       </form>
 
       <form onSubmit={(e) => void savePassword(e)} className="space-y-3">
-        <h2 className="font-display text-2xl text-primary">
+        <h2 className="font-sans text-2xl text-primary">
           Change password
         </h2>
         <label className="block text-sm">

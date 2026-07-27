@@ -137,7 +137,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
           title: "Senior React Developer",
           skills: ["React", "TypeScript", "Node.js", "AWS"],
           yearsExperience: 8,
-          topProject: "Built SaaS platforms for two Series B startups",
+          topProject: "Led frontend delivery on two long-term client projects",
           availability: "immediate",
         },
         {

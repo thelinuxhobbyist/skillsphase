@@ -6,10 +6,10 @@ export default function AccessDeniedPage() {
     <>
       <SiteHeader />
       <main className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center px-6 py-16 text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-red-800">
+        <p className="text-sm font-medium text-red-800">
           403
         </p>
-        <h1 className="mt-2 font-display text-4xl text-primary">
+        <h1 className="mt-2 font-sans text-4xl text-primary">
           Access denied
         </h1>
         <p className="mt-4 text-[color:var(--foreground)]/75">

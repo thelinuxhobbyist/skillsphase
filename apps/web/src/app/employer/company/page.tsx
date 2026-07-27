@@ -39,7 +39,7 @@ export default async function EmployerCompanyPage() {
         <Link href="/employer" className="text-sm text-primary underline">
           ← Back to dashboard
         </Link>
-        <h1 className="mt-4 font-display text-4xl text-primary">
+        <h1 className="mt-4 font-sans text-4xl text-primary">
           Company profile
         </h1>
         <div className="mt-8 space-y-6">

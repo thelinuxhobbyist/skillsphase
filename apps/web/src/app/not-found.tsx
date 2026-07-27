@@ -6,10 +6,10 @@ export default function NotFound() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-xl px-6 py-24 text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">
+        <p className="text-sm font-medium text-primary">
           404
         </p>
-        <h1 className="mt-3 font-display text-4xl text-primary">
+        <h1 className="mt-3 font-sans text-4xl text-primary">
           Page not found
         </h1>
         <p className="mt-3 text-[color:var(--foreground)]/75">

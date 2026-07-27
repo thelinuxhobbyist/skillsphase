@@ -55,7 +55,7 @@ function VerifyEmailContent() {
         ) : null}
         {state === "success" ? (
           <>
-            <h1 className="font-display text-3xl text-primary">
+            <h1 className="font-sans text-3xl text-primary">
               Account activated
             </h1>
             <p className="mt-4 text-[color:var(--foreground)]/75">
@@ -72,7 +72,7 @@ function VerifyEmailContent() {
         ) : null}
         {state === "error" ? (
           <>
-            <h1 className="font-display text-3xl text-primary">
+            <h1 className="font-sans text-3xl text-primary">
               Activation failed
             </h1>
             <p className="mt-4 text-red-700" role="alert">

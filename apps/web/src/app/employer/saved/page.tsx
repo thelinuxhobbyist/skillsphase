@@ -29,7 +29,7 @@ export default async function SavedCandidatesPage() {
         <Link href="/employer" className="text-sm text-primary underline">
           ← Back to dashboard
         </Link>
-        <h1 className="mt-4 font-display text-3xl text-primary sm:text-4xl">
+        <h1 className="mt-4 font-sans text-3xl text-primary sm:text-4xl">
           Saved candidates
         </h1>
         <p className="mt-2 mb-8 text-[color:var(--foreground)]/75">
@@ -77,7 +77,7 @@ export default async function SavedCandidatesPage() {
                     </div>
                   ) : null}
                   {entry.candidate.availability ? (
-                    <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-primary-accent">
+                    <p className="mt-2 text-xs font-medium text-primary-accent">
                       {AVAILABILITY_LABELS[entry.candidate.availability]}
                     </p>
                   ) : null}

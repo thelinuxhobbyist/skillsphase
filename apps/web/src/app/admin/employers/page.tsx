@@ -14,12 +14,12 @@ export default async function AdminEmployersPage() {
       <main className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6">
         <Link
           href="/admin"
-          className="font-mono text-sm text-[color:var(--stamp)] hover:underline"
+          className="text-sm font-medium text-primary hover:underline"
         >
           ← Back to dashboard
         </Link>
         <p className="eyebrow mt-6">Admin</p>
-        <h1 className="mt-3 font-display text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
+        <h1 className="mt-3 font-sans text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
           Business management
         </h1>
         <p className="mt-3 max-w-2xl text-base text-[color:var(--ink-soft)]">

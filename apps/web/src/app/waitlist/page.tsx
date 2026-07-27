@@ -15,7 +15,7 @@ export default function WaitlistPage() {
   if (done) {
     return (
       <main className="mx-auto max-w-lg px-6 py-16">
-        <h1 className="font-display text-3xl text-primary">
+        <h1 className="font-sans text-3xl text-primary">
           You’re on the list
         </h1>
         <p className="mt-3 text-[color:var(--foreground)]/75">
@@ -28,7 +28,7 @@ export default function WaitlistPage() {
 
   return (
     <main className="mx-auto max-w-lg px-6 py-16">
-      <h1 className="font-display text-3xl text-primary">
+      <h1 className="font-sans text-3xl text-primary">
         Non-UK business waitlist
       </h1>
       <p className="mt-3 mb-8 text-[color:var(--foreground)]/75">

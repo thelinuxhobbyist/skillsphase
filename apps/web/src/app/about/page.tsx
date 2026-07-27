@@ -7,10 +7,10 @@ export default function AboutPage() {
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 py-16">
         <p className="eyebrow">Skills-first hiring</p>
-        <h1 className="mt-3 font-display text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
+        <h1 className="mt-3 font-sans text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
           About SkillsPhase
         </h1>
-        <p className="mt-6 text-xl font-display leading-snug text-[color:var(--stamp)]">
+        <p className="mt-6 text-xl font-sans leading-snug text-[color:var(--stamp)]">
           Skills first. Because life happens.
         </p>
         <p className="mt-4 text-lg leading-relaxed text-[color:var(--ink-soft)]">
@@ -27,7 +27,7 @@ export default function AboutPage() {
         </p>
 
         <section className="mt-12 space-y-4 text-base leading-relaxed text-[color:var(--ink-soft)]">
-          <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
+          <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
             For candidates
           </h2>
           <p>
@@ -39,7 +39,7 @@ export default function AboutPage() {
         </section>
 
         <section className="mt-12 space-y-4 text-base leading-relaxed text-[color:var(--ink-soft)]">
-          <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
+          <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
             For businesses
           </h2>
           <p>
@@ -51,7 +51,7 @@ export default function AboutPage() {
         </section>
 
         <section className="mt-12 space-y-4 text-base leading-relaxed text-[color:var(--ink-soft)]">
-          <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
+          <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
             What we value
           </h2>
           <p>
@@ -74,7 +74,7 @@ export default function AboutPage() {
         </section>
 
         <section className="mt-14 rounded-[5px] border border-[color:var(--folder-line)] bg-[color:var(--folder)] p-6 sm:p-7">
-          <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
+          <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
             Skills first. Because life happens.
           </h2>
           <p className="mt-3 text-base text-[color:var(--ink-soft)]">
@@ -84,13 +84,13 @@ export default function AboutPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href="/register?as=candidate"
-              className="btn-primary rounded-[var(--radius)] px-5 py-3 font-mono text-xs tracking-[0.05em] uppercase"
+              className="btn-primary rounded-[var(--radius)] px-5 py-3 text-sm font-medium"
             >
               Create your Skill Profile
             </Link>
             <Link
               href="/register?as=business"
-              className="rounded-[var(--radius)] border border-[color:var(--line-strong)] bg-transparent px-5 py-3 font-mono text-xs tracking-[0.05em] uppercase text-[color:var(--ink)]"
+              className="rounded-[var(--radius)] border border-[color:var(--line-strong)] bg-transparent px-5 py-3 text-sm font-medium text-[color:var(--ink)]"
             >
               Register as a business
             </Link>

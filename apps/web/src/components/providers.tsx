@@ -39,7 +39,7 @@ export function Providers({ children }: ProvidersProps) {
           colorText: "#1a1f2e",
           colorBackground: "#fafbfb",
           borderRadius: "0.875rem",
-          fontFamily: "var(--font-sans-family), ui-sans-serif, system-ui, sans-serif",
+          fontFamily: "var(--font-inter), ui-sans-serif, system-ui, sans-serif",
         },
       }}
     >

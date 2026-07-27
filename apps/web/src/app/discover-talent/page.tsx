@@ -17,10 +17,10 @@ export default async function DiscoverTalentPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">
+        <p className="text-sm font-medium text-primary">
           Skills First Hiring
         </p>
-        <h1 className="mt-3 font-display text-4xl text-primary">
+        <h1 className="mt-3 font-sans text-4xl text-primary">
           Browse real Skill Profiles
         </h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[color:var(--foreground)]/80">

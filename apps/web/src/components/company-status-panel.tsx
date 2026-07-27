@@ -40,10 +40,10 @@ export function CompanyStatusPanel({ company }: { company: HorizonCompany }) {
 
   return (
     <section className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-6">
-      <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
+      <p className="text-sm font-medium text-primary">
         Verification status
       </p>
-      <h2 className="mt-2 font-display text-2xl text-primary">
+      <h2 className="mt-2 font-sans text-2xl text-primary">
         {copy.title}
       </h2>
       <p className="mt-2 text-[color:var(--foreground)]/75">{copy.body}</p>
