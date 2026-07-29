@@ -3,6 +3,7 @@ import {
   deleteHomepageSection,
   ensureHomepageSections,
   findHomepageSectionById,
+  getFooterSection,
   listEnabledHomepageSections,
   reorderHomepageSections,
   resetHomepageSectionsToDefault,
@@ -11,6 +12,8 @@ import {
 } from "@horizon/database";
 import {
   createHomepageSectionSchema,
+  filterHomepageBodySections,
+  getDefaultFooterSection,
   getDefaultHomepageSections,
   reorderHomepageSectionsSchema,
   updateHomepageSectionSchema,
@@ -28,7 +31,7 @@ contentRoutes.get("/homepage", async (c) => {
   if (!c.env.DATABASE_URL) {
     return ok(c, {
       source: "defaults",
-      sections: getDefaultHomepageSections().filter((s) => s.enabled),
+      sections: filterHomepageBodySections(getDefaultHomepageSections()),
     });
   }
 
@@ -38,7 +41,34 @@ contentRoutes.get("/homepage", async (c) => {
   } catch {
     return ok(c, {
       source: "defaults",
-      sections: getDefaultHomepageSections().filter((s) => s.enabled),
+      sections: filterHomepageBodySections(getDefaultHomepageSections()),
+    });
+  }
+});
+
+contentRoutes.get("/footer", async (c) => {
+  if (!c.env.DATABASE_URL) {
+    const footer = getDefaultFooterSection();
+    return ok(c, {
+      source: "defaults",
+      enabled: footer.enabled,
+      content: footer.content,
+    });
+  }
+
+  try {
+    const footer = await getFooterSection(getDb(c));
+    return ok(c, {
+      source: "database",
+      enabled: footer.enabled,
+      content: footer.content,
+    });
+  } catch {
+    const footer = getDefaultFooterSection();
+    return ok(c, {
+      source: "defaults",
+      enabled: footer.enabled,
+      content: footer.content,
     });
   }
 });
@@ -176,6 +206,14 @@ adminHomepageRoutes.delete("/:id", async (c) => {
   const existing = await findHomepageSectionById(db, c.req.param("id"));
   if (!existing) {
     return fail(c, "SECTION_NOT_FOUND", "Homepage section not found.", 404);
+  }
+  if (existing.type === "footer") {
+    return fail(
+      c,
+      "FOOTER_PROTECTED",
+      "The footer section cannot be deleted.",
+      400,
+    );
   }
 
   await deleteHomepageSection(db, existing.id);

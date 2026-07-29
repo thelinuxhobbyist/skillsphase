@@ -103,11 +103,13 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
         <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
             <h2 className="max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
-              {str(c.title, "How it works")}
+              {str(c.title, "Three simple steps from profile to conversation.")}
             </h2>
-            <p className="mt-3.5 max-w-2xl text-base text-[color:var(--ink-soft)]">
-              {str(c.subtitle, "Three simple steps from profile to conversation.")}
-            </p>
+            {c.subtitle ? (
+              <p className="mt-3.5 max-w-2xl text-base text-[color:var(--ink-soft)]">
+                {str(c.subtitle)}
+              </p>
+            ) : null}
             <ol className="mt-12 grid border-t border-[color:var(--line-strong)] md:grid-cols-3">
               {arr<{ title: string; body: string }>(c.steps).map((step, index) => (
                 <li

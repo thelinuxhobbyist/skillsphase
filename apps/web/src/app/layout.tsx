@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
-import { SiteFooter } from "@/components/site-footer";
+import { SiteFooterLoader } from "@/components/site-footer-loader";
 import { getClerkFrontendApiOrigin } from "@/lib/clerk-config";
 import "./globals.css";
 
@@ -40,7 +40,7 @@ export default function RootLayout({
         <Providers>
           <div className="flex min-h-screen flex-col">
             <div className="flex-1">{children}</div>
-            <SiteFooter />
+            <SiteFooterLoader />
           </div>
         </Providers>
       </body>

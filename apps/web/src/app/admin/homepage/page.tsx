@@ -38,7 +38,10 @@ export default async function AdminHomepagePage() {
         </h1>
         <p className="mt-2 text-[color:var(--foreground)]/75">
           Show, hide, reorder, edit, add, or delete homepage sections. Changes go
-          live on the public site once saved (requires Neon).
+          live on the public site once saved (requires Neon). Optional marketing
+          sections (FAQ, testimonials, statistics, trust bar, business CTA) are
+          hidden by default for launch — enable them here when you have content
+          ready. The footer section appears on every page.
         </p>
         <div className="mt-8">
           <AdminHomepagePanel

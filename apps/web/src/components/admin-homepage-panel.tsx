@@ -2,6 +2,7 @@
 
 import { useAdminToken } from "@/lib/use-admin-token";
 import {
+  HOMEPAGE_OPTIONAL_SECTION_TYPES,
   HOMEPAGE_SECTION_LABELS,
   HOMEPAGE_SECTION_TYPES,
   type HomepageSectionType,
@@ -170,6 +171,12 @@ export function AdminHomepagePanel({
                 <h2 className="font-semibold text-primary">{section.label}</h2>
                 <p className="text-sm text-[color:var(--foreground)]/65">
                   {section.enabled ? "Visible on homepage" : "Hidden"}
+                  {section.type === "footer" ? " · Site-wide footer" : null}
+                  {(
+                    HOMEPAGE_OPTIONAL_SECTION_TYPES as readonly HomepageSectionType[]
+                  ).includes(section.type)
+                    ? " · Optional marketing section"
+                    : null}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -285,8 +292,13 @@ export function AdminHomepagePanel({
                 </button>
                 <button
                   type="button"
-                  disabled={pending}
+                  disabled={pending || section.type === "footer"}
                   className="rounded-md bg-red-800 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+                  title={
+                    section.type === "footer"
+                      ? "The footer section cannot be deleted"
+                      : undefined
+                  }
                   onClick={() => {
                     if (!window.confirm(`Delete “${section.label}”?`)) return;
                     void (async () => {

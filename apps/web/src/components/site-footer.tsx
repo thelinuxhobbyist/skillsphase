@@ -1,6 +1,37 @@
 import Link from "next/link";
+import { getDefaultFooterSection } from "@horizon/shared";
 
-export function SiteFooter() {
+type FooterLink = { label: string; href: string };
+type FooterColumn = { title: string; links: FooterLink[] };
+
+function str(value: unknown, fallback = "") {
+  return typeof value === "string" ? value : fallback;
+}
+
+function arr<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
+function defaultFooterContent() {
+  return getDefaultFooterSection().content;
+}
+
+export function SiteFooter({
+  content,
+}: {
+  content?: Record<string, unknown>;
+}) {
+  const c = content ?? defaultFooterContent();
+  const columns = arr<FooterColumn>(c.columns);
+  const tagline = str(
+    c.tagline,
+    "Skills first. Because life happens. A skills-first hiring platform connecting verified UK businesses with capable people through skills-first profiles and portfolio evidence.",
+  );
+  const copyright = str(
+    c.copyright,
+    "© {year} SkillsPhase. UK only for business registration.",
+  ).replace("{year}", String(new Date().getFullYear()));
+
   return (
     <footer className="mt-auto bg-ink text-ink-foreground">
       <div className="mx-auto grid w-full max-w-[1180px] gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
@@ -26,99 +57,28 @@ export function SiteFooter() {
             SkillsPhase
           </p>
           <p className="mt-3 max-w-[32ch] text-sm leading-relaxed text-ink-foreground/70">
-            Skills first. Because life happens. A skills-first hiring platform
-            connecting verified UK businesses with capable people through
-            skills-first profiles and portfolio evidence.
+            {tagline}
           </p>
         </div>
 
-        <div>
-          <p className="text-xs font-semibold text-primary">
-            FOR CANDIDATES
-          </p>
-          <ul className="mt-3.5 space-y-2.5 text-sm text-ink-foreground/80">
-            <li>
-              <Link
-                href="/register?as=candidate"
-                className="hover:text-ink-foreground"
-              >
-                Create your Skill Profile
-              </Link>
-            </li>
-            <li>
-              <Link href="/about" className="hover:text-ink-foreground">
-                About
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <p className="text-xs font-semibold text-primary">
-            FOR BUSINESSES
-          </p>
-          <ul className="mt-3.5 space-y-2.5 text-sm text-ink-foreground/80">
-            <li>
-              <Link
-                href="/discover-talent"
-                className="hover:text-ink-foreground"
-              >
-                Browse Skill Profiles
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/register?as=business"
-                className="hover:text-ink-foreground"
-              >
-                Register as a business
-              </Link>
-            </li>
-            <li>
-              <Link href="/waitlist" className="hover:text-ink-foreground">
-                Non-UK waitlist
-              </Link>
-            </li>
-            <li>
-              <Link href="/login" className="hover:text-ink-foreground">
-                Sign in
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <p className="text-xs font-semibold text-primary">
-            LEGAL &amp; HELP
-          </p>
-          <ul className="mt-3.5 space-y-2.5 text-sm text-ink-foreground/80">
-            <li>
-              <Link href="/privacy" className="hover:text-ink-foreground">
-                Privacy Policy
-              </Link>
-            </li>
-            <li>
-              <Link href="/terms" className="hover:text-ink-foreground">
-                Terms &amp; Conditions
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="hover:text-ink-foreground">
-                Contact
-              </Link>
-            </li>
-            <li>
-              <Link href="/#faq" className="hover:text-ink-foreground">
-                FAQ
-              </Link>
-            </li>
-          </ul>
-        </div>
+        {columns.map((column) => (
+          <div key={column.title}>
+            <p className="text-xs font-semibold text-primary">{column.title}</p>
+            <ul className="mt-3.5 space-y-2.5 text-sm text-ink-foreground/80">
+              {arr<FooterLink>(column.links).map((link) => (
+                <li key={`${column.title}-${link.href}`}>
+                  <Link href={link.href} className="hover:text-ink-foreground">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
       <div className="border-t border-ink-foreground/15">
         <p className="mx-auto max-w-[1180px] px-4 py-5 text-xs text-ink-foreground/55 sm:px-6">
-          © {new Date().getFullYear()} SkillsPhase. UK only for business
-          registration.
+          {copyright}
         </p>
       </div>
     </footer>

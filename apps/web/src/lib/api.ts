@@ -959,6 +959,14 @@ export async function getHomepageContent() {
   }>("/content/homepage", { revalidate: 60 });
 }
 
+export async function getFooterContent() {
+  return apiFetch<{
+    source: "database" | "defaults";
+    enabled: boolean;
+    content: Record<string, unknown>;
+  }>("/content/footer", { revalidate: 60 });
+}
+
 export function listAdminHomepageSections(token: string) {
   return apiFetch<{ sections: HomepageSectionDto[] }>("/admin/homepage", {
     token,

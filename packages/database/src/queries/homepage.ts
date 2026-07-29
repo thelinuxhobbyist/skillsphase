@@ -1,7 +1,9 @@
 import { asc, eq, inArray, sql } from "drizzle-orm";
 import {
   defaultContentForType,
+  filterHomepageBodySections,
   getDefaultHomepageSections,
+  getDefaultFooterSection,
   HOMEPAGE_SECTION_LABELS,
   type HomepageSection,
   type HomepageSectionType,
@@ -33,18 +35,35 @@ export async function ensureHomepageSections(
   db: Database,
 ): Promise<HomepageSection[]> {
   const existing = await listHomepageSections(db);
-  if (existing.length > 0) return existing;
+  if (existing.length === 0) {
+    const defaults = getDefaultHomepageSections();
+    await db.insert(homepageSections).values(
+      defaults.map((section) => ({
+        type: section.type,
+        enabled: section.enabled,
+        sortOrder: section.sortOrder,
+        label: section.label,
+        content: section.content,
+      })),
+    );
+    return listHomepageSections(db);
+  }
 
-  const defaults = getDefaultHomepageSections();
-  await db.insert(homepageSections).values(
-    defaults.map((section) => ({
-      type: section.type,
-      enabled: section.enabled,
-      sortOrder: section.sortOrder,
-      label: section.label,
-      content: section.content,
-    })),
+  const existingTypes = new Set(existing.map((section) => section.type));
+  const missing = getDefaultHomepageSections().filter(
+    (section) => !existingTypes.has(section.type),
   );
+  if (missing.length > 0) {
+    await db.insert(homepageSections).values(
+      missing.map((section) => ({
+        type: section.type,
+        enabled: section.enabled,
+        sortOrder: section.sortOrder,
+        label: section.label,
+        content: section.content,
+      })),
+    );
+  }
 
   return listHomepageSections(db);
 }
@@ -53,7 +72,15 @@ export async function listEnabledHomepageSections(
   db: Database,
 ): Promise<HomepageSection[]> {
   const all = await ensureHomepageSections(db);
-  return all.filter((section) => section.enabled);
+  return filterHomepageBodySections(all);
+}
+
+export async function getFooterSection(
+  db: Database,
+): Promise<HomepageSection> {
+  const all = await ensureHomepageSections(db);
+  const footer = all.find((section) => section.type === "footer");
+  return footer ?? getDefaultFooterSection();
 }
 
 export async function findHomepageSectionById(db: Database, id: string) {
