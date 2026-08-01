@@ -83,24 +83,24 @@ export function filterHomepageBodySections(
 
 const EXAMPLE_SKILL_PROFILES = [
   {
-    title: "Alex M.",
-    skills: ["React", "TypeScript", "Node.js"],
-    yearsExperience: 6,
-    topProject: "Led rebuild of a customer portal serving 40k users",
+    title: "Senior React Developer",
+    skills: ["React", "TypeScript", "Node.js", "AWS"],
+    yearsExperience: 8,
+    topProject: "Built SaaS platforms for two Series B startups.",
     availability: "immediate",
   },
   {
-    title: "Sam T.",
-    skills: ["Data analysis", "Python", "SQL"],
-    yearsExperience: 4,
-    topProject: "Built reporting dashboards for a retail operations team",
+    title: "Brand & Marketing Lead",
+    skills: ["Marketing", "Content Strategy", "SEO", "Figma"],
+    yearsExperience: 5,
+    topProject: "Grew organic traffic 4x for a D2C retailer.",
     availability: "within_one_month",
   },
   {
-    title: "Jordan K.",
-    skills: ["UX research", "Figma", "Service design"],
-    yearsExperience: 8,
-    topProject: "Redesigned onboarding flow, cutting drop-off by 28%",
+    title: "Full-Stack Product Designer",
+    skills: ["Figma", "Design Systems", "React", "User Research"],
+    yearsExperience: 6,
+    topProject: "Designed and shipped a fintech mobile app.",
     availability: "freelance",
   },
 ] as const;
@@ -200,8 +200,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       70,
       {
         title: "Example skill profiles",
-        subtitle:
-          "Skills-first profiles built around capability and evidence — not CV timelines.",
+        subtitle: "Real candidates appear once people join SkillsPhase.",
         demoCards: EXAMPLE_SKILL_PROFILES,
       },
       true,

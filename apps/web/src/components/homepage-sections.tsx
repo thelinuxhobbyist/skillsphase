@@ -265,14 +265,9 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                   key={card.title}
                   className="rounded-[5px] border border-[color:var(--folder-line)] bg-[color:var(--folder)] p-5 sm:p-6"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-sans text-[1.35rem] font-semibold text-[color:var(--ink)]">
-                      {card.title}
-                    </h3>
-                    <span className="-rotate-3 rounded-full border border-[color:var(--stamp)] px-2.5 py-0.5 text-xs font-medium text-primary whitespace-nowrap">
-                      EXAMPLE
-                    </span>
-                  </div>
+                  <h3 className="font-sans text-lg font-semibold leading-snug tracking-tight text-[color:var(--ink)] whitespace-nowrap [overflow-wrap:normal] [word-break:normal]">
+                    {card.title}
+                  </h3>
                   {card.skills.length > 0 ? (
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {card.skills.map((skill) => (

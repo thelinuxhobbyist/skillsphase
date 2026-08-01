@@ -76,65 +76,84 @@ export function PublicDiscoveryBrowser({
   return (
     <div className="space-y-6">
       <form
-        className="flex flex-wrap gap-3 rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-4"
+        className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-4"
         onSubmit={(event) => {
           event.preventDefault();
           void search(filters, 0, false);
         }}
       >
-        <input
-          value={filters.keyword}
-          onChange={(e) => setFilters((f) => ({ ...f, keyword: e.target.value }))}
-          placeholder="Keyword (title)"
-          className="min-w-[160px] flex-1 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
-        />
-        <input
-          value={filters.skills}
-          onChange={(e) => setFilters((f) => ({ ...f, skills: e.target.value }))}
-          placeholder="Skills, comma separated"
-          className="min-w-[160px] flex-1 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
-        />
-        <select
-          value={filters.availability}
-          onChange={(e) => setFilters((f) => ({ ...f, availability: e.target.value }))}
-          className="rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
-        >
-          <option value="">Any availability</option>
-          {AVAILABILITY_OPTIONS.map((value) => (
-            <option key={value} value={value}>
-              {AVAILABILITY_LABELS[value]}
-            </option>
-          ))}
-        </select>
-        <select
-          value={filters.remoteType}
-          onChange={(e) => setFilters((f) => ({ ...f, remoteType: e.target.value }))}
-          className="rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
-        >
-          <option value="">Any location</option>
-          {REMOTE_TYPES.map((value) => (
-            <option key={value} value={value}>
-              {REMOTE_TYPE_LABELS[value]}
-            </option>
-          ))}
-        </select>
-        <input
-          type="number"
-          min={0}
-          value={filters.minYearsExperience}
-          onChange={(e) =>
-            setFilters((f) => ({ ...f, minYearsExperience: e.target.value }))
-          }
-          placeholder="Min years exp."
-          className="w-32 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-        >
-          {loading ? "Searching…" : "Search"}
-        </button>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <label className="flex min-w-0 flex-col gap-1.5 text-xs font-medium text-[color:var(--ink-soft)]">
+            Title
+            <input
+              value={filters.keyword}
+              onChange={(e) => setFilters((f) => ({ ...f, keyword: e.target.value }))}
+              placeholder="e.g. Designer"
+              className="w-full min-w-0 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm text-[color:var(--ink)]"
+            />
+          </label>
+          <label className="flex min-w-0 flex-col gap-1.5 text-xs font-medium text-[color:var(--ink-soft)]">
+            Skills
+            <input
+              value={filters.skills}
+              onChange={(e) => setFilters((f) => ({ ...f, skills: e.target.value }))}
+              placeholder="e.g. TypeScript, SQL"
+              className="w-full min-w-0 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm text-[color:var(--ink)]"
+            />
+          </label>
+          <label className="flex min-w-0 flex-col gap-1.5 text-xs font-medium text-[color:var(--ink-soft)]">
+            Availability
+            <select
+              value={filters.availability}
+              onChange={(e) => setFilters((f) => ({ ...f, availability: e.target.value }))}
+              className="w-full min-w-0 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm text-[color:var(--ink)]"
+            >
+              <option value="">Any</option>
+              {AVAILABILITY_OPTIONS.map((value) => (
+                <option key={value} value={value}>
+                  {AVAILABILITY_LABELS[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex min-w-0 flex-col gap-1.5 text-xs font-medium text-[color:var(--ink-soft)]">
+            Work style
+            <select
+              value={filters.remoteType}
+              onChange={(e) => setFilters((f) => ({ ...f, remoteType: e.target.value }))}
+              className="w-full min-w-0 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm text-[color:var(--ink)]"
+            >
+              <option value="">Any</option>
+              {REMOTE_TYPES.map((value) => (
+                <option key={value} value={value}>
+                  {REMOTE_TYPE_LABELS[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex min-w-0 flex-col gap-1.5 text-xs font-medium text-[color:var(--ink-soft)]">
+            Min. years
+            <input
+              type="number"
+              min={0}
+              value={filters.minYearsExperience}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, minYearsExperience: e.target.value }))
+              }
+              placeholder="0"
+              className="w-full min-w-0 rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm text-[color:var(--ink)]"
+            />
+          </label>
+          <div className="flex items-end">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            >
+              {loading ? "Searching…" : "Search"}
+            </button>
+          </div>
+        </div>
       </form>
 
       {error ? (
@@ -180,36 +199,69 @@ export function PublicDiscoveryBrowser({
   );
 }
 
+function initialsFor(card: PublicCandidateCard, name: string) {
+  const fromParts = [card.firstName, card.lastName]
+    .filter(Boolean)
+    .map((part) => part!.slice(0, 1).toUpperCase())
+    .join("");
+  if (fromParts) return fromParts.slice(0, 2);
+  if (name) return name.slice(0, 2).toUpperCase();
+  return "?";
+}
+
 function PublicCandidateCardView({ card }: { card: PublicCandidateCard }) {
   const name = [card.firstName, card.lastName].filter(Boolean).join(" ");
+  const title = card.professionalTitle || name || "Skill Profile";
+  const locationParts = [
+    card.city,
+    card.remotePreference ? REMOTE_TYPE_LABELS[card.remotePreference] : null,
+  ].filter(Boolean);
+  const initials = initialsFor(card, name);
+
   return (
-    <li className="flex flex-col rounded-lg border border-[color:var(--line)] bg-white p-5 shadow-sm sm:p-6">
+    <li className="flex flex-col rounded-[5px] border border-[color:var(--folder-line)] bg-[color:var(--folder)] p-5 sm:p-6">
       <Link href={`/discover-talent/${card.id}`} className="flex flex-1 flex-col">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="font-semibold text-lg text-primary">
-              {card.professionalTitle || name || "Skill Profile"}
-            </h3>
-            {name ? (
-              <p className="text-sm text-[color:var(--foreground)]/70">
-                {name}
-                {card.city ? ` · ${card.city}` : ""}
+        <div className="flex items-center gap-3">
+          {card.profilePhotoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={card.profilePhotoUrl}
+              alt=""
+              className="h-11 w-11 shrink-0 rounded-full object-cover"
+            />
+          ) : (
+            <span
+              aria-hidden
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[color:var(--paper)] text-sm font-semibold text-[color:var(--ink)]"
+            >
+              {initials}
+            </span>
+          )}
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-[color:var(--ink)]">
+              {name || "Candidate"}
+            </p>
+            {locationParts.length > 0 ? (
+              <p className="truncate text-sm text-[color:var(--ink-soft)]">
+                {locationParts.join(" · ")}
               </p>
             ) : null}
           </div>
-          {card.availability ? (
-            <span className="shrink-0 rounded-full bg-brand-accent/10 px-2.5 py-0.5 text-xs font-medium text-primary-accent">
-              {AVAILABILITY_LABELS[card.availability]}
-            </span>
-          ) : null}
         </div>
 
+        <h3
+          className="mt-4 font-sans text-lg font-semibold leading-snug tracking-tight text-[color:var(--ink)] whitespace-nowrap truncate [overflow-wrap:normal] [word-break:normal]"
+          title={title}
+        >
+          {title}
+        </h3>
+
         {card.skills.length > 0 ? (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {card.skills.slice(0, 8).map((skill) => (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {card.skills.slice(0, 6).map((skill) => (
               <span
                 key={skill}
-                className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] px-2.5 py-1 text-xs font-medium text-primary"
+                className="rounded-full border border-[color:var(--line-strong)] bg-[color:var(--paper)] px-2.5 py-1 text-xs text-muted-foreground"
               >
                 {skill}
               </span>
@@ -217,36 +269,29 @@ function PublicCandidateCardView({ card }: { card: PublicCandidateCard }) {
           </div>
         ) : null}
 
-        <dl className="mt-4 space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <div className="mt-3.5 space-y-1">
           {card.yearsExperience != null ? (
-            <div>
-              <dt className="inline font-semibold text-primary">Experience: </dt>
-              <dd className="inline">{card.yearsExperience} years</dd>
-            </div>
-          ) : null}
-          {card.remotePreference ? (
-            <div>
-              <dt className="inline font-semibold text-primary">Preference: </dt>
-              <dd className="inline">{REMOTE_TYPE_LABELS[card.remotePreference]}</dd>
-            </div>
+            <p className="text-sm text-[color:var(--ink-soft)]">
+              {card.yearsExperience} years experience
+            </p>
           ) : null}
           {card.topProject ? (
-            <div>
-              <dt className="inline font-semibold text-primary">Top project: </dt>
-              <dd className="inline">{card.topProject}</dd>
-            </div>
+            <p className="line-clamp-2 text-base text-[color:var(--ink)]">
+              {card.topProject}
+            </p>
           ) : null}
-        </dl>
-      </Link>
+        </div>
 
-      <div className="mt-5 border-t border-[color:var(--line)]/60 pt-4">
-        <Link
-          href="/register?as=business"
-          className="btn-primary block rounded-md bg-brand px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:opacity-90"
-        >
-          Sign in or register as a business to contact
-        </Link>
-      </div>
+        {card.availability ? (
+          <p className="mt-3.5 flex items-center gap-1.5 text-sm font-medium text-primary before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-[color:var(--verified)] before:content-['']">
+            {AVAILABILITY_LABELS[card.availability]}
+          </p>
+        ) : null}
+
+        <span className="mt-5 block w-full rounded-md bg-brand px-4 py-2.5 text-center text-sm font-semibold text-white">
+          View profile →
+        </span>
+      </Link>
     </li>
   );
 }
