@@ -110,7 +110,7 @@ export function CandidateProfileView({
       {hasEvidence ? (
         <section className="mt-10">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-accent">
-            Proof of ability
+            Evidence
           </p>
           <h2 className="mt-1 font-sans text-xl text-primary">
             Proof of Ability
