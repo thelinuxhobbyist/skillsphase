@@ -245,7 +245,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <h2 className="font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
-                  {str(c.title, "Example skill profiles")}
+                  {str(c.title, "Skill profiles")}
                 </h2>
                 <p className="mt-2 text-base text-[color:var(--ink-soft)]">
                   {str(c.subtitle)}
@@ -255,7 +255,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                 href="/discover-talent"
                 className="text-sm font-medium text-primary hover:underline"
               >
-                Browse real Skill Profiles →
+                Browse Skill Profiles →
               </Link>
             </div>
 
@@ -263,9 +263,9 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
               {demoCards.map((card) => (
                 <li
                   key={card.title}
-                  className="rounded-[5px] border border-[color:var(--folder-line)] bg-[color:var(--folder)] p-5 sm:p-6"
+                  className="min-w-0 rounded-[5px] border border-[color:var(--folder-line)] bg-[color:var(--folder)] p-5 sm:p-6"
                 >
-                  <h3 className="font-sans text-lg font-semibold leading-snug tracking-tight text-[color:var(--ink)] whitespace-nowrap [overflow-wrap:normal] [word-break:normal]">
+                  <h3 className="font-sans text-[1.25rem] font-semibold leading-snug text-[color:var(--ink)] sm:text-[1.35rem]">
                     {card.title}
                   </h3>
                   {card.skills.length > 0 ? (

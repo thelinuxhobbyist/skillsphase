@@ -6,6 +6,7 @@ import {
   listEducation,
   listEmploymentHistory,
   listQualifications,
+  listRecommendations,
   listUserSkills,
 } from "./profile";
 import { listProjectsForUser } from "./projects";
@@ -18,15 +19,23 @@ export async function buildGdprExport(db: Database, user: AppUser) {
   };
 
   if (user.role === "job_seeker") {
-    const [employmentHistory, education, qualifications, skills, projects, contacts] =
-      await Promise.all([
-        listEmploymentHistory(db, user.id),
-        listEducation(db, user.id),
-        listQualifications(db, user.id),
-        listUserSkills(db, user.id),
-        listProjectsForUser(db, user.id),
-        listContactsForCandidate(db, user.id),
-      ]);
+    const [
+      employmentHistory,
+      education,
+      qualifications,
+      recommendations,
+      skills,
+      projects,
+      contacts,
+    ] = await Promise.all([
+      listEmploymentHistory(db, user.id),
+      listEducation(db, user.id),
+      listQualifications(db, user.id),
+      listRecommendations(db, user.id),
+      listUserSkills(db, user.id),
+      listProjectsForUser(db, user.id),
+      listContactsForCandidate(db, user.id),
+    ]);
 
     return {
       ...base,
@@ -34,6 +43,7 @@ export async function buildGdprExport(db: Database, user: AppUser) {
         employmentHistory,
         education,
         qualifications,
+        recommendations,
         skills,
         projects,
       },

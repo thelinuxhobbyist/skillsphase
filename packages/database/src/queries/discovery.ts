@@ -9,7 +9,13 @@ import {
 import { skills, userSkills } from "../schema/profile";
 import { users } from "../schema/users";
 import { listProjectsForUser } from "./projects";
-import { listEducation, listEmploymentHistory, listQualifications, listUserSkills } from "./profile";
+import {
+  listEducation,
+  listEmploymentHistory,
+  listQualifications,
+  listRecommendations,
+  listUserSkills,
+} from "./profile";
 
 export type DiscoveryFilters = {
   skillNames?: string[];
@@ -192,14 +198,21 @@ export async function getPublicCandidateDetail(db: Database, candidateUserId: st
     .limit(1);
   if (!user) return null;
 
-  const [skillRows, projectRows, employment, education, qualifications] =
-    await Promise.all([
-      listUserSkills(db, candidateUserId),
-      listProjectsForUser(db, candidateUserId),
-      listEmploymentHistory(db, candidateUserId),
-      listEducation(db, candidateUserId),
-      listQualifications(db, candidateUserId),
-    ]);
+  const [
+    skillRows,
+    projectRows,
+    employment,
+    education,
+    qualifications,
+    recommendationRows,
+  ] = await Promise.all([
+    listUserSkills(db, candidateUserId),
+    listProjectsForUser(db, candidateUserId),
+    listEmploymentHistory(db, candidateUserId),
+    listEducation(db, candidateUserId),
+    listQualifications(db, candidateUserId),
+    listRecommendations(db, candidateUserId),
+  ]);
 
   return {
     id: user.id,
@@ -221,6 +234,7 @@ export async function getPublicCandidateDetail(db: Database, candidateUserId: st
     employmentHistory: employment,
     education,
     qualifications,
+    recommendations: recommendationRows,
   };
 }
 
@@ -271,14 +285,21 @@ export async function getCandidateDetail(db: Database, candidateUserId: string) 
     .limit(1);
   if (!user) return null;
 
-  const [skillRows, projectRows, employment, education, qualifications] =
-    await Promise.all([
-      listUserSkills(db, candidateUserId),
-      listProjectsForUser(db, candidateUserId),
-      listEmploymentHistory(db, candidateUserId),
-      listEducation(db, candidateUserId),
-      listQualifications(db, candidateUserId),
-    ]);
+  const [
+    skillRows,
+    projectRows,
+    employment,
+    education,
+    qualifications,
+    recommendationRows,
+  ] = await Promise.all([
+    listUserSkills(db, candidateUserId),
+    listProjectsForUser(db, candidateUserId),
+    listEmploymentHistory(db, candidateUserId),
+    listEducation(db, candidateUserId),
+    listQualifications(db, candidateUserId),
+    listRecommendations(db, candidateUserId),
+  ]);
 
   return {
     id: user.id,
@@ -300,6 +321,7 @@ export async function getCandidateDetail(db: Database, candidateUserId: string) 
     employmentHistory: employment,
     education,
     qualifications,
+    recommendations: recommendationRows,
   };
 }
 

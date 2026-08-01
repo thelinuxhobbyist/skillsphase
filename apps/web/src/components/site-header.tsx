@@ -8,6 +8,7 @@ import { SafeUserButton } from "@/components/safe-user-button";
 import { isClerkConfigured } from "@/lib/clerk-config";
 
 const PUBLIC_LINKS = [
+  { href: "/", label: "Home" },
   { href: "/discover-talent", label: "Browse Talent" },
   { href: "/about", label: "About" },
   { href: "/waitlist", label: "Waitlist" },
@@ -23,6 +24,7 @@ const mobileNavLinkClass =
 function linksForUser(user: HorizonUser | null) {
   if (user?.role === "job_seeker") {
     return [
+      { href: "/", label: "Home" },
       { href: "/dashboard", label: "Dashboard" },
       { href: "/profile", label: "Skill Profile" },
       { href: "/contacts", label: "Messages" },
@@ -31,6 +33,7 @@ function linksForUser(user: HorizonUser | null) {
   }
   if (user?.role === "employer") {
     return [
+      { href: "/", label: "Home" },
       { href: "/employer", label: "Dashboard" },
       { href: "/employer/discover", label: "Discover Talent" },
       { href: "/employer/saved", label: "Saved" },
@@ -41,6 +44,7 @@ function linksForUser(user: HorizonUser | null) {
   }
   if (user?.role === "admin") {
     return [
+      { href: "/", label: "Home" },
       { href: "/admin", label: "Dashboard" },
       { href: "/admin/employers", label: "Businesses" },
       { href: "/admin/users", label: "Users" },
@@ -184,17 +188,17 @@ function HeaderChrome({
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
-      <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
+      <div className="mx-auto flex w-full max-w-[1180px] items-center gap-3 px-4 py-3 sm:px-6 sm:py-4">
         <Link
           href="/"
-          className="flex min-w-0 shrink items-center gap-2.5 font-sans text-lg font-semibold tracking-tight text-primary sm:text-xl md:text-2xl"
+          className="mr-auto flex shrink-0 items-center gap-2.5 font-sans text-lg font-semibold tracking-tight text-primary sm:text-xl md:text-2xl"
           onClick={close}
         >
           <StampMark className="h-8 w-8 sm:h-9 sm:w-9" />
-          <span className="truncate">SkillsPhase</span>
+          <span>SkillsPhase</span>
         </Link>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex shrink-0 items-center gap-2 md:hidden">
           {hasClerk ? (
             <SignedIn>
               <SafeUserButton />
@@ -213,7 +217,7 @@ function HeaderChrome({
         </div>
 
         <nav
-          className="hidden min-w-0 items-center justify-end gap-5 md:flex lg:gap-8"
+          className="hidden min-w-0 shrink items-center justify-end gap-5 overflow-x-auto md:flex lg:gap-8"
           aria-label="Main"
         >
           {!loadingUser ? <NavLinks user={user} /> : null}

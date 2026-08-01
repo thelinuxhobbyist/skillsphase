@@ -2,9 +2,11 @@ import {
   createEducation,
   createEmploymentHistory,
   createQualification,
+  createRecommendation,
   deleteEducation,
   deleteEmploymentHistory,
   deleteQualification,
+  deleteRecommendation,
   getProfileBundle,
   listSkills,
   setUserSkillsByName,
@@ -13,11 +15,13 @@ import {
   updateEducation,
   updateEmploymentHistory,
   updateQualification,
+  updateRecommendation,
 } from "@horizon/database";
 import {
   educationSchema,
   employmentHistorySchema,
   qualificationSchema,
+  recommendationSchema,
   setSkillsByNameSchema,
   updateCandidateProfileSchema,
 } from "@horizon/shared";
@@ -48,6 +52,7 @@ profileRoutes.get("/me/profile", requireRoles("job_seeker"), async (c) => {
     employmentHistory: bundle.employmentHistory,
     education: bundle.education,
     qualifications: bundle.qualifications,
+    recommendations: bundle.recommendations,
     skills: bundle.skills,
     projects: bundle.projects,
     completion: {
@@ -278,6 +283,64 @@ profileRoutes.delete(
     const appUser = c.get("appUser");
     if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
     await deleteQualification(getDb(c), appUser.id, c.req.param("id"));
+    return ok(c, { deleted: true });
+  },
+);
+
+profileRoutes.post("/me/recommendations", requireRoles("job_seeker"), async (c) => {
+  const appUser = c.get("appUser");
+  if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+  const body = await c.req.json().catch(() => null);
+  const parsed = recommendationSchema.safeParse(body);
+  if (!parsed.success) {
+    return fail(
+      c,
+      "VALIDATION_ERROR",
+      parsed.error.issues[0]?.message ?? "Invalid recommendation.",
+      400,
+    );
+  }
+  const row = await createRecommendation(getDb(c), appUser.id, parsed.data);
+  return ok(c, row, 201);
+});
+
+profileRoutes.patch(
+  "/me/recommendations/:id",
+  requireRoles("job_seeker"),
+  async (c) => {
+    const appUser = c.get("appUser");
+    if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+    const body = await c.req.json().catch(() => null);
+    const parsed = recommendationSchema.safeParse(body);
+    if (!parsed.success) {
+      return fail(
+        c,
+        "VALIDATION_ERROR",
+        parsed.error.issues[0]?.message ?? "Invalid recommendation.",
+        400,
+      );
+    }
+    try {
+      const row = await updateRecommendation(
+        getDb(c),
+        appUser.id,
+        c.req.param("id"),
+        parsed.data,
+      );
+      return ok(c, row);
+    } catch {
+      return fail(c, "NOT_FOUND", "Recommendation not found.", 404);
+    }
+  },
+);
+
+profileRoutes.delete(
+  "/me/recommendations/:id",
+  requireRoles("job_seeker"),
+  async (c) => {
+    const appUser = c.get("appUser");
+    if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+    await deleteRecommendation(getDb(c), appUser.id, c.req.param("id"));
     return ok(c, { deleted: true });
   },
 );

@@ -4,6 +4,7 @@ import {
   education,
   employmentHistory,
   qualifications,
+  recommendations,
   skills,
   userSkills,
 } from "../schema/profile";
@@ -220,6 +221,70 @@ export async function deleteQualification(
     .where(and(eq(qualifications.id, id), eq(qualifications.userId, userId)));
 }
 
+export async function listRecommendations(db: Database, userId: string) {
+  return db
+    .select()
+    .from(recommendations)
+    .where(eq(recommendations.userId, userId))
+    .orderBy(asc(recommendations.createdAt));
+}
+
+export async function createRecommendation(
+  db: Database,
+  userId: string,
+  input: {
+    authorName: string;
+    relationship: string;
+    body: string;
+  },
+) {
+  const [row] = await db
+    .insert(recommendations)
+    .values({
+      userId,
+      authorName: input.authorName,
+      relationship: input.relationship,
+      body: input.body,
+    })
+    .returning();
+  if (!row) throw new Error("Failed to create recommendation");
+  return row;
+}
+
+export async function updateRecommendation(
+  db: Database,
+  userId: string,
+  id: string,
+  input: {
+    authorName: string;
+    relationship: string;
+    body: string;
+  },
+) {
+  const [row] = await db
+    .update(recommendations)
+    .set({
+      authorName: input.authorName,
+      relationship: input.relationship,
+      body: input.body,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(recommendations.id, id), eq(recommendations.userId, userId)))
+    .returning();
+  if (!row) throw new Error("Recommendation not found");
+  return row;
+}
+
+export async function deleteRecommendation(
+  db: Database,
+  userId: string,
+  id: string,
+) {
+  await db
+    .delete(recommendations)
+    .where(and(eq(recommendations.id, id), eq(recommendations.userId, userId)));
+}
+
 export async function listSkills(db: Database, query?: string) {
   if (query?.trim()) {
     return db
@@ -297,20 +362,28 @@ export async function getProfileBundle(db: Database, userId: string) {
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user) return null;
 
-  const [employment, educationRows, qualificationRows, skillRows, projectRows] =
-    await Promise.all([
-      listEmploymentHistory(db, userId),
-      listEducation(db, userId),
-      listQualifications(db, userId),
-      listUserSkills(db, userId),
-      listProjectsForUser(db, userId),
-    ]);
+  const [
+    employment,
+    educationRows,
+    qualificationRows,
+    recommendationRows,
+    skillRows,
+    projectRows,
+  ] = await Promise.all([
+    listEmploymentHistory(db, userId),
+    listEducation(db, userId),
+    listQualifications(db, userId),
+    listRecommendations(db, userId),
+    listUserSkills(db, userId),
+    listProjectsForUser(db, userId),
+  ]);
 
   return {
     user,
     employmentHistory: employment,
     education: educationRows,
     qualifications: qualificationRows,
+    recommendations: recommendationRows,
     skills: skillRows,
     projects: projectRows,
   };

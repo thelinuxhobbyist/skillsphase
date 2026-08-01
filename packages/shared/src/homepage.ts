@@ -199,8 +199,8 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       "featured_candidates",
       70,
       {
-        title: "Example skill profiles",
-        subtitle: "Real candidates appear once people join SkillsPhase.",
+        title: "Skill profiles",
+        subtitle: "A preview of how Skill Profiles look on SkillsPhase.",
         demoCards: EXAMPLE_SKILL_PROFILES,
       },
       true,

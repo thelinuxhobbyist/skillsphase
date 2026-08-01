@@ -21,9 +21,12 @@ export function CandidateProfileView({
   fallbackTitle: string;
   actions?: ReactNode;
 }) {
-  const hasCertifications =
-    candidate.qualifications.length > 0 || candidate.education.length > 0;
-  const hasEvidence = candidate.projects.length > 0 || hasCertifications;
+  const recommendations = candidate.recommendations ?? [];
+  const hasEvidence =
+    candidate.projects.length > 0 ||
+    candidate.qualifications.length > 0 ||
+    recommendations.length > 0 ||
+    candidate.education.length > 0;
 
   return (
     <>
@@ -61,7 +64,7 @@ export function CandidateProfileView({
             What they can do
           </p>
           <h2 className="mt-1 font-sans text-xl text-primary">
-            Skills
+            Core Skills
           </h2>
           <div className="mt-4 flex flex-wrap gap-2">
             {candidate.skills.map((skill) => (
@@ -110,7 +113,7 @@ export function CandidateProfileView({
             Proof of ability
           </p>
           <h2 className="mt-1 font-sans text-xl text-primary">
-            Evidence
+            Proof of Ability
           </h2>
 
           {candidate.projects.length > 0 ? (
@@ -161,24 +164,57 @@ export function CandidateProfileView({
             </ul>
           ) : null}
 
-          {hasCertifications ? (
+          {candidate.qualifications.length > 0 ? (
             <ul className="mt-3 grid gap-3 sm:grid-cols-2">
               {candidate.qualifications.map((row) => (
                 <li
                   key={row.id}
                   className="rounded-md border border-[color:var(--line)] bg-white p-3 text-sm"
                 >
+                  <p className="text-xs font-semibold uppercase tracking-wide text-primary-accent">
+                    Certificate
+                  </p>
                   <p className="font-semibold text-primary">{row.name}</p>
                   {row.issuingBody ? (
                     <p className="text-[color:var(--foreground)]/75">{row.issuingBody}</p>
                   ) : null}
                 </li>
               ))}
+            </ul>
+          ) : null}
+
+          {recommendations.length > 0 ? (
+            <ul className="mt-3 space-y-3">
+              {recommendations.map((row) => (
+                <li
+                  key={row.id}
+                  className="rounded-lg border border-[color:var(--line)] bg-white p-4 shadow-sm"
+                >
+                  <p className="text-xs font-semibold uppercase tracking-wide text-primary-accent">
+                    Recommendation
+                  </p>
+                  <p className="font-semibold text-primary">{row.authorName}</p>
+                  <p className="text-sm text-[color:var(--foreground)]/70">
+                    {row.relationship}
+                  </p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm text-[color:var(--foreground)]/80">
+                    {row.body}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {candidate.education.length > 0 ? (
+            <ul className="mt-3 grid gap-3 sm:grid-cols-2">
               {candidate.education.map((row) => (
                 <li
                   key={row.id}
                   className="rounded-md border border-[color:var(--line)] bg-white p-3 text-sm"
                 >
+                  <p className="text-xs font-semibold uppercase tracking-wide text-primary-accent">
+                    Education
+                  </p>
                   <p className="font-semibold text-primary">{row.qualification}</p>
                   <p className="text-[color:var(--foreground)]/75">{row.institution}</p>
                 </li>

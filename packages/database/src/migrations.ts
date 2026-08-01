@@ -363,4 +363,19 @@ CREATE INDEX IF NOT EXISTS "candidate_reviews_company_id_idx" ON "candidate_revi
 CREATE INDEX IF NOT EXISTS "contacts_company_id_idx" ON "contacts" ("company_id");
 CREATE INDEX IF NOT EXISTS "contacts_candidate_user_id_idx" ON "contacts" ("candidate_user_id");
 CREATE INDEX IF NOT EXISTS "messages_contact_id_idx" ON "messages" ("contact_id");`,
+
+  // 0007_recommendations.sql
+  `CREATE TABLE IF NOT EXISTS "recommendations" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"author_name" text NOT NULL,
+	"relationship" text NOT NULL,
+	"body" text NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+DO $$ BEGIN
+	ALTER TABLE "recommendations" ADD CONSTRAINT "recommendations_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+CREATE INDEX IF NOT EXISTS "recommendations_user_id_idx" ON "recommendations" ("user_id");`,
 ];

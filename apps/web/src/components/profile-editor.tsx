@@ -22,11 +22,13 @@ import {
   addEducation,
   addEmployment,
   addQualification,
+  addRecommendation,
   createProject,
   deleteEducation,
   deleteEmployment,
   deleteProject,
   deleteQualification,
+  deleteRecommendation,
   mediaUrl,
   searchSkills,
   setSkillsByName,
@@ -36,12 +38,14 @@ import {
   updateEmployment,
   updateProject,
   updateQualification,
+  updateRecommendation,
   uploadProjectMedia,
   type HorizonUser,
   type Project,
   type ProjectMediaItem,
   type ProfileBundle,
 } from "@/lib/api";
+import { isClerkConfigured } from "@/lib/clerk-config";
 import { formatUkDateLabel, isoToUk, normaliseUkDateInput, ukToIso } from "@/lib/dates";
 import { SKILL_SUGGESTIONS } from "@/lib/skill-suggestions";
 
@@ -57,14 +61,12 @@ type StepId =
 const STEPS: Array<{ id: StepId; label: string }> = [
   { id: "about", label: "About you" },
   { id: "skillProfile", label: "Skill Profile" },
-  { id: "skills", label: "Skills" },
-  { id: "projects", label: "Projects" },
-  { id: "employment", label: "Experience" },
+  { id: "skills", label: "Core Skills" },
+  { id: "projects", label: "Proof of Ability" },
+  { id: "employment", label: "Work History" },
   { id: "education", label: "Education" },
   { id: "review", label: "Review" },
 ];
-
-import { isClerkConfigured } from "@/lib/clerk-config";
 
 export function ProfileEditor({ initial }: { initial: ProfileBundle }) {
   if (!isClerkConfigured()) {
@@ -87,6 +89,9 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
   const [employment, setEmployment] = useState(initial.employmentHistory);
   const [education, setEducation] = useState(initial.education);
   const [qualifications, setQualifications] = useState(initial.qualifications);
+  const [recommendations, setRecommendations] = useState(
+    initial.recommendations ?? [],
+  );
   const [error, setError] = useState<string | null>(null);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">(
     "idle",
@@ -103,16 +108,19 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
         user,
         skillCount: skillList.length,
         projectCount: projects.length,
+        qualificationCount: qualifications.length,
+        recommendationCount: recommendations.length,
         employmentCount: employment.length,
-        educationCount: education.length + qualifications.length,
+        educationCount: education.length,
       }),
     [
       user,
       skillList.length,
       projects.length,
+      qualifications.length,
+      recommendations.length,
       employment.length,
       education.length,
-      qualifications.length,
     ],
   );
 
@@ -264,11 +272,18 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
           <SkillProfileStep user={user} setUser={setUser} />
         ) : null}
         {step === "skills" ? (
-          <SkillsStep skills={skillList} onChange={setSkillList} token={token} />
+          <SkillsStep
+            skills={skillList}
+            yearsExperience={user.yearsExperience}
+            onChange={setSkillList}
+            token={token}
+          />
         ) : null}
         {step === "projects" ? (
           <ProjectsStep
             projects={projects}
+            qualifications={qualifications}
+            recommendations={recommendations}
             token={token}
             onError={setError}
             onCreate={async (body) => {
@@ -285,6 +300,62 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
               await deleteProject(await token(), id);
               setProjects((rows) => rows.filter((p) => p.id !== id));
               router.refresh();
+            }}
+            onSaveQualification={async (body, id) => {
+              setError(null);
+              try {
+                if (id) {
+                  const row = await updateQualification(await token(), id, body);
+                  setQualifications((rows) =>
+                    rows.map((item) => (item.id === id ? row : item)),
+                  );
+                } else {
+                  const row = await addQualification(await token(), body);
+                  setQualifications((rows) => [...rows, row]);
+                }
+                router.refresh();
+              } catch (err) {
+                setError(messageFrom(err));
+                throw err;
+              }
+            }}
+            onDeleteQualification={async (id) => {
+              try {
+                await deleteQualification(await token(), id);
+                setQualifications((rows) => rows.filter((row) => row.id !== id));
+                router.refresh();
+              } catch (err) {
+                setError(messageFrom(err));
+              }
+            }}
+            onSaveRecommendation={async (body, id) => {
+              setError(null);
+              try {
+                if (id) {
+                  const row = await updateRecommendation(await token(), id, body);
+                  setRecommendations((rows) =>
+                    rows.map((item) => (item.id === id ? row : item)),
+                  );
+                } else {
+                  const row = await addRecommendation(await token(), body);
+                  setRecommendations((rows) => [...rows, row]);
+                }
+                router.refresh();
+              } catch (err) {
+                setError(messageFrom(err));
+                throw err;
+              }
+            }}
+            onDeleteRecommendation={async (id) => {
+              try {
+                await deleteRecommendation(await token(), id);
+                setRecommendations((rows) =>
+                  rows.filter((row) => row.id !== id),
+                );
+                router.refresh();
+              } catch (err) {
+                setError(messageFrom(err));
+              }
             }}
           />
         ) : null}
@@ -324,7 +395,6 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
         {step === "education" ? (
           <EducationStep
             education={education}
-            qualifications={qualifications}
             onSaveEducation={async (body, id) => {
               setError(null);
               try {
@@ -352,33 +422,6 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
                 setError(messageFrom(err));
               }
             }}
-            onSaveQualification={async (body, id) => {
-              setError(null);
-              try {
-                if (id) {
-                  const row = await updateQualification(await token(), id, body);
-                  setQualifications((rows) =>
-                    rows.map((item) => (item.id === id ? row : item)),
-                  );
-                } else {
-                  const row = await addQualification(await token(), body);
-                  setQualifications((rows) => [...rows, row]);
-                }
-                router.refresh();
-              } catch (err) {
-                setError(messageFrom(err));
-                throw err;
-              }
-            }}
-            onDeleteQualification={async (id) => {
-              try {
-                await deleteQualification(await token(), id);
-                setQualifications((rows) => rows.filter((row) => row.id !== id));
-                router.refresh();
-              } catch (err) {
-                setError(messageFrom(err));
-              }
-            }}
           />
         ) : null}
         {step === "review" ? (
@@ -387,8 +430,10 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
             sections={sections}
             skillCount={skillList.length}
             projectCount={projects.length}
+            qualificationCount={qualifications.length}
+            recommendationCount={recommendations.length}
             employmentCount={employment.length}
-            educationCount={education.length + qualifications.length}
+            educationCount={education.length}
             onEditSection={setStep}
           />
         ) : null}
@@ -446,10 +491,14 @@ function buildSectionStatus(input: {
   user: HorizonUser;
   skillCount: number;
   projectCount: number;
+  qualificationCount: number;
+  recommendationCount: number;
   employmentCount: number;
   educationCount: number;
 }): SectionStatus[] {
   const u = input.user;
+  const proofCount =
+    input.projectCount + input.qualificationCount + input.recommendationCount;
   return [
     {
       id: "about",
@@ -461,22 +510,22 @@ function buildSectionStatus(input: {
       label: "Skill Profile basics",
       done: Boolean(u.professionalTitle?.trim()),
     },
-    { id: "skills", label: "Skills (min. 3)", done: input.skillCount >= 3 },
+    { id: "skills", label: "Core Skills (min. 3)", done: input.skillCount >= 3 },
     {
       id: "projects",
-      label: "Portfolio project",
-      done: input.projectCount >= 1,
+      label: "Proof of Ability",
+      done: proofCount >= 1,
       optional: true,
     },
     {
       id: "employment",
-      label: "Experience history",
+      label: "Work History",
       done: input.employmentCount >= 1,
       optional: true,
     },
     {
       id: "education",
-      label: "Education & certifications",
+      label: "Education",
       done: input.educationCount >= 1,
       optional: true,
     },
@@ -690,10 +739,12 @@ function SkillProfileStep({
 
 function SkillsStep({
   skills,
+  yearsExperience,
   onChange,
   token,
 }: {
   skills: string[];
+  yearsExperience: number | null;
   onChange: (skills: string[]) => void;
   token: () => Promise<string>;
 }) {
@@ -744,7 +795,7 @@ function SkillsStep({
 
   return (
     <StepShell
-      title="Skills"
+      title="Core Skills"
       body="Skills are the first thing businesses see. Add at least 3 — React, Python, AWS, Figma, Marketing, Video Editing, anything demonstrable."
     >
       <div className="flex flex-wrap gap-2">
@@ -767,6 +818,13 @@ function SkillsStep({
           ))
         )}
       </div>
+      {yearsExperience != null && yearsExperience >= 0 ? (
+        <p className="text-sm text-[color:var(--foreground)]/70">
+          {yearsExperience === 1
+            ? "1 year of experience"
+            : `${yearsExperience} years of experience`}
+        </p>
+      ) : null}
       <div className="flex flex-col gap-2 sm:flex-row">
         <input
           value={draft}
@@ -808,13 +866,21 @@ function SkillsStep({
 
 function ProjectsStep({
   projects,
+  qualifications,
+  recommendations,
   token,
   onCreate,
   onUpdate,
   onDelete,
+  onSaveQualification,
+  onDeleteQualification,
+  onSaveRecommendation,
+  onDeleteRecommendation,
   onError,
 }: {
   projects: Project[];
+  qualifications: ProfileBundle["qualifications"];
+  recommendations: ProfileBundle["recommendations"];
   token: () => Promise<string>;
   onCreate: (body: {
     title: string;
@@ -834,111 +900,280 @@ function ProjectsStep({
     }>,
   ) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
+  onSaveQualification: (
+    body: {
+      name: string;
+      issuingBody?: string | null;
+      dateAwarded?: string | null;
+      description?: string | null;
+    },
+    id?: string,
+  ) => Promise<void>;
+  onDeleteQualification: (id: string) => Promise<void>;
+  onSaveRecommendation: (
+    body: {
+      authorName: string;
+      relationship: string;
+      body: string;
+    },
+    id?: string,
+  ) => Promise<void>;
+  onDeleteRecommendation: (id: string) => Promise<void>;
   onError: (message: string | null) => void;
 }) {
-  const [draftId, setDraftId] = useState<string | "new" | null>(null);
+  const [draft, setDraft] = useState<
+    | null
+    | { kind: "project"; id?: string }
+    | { kind: "cert"; id?: string }
+    | { kind: "recommendation"; id?: string }
+  >(null);
 
   return (
     <StepShell
-      title="Projects & portfolio"
-      body="Show evidence of your work: projects completed, websites built, designs created, campaigns managed. Attach links, images, videos, or documents."
+      title="Proof of Ability"
+      body="Add evidence of what you can do: projects you’ve delivered, certificates you’ve earned, and recommendations from people you’ve worked with."
     >
       <ul className="space-y-3">
-        {projects.length === 0 ? (
-          <li className="text-sm text-[color:var(--foreground)]/55">
-            No projects yet — add one to show real evidence of your ability.
-          </li>
-        ) : (
-          projects.map((project) =>
-            draftId === project.id ? (
-              <li key={project.id}>
-                <ProjectForm
-                  initial={project}
-                  token={token}
-                  onCancel={() => setDraftId(null)}
-                  onError={onError}
-                  onSave={async (body) => {
-                    await onUpdate(project.id, body);
-                    setDraftId(null);
-                  }}
-                />
-              </li>
-            ) : (
-              <li
-                key={project.id}
-                className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-primary">{project.title}</p>
-                    {project.role ? (
-                      <p className="text-sm text-[color:var(--foreground)]/70">
-                        {project.role}
-                      </p>
-                    ) : null}
-                    {project.description ? (
-                      <p className="mt-1 text-sm text-[color:var(--foreground)]/75">
-                        {project.description}
-                      </p>
-                    ) : null}
-                    {project.media.length > 0 ? (
-                      <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                        {project.media.map((item, index) => (
-                          <a
-                            key={`${item.url}-${index}`}
-                            href={mediaUrl(item.url)}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] px-2 py-1 text-primary underline"
-                          >
-                            {item.label || item.type}
-                          </a>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className="flex shrink-0 gap-3">
-                    <button
-                      type="button"
-                      className="text-sm font-semibold text-primary underline"
-                      onClick={() => setDraftId(project.id)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      className="text-sm font-semibold text-red-800 underline"
-                      onClick={() => void onDelete(project.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
+        {projects.map((project) =>
+          draft?.kind === "project" && draft.id === project.id ? (
+            <li key={project.id}>
+              <ProjectForm
+                initial={project}
+                token={token}
+                onCancel={() => setDraft(null)}
+                onError={onError}
+                onSave={async (body) => {
+                  await onUpdate(project.id, body);
+                  setDraft(null);
+                }}
+              />
+            </li>
+          ) : (
+            <li
+              key={project.id}
+              className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-primary-accent">
+                    Project
+                  </p>
+                  <p className="font-semibold text-primary">{project.title}</p>
+                  {project.role ? (
+                    <p className="text-sm text-[color:var(--foreground)]/70">
+                      {project.role}
+                    </p>
+                  ) : null}
+                  {project.description ? (
+                    <p className="mt-1 text-sm text-[color:var(--foreground)]/75">
+                      {project.description}
+                    </p>
+                  ) : null}
+                  {project.media.length > 0 ? (
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                      {project.media.map((item, index) => (
+                        <a
+                          key={`${item.url}-${index}`}
+                          href={mediaUrl(item.url)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] px-2 py-1 text-primary underline"
+                        >
+                          {item.label || item.type}
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-              </li>
-            ),
-          )
+                <div className="flex shrink-0 gap-3">
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-primary underline"
+                    onClick={() => setDraft({ kind: "project", id: project.id })}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-red-800 underline"
+                    onClick={() => void onDelete(project.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </li>
+          ),
         )}
+
+        {qualifications.map((row) =>
+          draft?.kind === "cert" && draft.id === row.id ? (
+            <li key={row.id}>
+              <CertificationForm
+                initial={row}
+                onCancel={() => setDraft(null)}
+                onSave={async (body) => {
+                  await onSaveQualification(body, row.id);
+                  setDraft(null);
+                }}
+              />
+            </li>
+          ) : (
+            <li
+              key={row.id}
+              className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3"
+            >
+              <div className="flex justify-between gap-3">
+                <div>
+                  <p className="text-xs font-medium text-primary-accent">
+                    Certificate
+                  </p>
+                  <p className="font-semibold text-primary">{row.name}</p>
+                  {row.issuingBody ? (
+                    <p className="text-sm">{row.issuingBody}</p>
+                  ) : null}
+                  <p className="text-xs text-[color:var(--foreground)]/55">
+                    {formatUkDateLabel(row.dateAwarded)}
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-primary underline"
+                    onClick={() => setDraft({ kind: "cert", id: row.id })}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-red-800 underline"
+                    onClick={() => void onDeleteQualification(row.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </li>
+          ),
+        )}
+
+        {recommendations.map((row) =>
+          draft?.kind === "recommendation" && draft.id === row.id ? (
+            <li key={row.id}>
+              <RecommendationForm
+                initial={row}
+                onCancel={() => setDraft(null)}
+                onSave={async (body) => {
+                  await onSaveRecommendation(body, row.id);
+                  setDraft(null);
+                }}
+              />
+            </li>
+          ) : (
+            <li
+              key={row.id}
+              className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3"
+            >
+              <div className="flex justify-between gap-3">
+                <div>
+                  <p className="text-xs font-medium text-primary-accent">
+                    Recommendation
+                  </p>
+                  <p className="font-semibold text-primary">{row.authorName}</p>
+                  <p className="text-sm text-[color:var(--foreground)]/70">
+                    {row.relationship}
+                  </p>
+                  <p className="mt-1 text-sm text-[color:var(--foreground)]/75">
+                    {row.body}
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-primary underline"
+                    onClick={() =>
+                      setDraft({ kind: "recommendation", id: row.id })
+                    }
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-red-800 underline"
+                    onClick={() => void onDeleteRecommendation(row.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </li>
+          ),
+        )}
+
+        {projects.length === 0 &&
+        qualifications.length === 0 &&
+        recommendations.length === 0 ? (
+          <li className="text-sm text-[color:var(--foreground)]/55">
+            No evidence yet — add a project, certificate, or recommendation.
+          </li>
+        ) : null}
       </ul>
 
-      {draftId === "new" ? (
+      {draft === null ? (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary"
+            onClick={() => setDraft({ kind: "project" })}
+          >
+            Add project
+          </button>
+          <button
+            type="button"
+            className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary"
+            onClick={() => setDraft({ kind: "cert" })}
+          >
+            Add certificate
+          </button>
+          <button
+            type="button"
+            className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary"
+            onClick={() => setDraft({ kind: "recommendation" })}
+          >
+            Add recommendation
+          </button>
+        </div>
+      ) : null}
+
+      {draft?.kind === "project" && !draft.id ? (
         <ProjectForm
           token={token}
-          onCancel={() => setDraftId(null)}
+          onCancel={() => setDraft(null)}
           onError={onError}
           onSave={async (body) => {
             await onCreate(body);
-            setDraftId(null);
+            setDraft(null);
           }}
         />
-      ) : (
-        <button
-          type="button"
-          className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary"
-          onClick={() => setDraftId("new")}
-        >
-          Add project
-        </button>
-      )}
+      ) : null}
+      {draft?.kind === "cert" && !draft.id ? (
+        <CertificationForm
+          onCancel={() => setDraft(null)}
+          onSave={async (body) => {
+            await onSaveQualification(body);
+            setDraft(null);
+          }}
+        />
+      ) : null}
+      {draft?.kind === "recommendation" && !draft.id ? (
+        <RecommendationForm
+          onCancel={() => setDraft(null)}
+          onSave={async (body) => {
+            await onSaveRecommendation(body);
+            setDraft(null);
+          }}
+        />
+      ) : null}
     </StepShell>
   );
 }
@@ -1157,7 +1392,7 @@ function EmploymentStep({
 
   return (
     <StepShell
-      title="Experience"
+      title="Work History"
       body="Add, edit, or delete roles anytime. Dates use DD/MM/YYYY (2-digit years like 23 become 2023)."
     >
       <ul className="space-y-3">
@@ -1358,14 +1593,10 @@ function EmploymentForm({
 
 function EducationStep({
   education,
-  qualifications,
   onSaveEducation,
   onDeleteEducation,
-  onSaveQualification,
-  onDeleteQualification,
 }: {
   education: ProfileBundle["education"];
-  qualifications: ProfileBundle["qualifications"];
   onSaveEducation: (
     body: {
       institution: string;
@@ -1377,171 +1608,85 @@ function EducationStep({
     id?: string,
   ) => Promise<void>;
   onDeleteEducation: (id: string) => Promise<void>;
-  onSaveQualification: (
-    body: {
-      name: string;
-      issuingBody?: string | null;
-      dateAwarded?: string | null;
-      description?: string | null;
-    },
-    id?: string,
-  ) => Promise<void>;
-  onDeleteQualification: (id: string) => Promise<void>;
 }) {
-  const [draft, setDraft] = useState<
-    | null
-    | { kind: "education"; id?: string }
-    | { kind: "cert"; id?: string }
-  >(null);
+  const [draftId, setDraftId] = useState<string | "new" | null>(null);
 
   return (
     <StepShell
-      title="Education & certifications"
-      body="Add, edit, or delete entries anytime. Short years like 23 become 2023."
+      title="Education"
+      body="Add schools, degrees, and courses. Certificates and recommendations live under Proof of Ability."
     >
       <ul className="space-y-3">
-        {education.map((row) =>
-          draft?.kind === "education" && draft.id === row.id ? (
-            <li key={row.id}>
-              <EducationForm
-                initial={row}
-                onCancel={() => setDraft(null)}
-                onSave={async (body) => {
-                  await onSaveEducation(body, row.id);
-                  setDraft(null);
-                }}
-              />
-            </li>
-          ) : (
-            <li
-              key={row.id}
-              className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3"
-            >
-              <div className="flex justify-between gap-3">
-                <div>
-                  <p className="text-xs font-medium text-primary-accent">
-                    Education
-                  </p>
-                  <p className="font-semibold text-primary">{row.qualification}</p>
-                  <p className="text-sm">{row.institution}</p>
-                  <p className="text-xs text-[color:var(--foreground)]/55">
-                    {formatUkDateLabel(row.startDate)} –{" "}
-                    {formatUkDateLabel(row.endDate)}
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    className="text-sm font-semibold text-primary underline"
-                    onClick={() => setDraft({ kind: "education", id: row.id })}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="text-sm font-semibold text-red-800 underline"
-                    onClick={() => void onDeleteEducation(row.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </li>
-          ),
-        )}
-        {qualifications.map((row) =>
-          draft?.kind === "cert" && draft.id === row.id ? (
-            <li key={row.id}>
-              <CertificationForm
-                initial={row}
-                onCancel={() => setDraft(null)}
-                onSave={async (body) => {
-                  await onSaveQualification(body, row.id);
-                  setDraft(null);
-                }}
-              />
-            </li>
-          ) : (
-            <li
-              key={row.id}
-              className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3"
-            >
-              <div className="flex justify-between gap-3">
-                <div>
-                  <p className="text-xs font-medium text-primary-accent">
-                    Certification
-                  </p>
-                  <p className="font-semibold text-primary">{row.name}</p>
-                  {row.issuingBody ? (
-                    <p className="text-sm">{row.issuingBody}</p>
-                  ) : null}
-                  <p className="text-xs text-[color:var(--foreground)]/55">
-                    {formatUkDateLabel(row.dateAwarded)}
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    className="text-sm font-semibold text-primary underline"
-                    onClick={() => setDraft({ kind: "cert", id: row.id })}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="text-sm font-semibold text-red-800 underline"
-                    onClick={() => void onDeleteQualification(row.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </li>
-          ),
-        )}
-        {education.length === 0 && qualifications.length === 0 ? (
+        {education.length === 0 ? (
           <li className="text-sm text-[color:var(--foreground)]/55">
-            Nothing added yet — optional.
+            No education added yet — optional.
           </li>
-        ) : null}
+        ) : (
+          education.map((row) =>
+            draftId === row.id ? (
+              <li key={row.id}>
+                <EducationForm
+                  initial={row}
+                  onCancel={() => setDraftId(null)}
+                  onSave={async (body) => {
+                    await onSaveEducation(body, row.id);
+                    setDraftId(null);
+                  }}
+                />
+              </li>
+            ) : (
+              <li
+                key={row.id}
+                className="rounded-md border border-[color:var(--line)] bg-white px-4 py-3"
+              >
+                <div className="flex justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-primary">{row.qualification}</p>
+                    <p className="text-sm">{row.institution}</p>
+                    <p className="text-xs text-[color:var(--foreground)]/55">
+                      {formatUkDateLabel(row.startDate)} –{" "}
+                      {formatUkDateLabel(row.endDate)}
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      className="text-sm font-semibold text-primary underline"
+                      onClick={() => setDraftId(row.id)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="text-sm font-semibold text-red-800 underline"
+                      onClick={() => void onDeleteEducation(row.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ),
+          )
+        )}
       </ul>
 
-      {draft === null ? (
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary"
-            onClick={() => setDraft({ kind: "education" })}
-          >
-            Add education
-          </button>
-          <button
-            type="button"
-            className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary"
-            onClick={() => setDraft({ kind: "cert" })}
-          >
-            Add certification
-          </button>
-        </div>
-      ) : null}
-
-      {draft?.kind === "education" && !draft.id ? (
+      {draftId === "new" ? (
         <EducationForm
-          onCancel={() => setDraft(null)}
+          onCancel={() => setDraftId(null)}
           onSave={async (body) => {
             await onSaveEducation(body);
-            setDraft(null);
+            setDraftId(null);
           }}
         />
-      ) : null}
-      {draft?.kind === "cert" && !draft.id ? (
-        <CertificationForm
-          onCancel={() => setDraft(null)}
-          onSave={async (body) => {
-            await onSaveQualification(body);
-            setDraft(null);
-          }}
-        />
+      ) : draftId === null ? (
+        <button
+          type="button"
+          className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary"
+          onClick={() => setDraftId("new")}
+        >
+          Add education
+        </button>
       ) : null}
     </StepShell>
   );
@@ -1697,7 +1842,7 @@ function CertificationForm({
       }}
     >
       <div className="grid gap-3 md:grid-cols-2">
-        <Field label="Certification name" value={name} onChange={setName} required />
+        <Field label="Certificate name" value={name} onChange={setName} required />
         <Field label="Issuing body" value={issuingBody} onChange={setIssuingBody} />
         <UkDateField label="Date awarded" value={dateUk} onChange={setDateUk} />
       </div>
@@ -1713,7 +1858,95 @@ function CertificationForm({
           disabled={pending || !name}
           className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
         >
-          {initial ? "Update certification" : "Save certification"}
+          {initial ? "Update certificate" : "Save certificate"}
+        </button>
+        <button
+          type="button"
+          className="rounded-md border border-[color:var(--line)] px-4 py-2 text-sm font-semibold text-primary"
+          onClick={onCancel}
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function RecommendationForm({
+  initial,
+  onSave,
+  onCancel,
+}: {
+  initial?: ProfileBundle["recommendations"][number];
+  onSave: (body: {
+    authorName: string;
+    relationship: string;
+    body: string;
+  }) => Promise<void>;
+  onCancel: () => void;
+}) {
+  const [authorName, setAuthorName] = useState(initial?.authorName ?? "");
+  const [relationship, setRelationship] = useState(initial?.relationship ?? "");
+  const [body, setBody] = useState(initial?.body ?? "");
+  const [pending, setPending] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  return (
+    <form
+      className="space-y-3 rounded-md border border-[color:var(--line)] bg-white p-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void (async () => {
+          setLocalError(null);
+          setPending(true);
+          try {
+            await onSave({
+              authorName,
+              relationship,
+              body,
+            });
+          } catch (err) {
+            setLocalError(messageFrom(err));
+          } finally {
+            setPending(false);
+          }
+        })();
+      }}
+    >
+      <div className="grid gap-3 md:grid-cols-2">
+        <Field
+          label="Author name"
+          value={authorName}
+          onChange={setAuthorName}
+          required
+        />
+        <Field
+          label="Relationship"
+          value={relationship}
+          onChange={setRelationship}
+          required
+          hint="e.g. Former manager, Client, Colleague"
+        />
+      </div>
+      <TextArea
+        label="Recommendation"
+        value={body}
+        onChange={setBody}
+        rows={4}
+        hint="What they said about your work."
+      />
+      {localError ? (
+        <p className="text-sm text-red-700" role="alert">
+          {localError}
+        </p>
+      ) : null}
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={pending || !authorName || !relationship || !body}
+          className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+        >
+          {initial ? "Update recommendation" : "Save recommendation"}
         </button>
         <button
           type="button"
@@ -1732,6 +1965,8 @@ function ReviewStep({
   sections,
   skillCount,
   projectCount,
+  qualificationCount,
+  recommendationCount,
   employmentCount,
   educationCount,
   onEditSection,
@@ -1740,11 +1975,14 @@ function ReviewStep({
   sections: SectionStatus[];
   skillCount: number;
   projectCount: number;
+  qualificationCount: number;
+  recommendationCount: number;
   employmentCount: number;
   educationCount: number;
   onEditSection: (step: StepId) => void;
 }) {
   const incomplete = sections.filter((s) => !s.optional && !s.done);
+  const proofCount = projectCount + qualificationCount + recommendationCount;
 
   return (
     <StepShell
@@ -1768,22 +2006,22 @@ function ReviewStep({
           onEdit={() => onEditSection("skillProfile")}
         />
         <ReviewItem
-          label="Skills"
+          label="Core Skills"
           value={`${skillCount}`}
           onEdit={() => onEditSection("skills")}
         />
         <ReviewItem
-          label="Projects"
-          value={`${projectCount}`}
+          label="Proof of Ability"
+          value={`${proofCount} (${projectCount} projects, ${qualificationCount} certificates, ${recommendationCount} recommendations)`}
           onEdit={() => onEditSection("projects")}
         />
         <ReviewItem
-          label="Roles"
+          label="Work History"
           value={`${employmentCount}`}
           onEdit={() => onEditSection("employment")}
         />
         <ReviewItem
-          label="Education items"
+          label="Education"
           value={`${educationCount}`}
           onEdit={() => onEditSection("education")}
         />

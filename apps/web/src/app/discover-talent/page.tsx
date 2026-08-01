@@ -21,10 +21,10 @@ export default async function DiscoverTalentPage() {
           Skills First Hiring
         </p>
         <h1 className="mt-3 font-sans text-4xl text-primary">
-          Browse real Skill Profiles
+          Browse Skill Profiles
         </h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[color:var(--foreground)]/80">
-          Browse real Skill Profiles — names, skills, experience, and portfolio
+          Browse Skill Profiles — names, skills, experience, and portfolio
           evidence, open to anyone. Sign in or register as a business to contact a
           candidate directly.
         </p>

@@ -63,6 +63,23 @@ export const qualifications = pgTable("qualifications", {
     .defaultNow(),
 });
 
+/** Recommendations shown under Proof of Ability. */
+export const recommendations = pgTable("recommendations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  authorName: text("author_name").notNull(),
+  relationship: text("relationship").notNull(),
+  body: text("body").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const skills = pgTable("skills", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull().unique(),

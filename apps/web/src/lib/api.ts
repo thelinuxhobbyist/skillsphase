@@ -523,6 +523,14 @@ export type ProfileBundle = {
     dateAwarded: string | null;
     description: string | null;
   }>;
+  recommendations: Array<{
+    id: string;
+    authorName: string;
+    relationship: string;
+    body: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
   skills: SkillRef[];
   projects: Project[];
   completion: {
@@ -689,6 +697,50 @@ export function deleteQualification(token: string, id: string) {
   });
 }
 
+export function addRecommendation(
+  token: string,
+  body: {
+    authorName: string;
+    relationship: string;
+    body: string;
+  },
+) {
+  return apiFetch<ProfileBundle["recommendations"][number]>(
+    "/users/me/recommendations",
+    {
+      method: "POST",
+      token,
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function updateRecommendation(
+  token: string,
+  id: string,
+  body: {
+    authorName: string;
+    relationship: string;
+    body: string;
+  },
+) {
+  return apiFetch<ProfileBundle["recommendations"][number]>(
+    `/users/me/recommendations/${id}`,
+    {
+      method: "PATCH",
+      token,
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function deleteRecommendation(token: string, id: string) {
+  return apiFetch<{ deleted: boolean }>(`/users/me/recommendations/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
 export function listMyProjects(token: string) {
   return apiFetch<Project[]>("/projects", { token });
 }
@@ -799,6 +851,7 @@ export type CandidateDetail = {
   employmentHistory: ProfileBundle["employmentHistory"];
   education: ProfileBundle["education"];
   qualifications: ProfileBundle["qualifications"];
+  recommendations: ProfileBundle["recommendations"];
 };
 
 export function getDiscoveryFeed(
