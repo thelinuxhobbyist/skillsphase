@@ -176,7 +176,7 @@ export function PublicDiscoveryBrowser({
           </p>
         </div>
       ) : (
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,20rem),1fr))] gap-5">
           {candidates.map((card) => (
             <PublicCandidateCardView key={card.id} card={card} />
           ))}

@@ -268,7 +268,7 @@ function HomepageSectionBlock({
                 </p>
               </div>
             ) : (
-              <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <ul className="mt-10 grid grid-cols-[repeat(auto-fit,minmax(min(100%,20rem),1fr))] gap-5">
                 {featuredCandidates.map((card) => (
                   <PublicCandidateCardView key={card.id} card={card} />
                 ))}
