@@ -27,7 +27,7 @@ export const users = pgTable("users", {
   professionalTitle: text("professional_title"),
   remotePreference: remoteTypeEnum("remote_preference"),
   availability: availabilityEnum("availability"),
-  yearsExperience: integer("years_experience"),
+  yearsExperience: integer("years_of_experience"),
   salaryMin: numeric("salary_min", { precision: 12, scale: 2 }),
   salaryMax: numeric("salary_max", { precision: 12, scale: 2 }),
   salaryCurrency: text("salary_currency").notNull().default("GBP"),
