@@ -12,7 +12,7 @@ import {
 import type { AvailabilityOption, RemoteType, UserRole } from "@horizon/shared";
 import type { Database } from "../client";
 import { companies } from "../schema/companies";
-import { userSkills } from "../schema/profile";
+import { education, userSkills } from "../schema/profile";
 import { users } from "../schema/users";
 
 export type AppUser = typeof users.$inferSelect;
@@ -30,6 +30,7 @@ export type PublicUser = {
   careerSummary: string | null;
   profilePhotoUrl: string | null;
   professionalTitle: string | null;
+  primaryCapability: string | null;
   remotePreference: RemoteType | null;
   availability: AvailabilityOption | null;
   yearsExperience: number | null;
@@ -64,6 +65,7 @@ export function toPublicUser(user: AppUser): PublicUser {
     careerSummary: user.careerSummary,
     profilePhotoUrl: user.profilePhotoUrl,
     professionalTitle: user.professionalTitle,
+    primaryCapability: user.primaryCapability,
     remotePreference: user.remotePreference,
     availability: user.availability,
     yearsExperience: user.yearsExperience,
@@ -340,6 +342,7 @@ export function isProfileComplete(input: {
   city: string | null;
   professionalTitle: string | null;
   skillCount: number;
+  educationCount: number;
 }): boolean {
   return Boolean(
     input.firstName?.trim() &&
@@ -347,7 +350,8 @@ export function isProfileComplete(input: {
       input.email.trim() &&
       input.city?.trim() &&
       input.professionalTitle?.trim() &&
-      input.skillCount >= MIN_PROFILE_SKILLS,
+      input.skillCount >= MIN_PROFILE_SKILLS &&
+      input.educationCount >= 1,
   );
 }
 
@@ -363,6 +367,10 @@ export async function recomputeProfileCompleted(
     .select({ value: count() })
     .from(userSkills)
     .where(eq(userSkills.userId, user.id));
+  const [educationRow] = await db
+    .select({ value: count() })
+    .from(education)
+    .where(eq(education.userId, user.id));
 
   return isProfileComplete({
     firstName: user.firstName,
@@ -371,6 +379,7 @@ export async function recomputeProfileCompleted(
     city: user.city,
     professionalTitle: user.professionalTitle,
     skillCount: Number(skillRow?.value ?? 0),
+    educationCount: Number(educationRow?.value ?? 0),
   });
 }
 
@@ -385,6 +394,7 @@ export async function updateAppUserProfile(
     country?: string | null;
     careerSummary?: string | null;
     professionalTitle?: string | null;
+    primaryCapability?: string | null;
     remotePreference?: RemoteType | null;
     availability?: AvailabilityOption | null;
     yearsExperience?: number | null;
@@ -410,6 +420,10 @@ export async function updateAppUserProfile(
         data.professionalTitle === undefined
           ? user.professionalTitle
           : data.professionalTitle,
+      primaryCapability:
+        data.primaryCapability === undefined
+          ? user.primaryCapability
+          : data.primaryCapability,
       remotePreference:
         data.remotePreference === undefined
           ? user.remotePreference

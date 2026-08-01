@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   jsonb,
   pgTable,
@@ -25,9 +26,15 @@ export const projects = pgTable("projects", {
     .references(() => users.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   description: text("description"),
+  /** Measurable impact of the work (what changed because of it). */
+  outcome: text("outcome"),
   role: text("role"),
   projectUrl: text("project_url"),
+  /** Technologies used on this evidence item (distinct from profile-level skills). */
+  technologies: jsonb("technologies").$type<string[]>().notNull().default([]),
   media: jsonb("media").$type<ProjectMediaItem[]>().notNull().default([]),
+  /** When true, this project is the featured Proof of Ability (browse card + profile first). */
+  featured: boolean("featured").notNull().default(false),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

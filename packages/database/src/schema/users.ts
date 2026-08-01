@@ -25,6 +25,8 @@ export const users = pgTable("users", {
   profilePhotoUrl: text("profile_photo_url"),
   /** Candidate Skill Profile fields (role = job_seeker only). */
   professionalTitle: text("professional_title"),
+  /** Short skills-first statement of what the candidate does best. */
+  primaryCapability: text("primary_capability"),
   remotePreference: remoteTypeEnum("remote_preference"),
   availability: availabilityEnum("availability"),
   yearsExperience: integer("years_of_experience"),

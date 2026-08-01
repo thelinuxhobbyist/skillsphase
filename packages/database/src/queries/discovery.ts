@@ -8,12 +8,16 @@ import {
 } from "../schema/marketplace";
 import { skills, userSkills } from "../schema/profile";
 import { users } from "../schema/users";
+import {
+  listCapabilitiesForUser,
+  pickCardCapabilities,
+} from "./capabilities";
 import { listProjectsForUser } from "./projects";
 import {
   listEducation,
   listEmploymentHistory,
+  listPublicRecommendations,
   listQualifications,
-  listRecommendations,
   listUserSkills,
 } from "./profile";
 
@@ -30,6 +34,9 @@ export type CandidateCard = {
   firstName: string | null;
   lastName: string | null;
   professionalTitle: string | null;
+  primaryCapability: string | null;
+  /** First additional capability for lightweight browse cards. */
+  additionalCapability: string | null;
   city: string | null;
   remotePreference: RemoteType | null;
   availability: AvailabilityOption | null;
@@ -45,22 +52,30 @@ async function candidatesToCards(
 ): Promise<CandidateCard[]> {
   const cards: CandidateCard[] = [];
   for (const row of rows) {
-    const [skillRows, projectRows] = await Promise.all([
+    const [skillRows, projectRows, capabilityRows] = await Promise.all([
       listUserSkills(db, row.id),
       listProjectsForUser(db, row.id),
+      listCapabilitiesForUser(db, row.id),
     ]);
+    const cardCapabilities = pickCardCapabilities(capabilityRows);
     cards.push({
       id: row.id,
       firstName: row.firstName,
       lastName: row.lastName,
       professionalTitle: row.professionalTitle,
+      primaryCapability:
+        cardCapabilities.primaryCapability ?? row.primaryCapability,
+      additionalCapability: cardCapabilities.additionalCapability,
       city: row.city,
       remotePreference: row.remotePreference,
       availability: row.availability,
       yearsExperience: row.yearsExperience,
       profilePhotoUrl: row.profilePhotoUrl,
       skills: skillRows.map((s) => s.name),
-      topProject: projectRows[0]?.title ?? null,
+      topProject:
+        projectRows.find((p) => p.featured)?.title ??
+        projectRows[0]?.title ??
+        null,
     });
   }
   return cards;
@@ -97,7 +112,12 @@ export async function listDiscoveryFeed(
     conditions.push(gte(users.yearsExperience, filters.minYearsExperience));
   }
   if (filters.keyword?.trim()) {
-    conditions.push(ilike(users.professionalTitle, `%${filters.keyword.trim()}%`));
+    {
+      const keyword = `%${filters.keyword.trim()}%`;
+      conditions.push(
+        sql`(${users.professionalTitle} ILIKE ${keyword} OR ${users.primaryCapability} ILIKE ${keyword})`,
+      );
+    }
   }
 
   let candidateIds: string[] | null = null;
@@ -138,7 +158,12 @@ function buildDiscoveryConditions(filters: DiscoveryFilters) {
     conditions.push(gte(users.yearsExperience, filters.minYearsExperience));
   }
   if (filters.keyword?.trim()) {
-    conditions.push(ilike(users.professionalTitle, `%${filters.keyword.trim()}%`));
+    {
+      const keyword = `%${filters.keyword.trim()}%`;
+      conditions.push(
+        sql`(${users.professionalTitle} ILIKE ${keyword} OR ${users.primaryCapability} ILIKE ${keyword})`,
+      );
+    }
   }
   return conditions;
 }
@@ -205,13 +230,15 @@ export async function getPublicCandidateDetail(db: Database, candidateUserId: st
     education,
     qualifications,
     recommendationRows,
+    capabilityRows,
   ] = await Promise.all([
     listUserSkills(db, candidateUserId),
     listProjectsForUser(db, candidateUserId),
     listEmploymentHistory(db, candidateUserId),
     listEducation(db, candidateUserId),
     listQualifications(db, candidateUserId),
-    listRecommendations(db, candidateUserId),
+    listPublicRecommendations(db, candidateUserId),
+    listCapabilitiesForUser(db, candidateUserId),
   ]);
 
   return {
@@ -219,6 +246,7 @@ export async function getPublicCandidateDetail(db: Database, candidateUserId: st
     firstName: user.firstName,
     lastName: user.lastName,
     professionalTitle: user.professionalTitle,
+    primaryCapability: user.primaryCapability,
     city: user.city,
     country: user.country,
     careerSummary: user.careerSummary,
@@ -229,6 +257,7 @@ export async function getPublicCandidateDetail(db: Database, candidateUserId: st
     salaryMin: user.salaryMin,
     salaryMax: user.salaryMax,
     salaryCurrency: user.salaryCurrency,
+    capabilities: capabilityRows,
     skills: skillRows,
     projects: projectRows,
     employmentHistory: employment,
@@ -292,13 +321,15 @@ export async function getCandidateDetail(db: Database, candidateUserId: string) 
     education,
     qualifications,
     recommendationRows,
+    capabilityRows,
   ] = await Promise.all([
     listUserSkills(db, candidateUserId),
     listProjectsForUser(db, candidateUserId),
     listEmploymentHistory(db, candidateUserId),
     listEducation(db, candidateUserId),
     listQualifications(db, candidateUserId),
-    listRecommendations(db, candidateUserId),
+    listPublicRecommendations(db, candidateUserId),
+    listCapabilitiesForUser(db, candidateUserId),
   ]);
 
   return {
@@ -306,6 +337,7 @@ export async function getCandidateDetail(db: Database, candidateUserId: string) 
     firstName: user.firstName,
     lastName: user.lastName,
     professionalTitle: user.professionalTitle,
+    primaryCapability: user.primaryCapability,
     city: user.city,
     country: user.country,
     careerSummary: user.careerSummary,
@@ -316,6 +348,7 @@ export async function getCandidateDetail(db: Database, candidateUserId: string) 
     salaryMin: user.salaryMin,
     salaryMax: user.salaryMax,
     salaryCurrency: user.salaryCurrency,
+    capabilities: capabilityRows,
     skills: skillRows,
     projects: projectRows,
     employmentHistory: employment,

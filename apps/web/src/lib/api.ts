@@ -108,6 +108,7 @@ export type HorizonUser = {
   careerSummary: string | null;
   profilePhotoUrl: string | null;
   professionalTitle: string | null;
+  primaryCapability: string | null;
   remotePreference: "on_site" | "hybrid" | "remote" | null;
   availability: "immediate" | "within_one_month" | "freelance" | "permanent" | null;
   yearsExperience: number | null;
@@ -489,12 +490,37 @@ export type Project = {
   userId: string;
   title: string;
   description: string | null;
+  outcome: string | null;
   role: string | null;
   projectUrl: string | null;
+  technologies: string[];
   media: ProjectMediaItem[];
+  featured: boolean;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
+};
+
+export type Capability = {
+  id: string;
+  label: string;
+  isPrimary: boolean;
+  sortOrder: number;
+  skillNames: string[];
+  projectIds: string[];
+  projects: Array<{ id: string; title: string; outcome: string | null }>;
+  outcomes: string[];
+  confidence: string | null;
+  lastDemonstratedAt: string | null;
+  verificationStatus: string | null;
+};
+
+export type CapabilityInput = {
+  label: string;
+  isPrimary?: boolean;
+  sortOrder?: number;
+  skillNames?: string[];
+  projectIds?: string[];
 };
 
 export type ProfileBundle = {
@@ -525,14 +551,21 @@ export type ProfileBundle = {
   }>;
   recommendations: Array<{
     id: string;
-    authorName: string;
+    authorName: string | null;
     relationship: string;
-    body: string;
+    publicSummary: string;
+    keyThemes: string[];
+    body: string | null;
+    verificationStatus: "unverified" | "self_attested" | "verified" | null;
+    documentKey: string | null;
+    documentFileName: string | null;
+    documentContentType: string | null;
     createdAt: string;
     updatedAt: string;
   }>;
   skills: SkillRef[];
   projects: Project[];
+  capabilities: Capability[];
   completion: {
     profileCompleted: boolean;
     required: string[];
@@ -548,6 +581,14 @@ export function setSkillsByName(token: string, skills: string[]) {
     method: "PUT",
     token,
     body: JSON.stringify({ skills }),
+  });
+}
+
+export function setCapabilities(token: string, capabilities: CapabilityInput[]) {
+  return apiFetch<Capability[]>("/users/me/capabilities", {
+    method: "PUT",
+    token,
+    body: JSON.stringify({ capabilities }),
   });
 }
 
@@ -700,9 +741,12 @@ export function deleteQualification(token: string, id: string) {
 export function addRecommendation(
   token: string,
   body: {
-    authorName: string;
+    authorName?: string | null;
     relationship: string;
-    body: string;
+    publicSummary: string;
+    keyThemes?: string[];
+    body?: string | null;
+    verificationStatus?: "unverified" | "self_attested" | "verified" | null;
   },
 ) {
   return apiFetch<ProfileBundle["recommendations"][number]>(
@@ -719,9 +763,12 @@ export function updateRecommendation(
   token: string,
   id: string,
   body: {
-    authorName: string;
+    authorName?: string | null;
     relationship: string;
-    body: string;
+    publicSummary: string;
+    keyThemes?: string[];
+    body?: string | null;
+    verificationStatus?: "unverified" | "self_attested" | "verified" | null;
   },
 ) {
   return apiFetch<ProfileBundle["recommendations"][number]>(
@@ -750,9 +797,12 @@ export function createProject(
   body: {
     title: string;
     description?: string | null;
+    outcome?: string | null;
     role?: string | null;
     projectUrl?: string | null;
+    technologies?: string[];
     media?: ProjectMediaItem[];
+    featured?: boolean;
   },
 ) {
   return apiFetch<Project>("/projects", {
@@ -768,9 +818,12 @@ export function updateProject(
   body: Partial<{
     title: string;
     description: string | null;
+    outcome: string | null;
     role: string | null;
     projectUrl: string | null;
+    technologies: string[];
     media: ProjectMediaItem[];
+    featured: boolean;
   }>,
 ) {
   return apiFetch<Project>(`/projects/${id}`, {
@@ -822,6 +875,8 @@ export type CandidateCard = {
   firstName: string | null;
   lastName: string | null;
   professionalTitle: string | null;
+  primaryCapability: string | null;
+  additionalCapability: string | null;
   city: string | null;
   remotePreference: "on_site" | "hybrid" | "remote" | null;
   availability: "immediate" | "within_one_month" | "freelance" | "permanent" | null;
@@ -831,11 +886,23 @@ export type CandidateCard = {
   topProject: string | null;
 };
 
+/** Public recommendation — no referee identity or full letter. */
+export type PublicRecommendation = {
+  id: string;
+  relationship: string;
+  publicSummary: string;
+  keyThemes: string[];
+  verificationStatus: "unverified" | "self_attested" | "verified" | null;
+  hasFullDocument: boolean;
+  createdAt: string;
+};
+
 export type CandidateDetail = {
   id: string;
   firstName: string | null;
   lastName: string | null;
   professionalTitle: string | null;
+  primaryCapability: string | null;
   city: string | null;
   country: string | null;
   careerSummary: string | null;
@@ -846,12 +913,13 @@ export type CandidateDetail = {
   salaryMin: string | null;
   salaryMax: string | null;
   salaryCurrency: string;
+  capabilities: Capability[];
   skills: SkillRef[];
   projects: Project[];
   employmentHistory: ProfileBundle["employmentHistory"];
   education: ProfileBundle["education"];
   qualifications: ProfileBundle["qualifications"];
-  recommendations: ProfileBundle["recommendations"];
+  recommendations: PublicRecommendation[];
 };
 
 export function getDiscoveryFeed(

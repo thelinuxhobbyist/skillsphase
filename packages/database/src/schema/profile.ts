@@ -1,6 +1,7 @@
 import {
   boolean,
   date,
+  jsonb,
   pgTable,
   primaryKey,
   text,
@@ -8,6 +9,12 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { users } from "./users";
+
+/** Public/private trust signal verification states (Phase 2C expands usage). */
+export type RecommendationVerificationStatus =
+  | "unverified"
+  | "self_attested"
+  | "verified";
 
 export const employmentHistory = pgTable("employment_history", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -63,15 +70,32 @@ export const qualifications = pgTable("qualifications", {
     .defaultNow(),
 });
 
-/** Recommendations shown under Proof of Ability. */
+/**
+ * Professional references / recommendations.
+ * Public profile shows anonymous context + summary only; referee identity and
+ * full document stay private until controlled employer access (future).
+ */
 export const recommendations = pgTable("recommendations", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  authorName: text("author_name").notNull(),
+  /** Private — never shown on public profiles. */
+  authorName: text("author_name"),
   relationship: text("relationship").notNull(),
-  body: text("body").notNull(),
+  /** Short extract shown publicly. */
+  publicSummary: text("public_summary").notNull().default(""),
+  /** Optional theme chips shown publicly. */
+  keyThemes: jsonb("key_themes").$type<string[]>().notNull().default([]),
+  /** Private full letter/text when no document upload. */
+  body: text("body"),
+  verificationStatus: text("verification_status")
+    .$type<RecommendationVerificationStatus | null>()
+    .default("self_attested"),
+  /** Private R2 object key for a full reference letter (future upload flow). */
+  documentKey: text("document_key"),
+  documentFileName: text("document_file_name"),
+  documentContentType: text("document_content_type"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

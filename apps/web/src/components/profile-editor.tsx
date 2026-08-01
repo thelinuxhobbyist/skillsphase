@@ -31,6 +31,7 @@ import {
   deleteRecommendation,
   mediaUrl,
   searchSkills,
+  setCapabilities,
   setSkillsByName,
   updateCandidateProfile,
   updateCurrentUser,
@@ -40,6 +41,8 @@ import {
   updateQualification,
   updateRecommendation,
   uploadProjectMedia,
+  type Capability,
+  type CapabilityInput,
   type HorizonUser,
   type Project,
   type ProjectMediaItem,
@@ -61,7 +64,7 @@ type StepId =
 const STEPS: Array<{ id: StepId; label: string }> = [
   { id: "about", label: "About you" },
   { id: "skillProfile", label: "Skill Profile" },
-  { id: "skills", label: "Core Skills" },
+  { id: "skills", label: "Technical Skills" },
   { id: "projects", label: "Proof of Ability" },
   { id: "employment", label: "Work History" },
   { id: "education", label: "Education" },
@@ -85,6 +88,9 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
   const [step, setStep] = useState<StepId>(() => firstIncompleteStep(initial));
   const [user, setUser] = useState(initial.user);
   const [skillList, setSkillList] = useState(initial.skills.map((s) => s.name));
+  const [capabilities, setCapabilitiesState] = useState<Capability[]>(() =>
+    initialCapabilities(initial),
+  );
   const [projects, setProjects] = useState(initial.projects);
   const [employment, setEmployment] = useState(initial.employmentHistory);
   const [education, setEducation] = useState(initial.education);
@@ -101,6 +107,8 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
   userRef.current = user;
   const skillListRef = useRef(skillList);
   skillListRef.current = skillList;
+  const capabilitiesRef = useRef(capabilities);
+  capabilitiesRef.current = capabilities;
 
   const sections = useMemo(
     () =>
@@ -223,6 +231,40 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
     700,
   );
 
+  useDebouncedEffect(
+    () => {
+      void (async () => {
+        const snapshot = capabilitiesRef.current;
+        setSaveState("saving");
+        setError(null);
+        try {
+          const rows = await setCapabilities(
+            await token(),
+            toCapabilityInputs(snapshot),
+          );
+          setCapabilitiesState((current) => {
+            const emptyDrafts = current.filter((row) => !row.label.trim());
+            return [...rows, ...emptyDrafts];
+          });
+          const primary =
+            rows.find((row) => row.isPrimary)?.label ?? rows[0]?.label ?? null;
+          setUser((current) =>
+            current.primaryCapability === primary
+              ? current
+              : { ...current, primaryCapability: primary },
+          );
+          setSaveState("saved");
+          router.refresh();
+        } catch (err) {
+          setSaveState("error");
+          setError(messageFrom(err));
+        }
+      })();
+    },
+    [capabilitySaveKey(capabilities), token, router],
+    700,
+  );
+
   const stepIndex = STEPS.findIndex((s) => s.id === step);
 
   return (
@@ -269,12 +311,19 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
           <AboutStep user={user} setUser={setUser} />
         ) : null}
         {step === "skillProfile" ? (
-          <SkillProfileStep user={user} setUser={setUser} />
+          <SkillProfileStep
+            user={user}
+            setUser={setUser}
+            capabilities={capabilities}
+            onCapabilitiesChange={setCapabilitiesState}
+            skillNames={skillList}
+            projects={projects}
+          />
         ) : null}
         {step === "skills" ? (
           <SkillsStep
             skills={skillList}
-            yearsExperience={user.yearsExperience}
+            primaryCapability={user.primaryCapability}
             onChange={setSkillList}
             token={token}
           />
@@ -299,6 +348,13 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
             onDelete={async (id) => {
               await deleteProject(await token(), id);
               setProjects((rows) => rows.filter((p) => p.id !== id));
+              setCapabilitiesState((rows) =>
+                rows.map((cap) => ({
+                  ...cap,
+                  projectIds: cap.projectIds.filter((projectId) => projectId !== id),
+                  projects: cap.projects.filter((project) => project.id !== id),
+                })),
+              );
               router.refresh();
             }}
             onSaveQualification={async (body, id) => {
@@ -471,12 +527,62 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
   );
 }
 
+function initialCapabilities(initial: ProfileBundle): Capability[] {
+  if (initial.capabilities?.length) return initial.capabilities;
+  if (initial.user.primaryCapability?.trim()) {
+    return [
+      {
+        id: `draft-${crypto.randomUUID()}`,
+        label: initial.user.primaryCapability.trim(),
+        isPrimary: true,
+        sortOrder: 0,
+        skillNames: [],
+        projectIds: [],
+        projects: [],
+        outcomes: [],
+        confidence: null,
+        lastDemonstratedAt: null,
+        verificationStatus: null,
+      },
+    ];
+  }
+  return [];
+}
+
+function toCapabilityInputs(capabilities: Capability[]): CapabilityInput[] {
+  return capabilities
+    .map((capability, index) => ({
+      label: capability.label.trim(),
+      isPrimary: capability.isPrimary,
+      sortOrder: index,
+      skillNames: capability.skillNames,
+      projectIds: capability.projectIds,
+    }))
+    .filter((capability) => capability.label.length > 0);
+}
+
+function capabilitySaveKey(capabilities: Capability[]) {
+  return capabilities
+    .map(
+      (capability) =>
+        [
+          capability.id,
+          capability.label,
+          capability.isPrimary ? "1" : "0",
+          capability.skillNames.join(","),
+          capability.projectIds.join(","),
+        ].join("|"),
+    )
+    .join("\u0001");
+}
+
 function firstIncompleteStep(initial: ProfileBundle): StepId {
   const u = initial.user;
   if (!u.firstName || !u.lastName || !u.city) return "about";
   if (!u.professionalTitle) return "skillProfile";
   if (initial.skills.length < 3) return "skills";
   if (initial.projects.length < 1) return "projects";
+  if (initial.education.length < 1) return "education";
   return "review";
 }
 
@@ -510,7 +616,7 @@ function buildSectionStatus(input: {
       label: "Skill Profile basics",
       done: Boolean(u.professionalTitle?.trim()),
     },
-    { id: "skills", label: "Core Skills (min. 3)", done: input.skillCount >= 3 },
+    { id: "skills", label: "Technical Skills (min. 3)", done: input.skillCount >= 3 },
     {
       id: "projects",
       label: "Proof of Ability",
@@ -527,7 +633,6 @@ function buildSectionStatus(input: {
       id: "education",
       label: "Education",
       done: input.educationCount >= 1,
-      optional: true,
     },
   ];
 }
@@ -644,14 +749,22 @@ function AboutStep({
 function SkillProfileStep({
   user,
   setUser,
+  capabilities,
+  onCapabilitiesChange,
+  skillNames,
+  projects,
 }: {
   user: HorizonUser;
   setUser: React.Dispatch<React.SetStateAction<HorizonUser>>;
+  capabilities: Capability[];
+  onCapabilitiesChange: React.Dispatch<React.SetStateAction<Capability[]>>;
+  skillNames: string[];
+  projects: Project[];
 }) {
   return (
     <StepShell
       title="Skill Profile"
-      body="These fields are the first thing businesses see: what you do, your availability, and your rate."
+      body="These fields are the first thing businesses see: what you can do, your availability, and your rate."
     >
       <Field
         label="Professional title"
@@ -661,6 +774,12 @@ function SkillProfileStep({
         }
         required
         hint="e.g. Senior React Developer, Brand & Marketing Lead"
+      />
+      <CapabilitiesEditor
+        capabilities={capabilities}
+        onChange={onCapabilitiesChange}
+        skillNames={skillNames}
+        projects={projects}
       />
       <div className="grid gap-3 md:grid-cols-2">
         <label className="block text-sm">
@@ -705,16 +824,6 @@ function SkillProfileStep({
             ))}
           </select>
         </label>
-        <Field
-          label="Years of experience"
-          value={user.yearsExperience != null ? String(user.yearsExperience) : ""}
-          onChange={(value) =>
-            setUser((u) => ({
-              ...u,
-              yearsExperience: value.trim() ? Number(value) : null,
-            }))
-          }
-        />
       </div>
       <div>
         <p className="mb-1 text-sm font-medium text-primary">
@@ -737,14 +846,221 @@ function SkillProfileStep({
   );
 }
 
+function CapabilitiesEditor({
+  capabilities,
+  onChange,
+  skillNames,
+  projects,
+}: {
+  capabilities: Capability[];
+  onChange: React.Dispatch<React.SetStateAction<Capability[]>>;
+  skillNames: string[];
+  projects: Project[];
+}) {
+  return (
+    <div className="space-y-3">
+      <div>
+        <p className="text-sm font-medium text-primary">Capabilities</p>
+        <p className="mt-0.5 text-xs text-[color:var(--foreground)]/65">
+          What you can do. Browse cards show your primary capability plus one
+          more — the full list appears on your profile (max 8).
+        </p>
+      </div>
+
+      <ul className="space-y-3">
+        {capabilities.map((capability, index) => (
+          <li
+            key={capability.id}
+            className="rounded-md border border-[color:var(--line)] bg-white p-3"
+          >
+            <div className="flex flex-wrap items-start gap-2">
+              <div className="min-w-0 flex-1">
+                <Field
+                  label={capability.isPrimary ? "Primary capability" : "Capability"}
+                  value={capability.label}
+                  onChange={(label) =>
+                    onChange((rows) =>
+                      rows.map((row, rowIndex) =>
+                        rowIndex === index
+                          ? { ...row, label: label.slice(0, 120) }
+                          : row,
+                      ),
+                    )
+                  }
+                  hint="e.g. Builds scalable web applications"
+                />
+              </div>
+              <button
+                type="button"
+                className="mt-6 text-sm font-semibold text-red-800 underline"
+                onClick={() =>
+                  onChange((rows) => {
+                    const next = rows.filter((_, rowIndex) => rowIndex !== index);
+                    if (next.length > 0 && !next.some((row) => row.isPrimary)) {
+                      next[0] = { ...next[0]!, isPrimary: true };
+                    }
+                    return next;
+                  })
+                }
+              >
+                Remove
+              </button>
+            </div>
+
+            <label className="mt-2 flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="primary-capability"
+                checked={capability.isPrimary}
+                onChange={() =>
+                  onChange((rows) =>
+                    rows.map((row, rowIndex) => ({
+                      ...row,
+                      isPrimary: rowIndex === index,
+                    })),
+                  )
+                }
+              />
+              <span className="text-[color:var(--foreground)]/80">
+                Set as primary
+              </span>
+            </label>
+
+            {skillNames.length > 0 ? (
+              <div className="mt-3">
+                <p className="mb-1 text-xs font-medium text-primary">
+                  Linked skills
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {skillNames.map((skill) => {
+                    const checked = capability.skillNames.includes(skill);
+                    return (
+                      <label
+                        key={`${capability.id}-${skill}`}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] px-2 py-1 text-xs"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() =>
+                            onChange((rows) =>
+                              rows.map((row, rowIndex) => {
+                                if (rowIndex !== index) return row;
+                                const skillNamesNext = checked
+                                  ? row.skillNames.filter((name) => name !== skill)
+                                  : [...row.skillNames, skill];
+                                return { ...row, skillNames: skillNamesNext };
+                              }),
+                            )
+                          }
+                        />
+                        {skill}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <p className="mt-3 text-xs text-[color:var(--foreground)]/55">
+                Add technical skills in the next step to link them here.
+              </p>
+            )}
+
+            {projects.length > 0 ? (
+              <div className="mt-3">
+                <p className="mb-1 text-xs font-medium text-primary">
+                  Supported by (Proof of Ability)
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {projects.map((project) => {
+                    const checked = capability.projectIds.includes(project.id);
+                    return (
+                      <label
+                        key={`${capability.id}-${project.id}`}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] px-2 py-1 text-xs"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() =>
+                            onChange((rows) =>
+                              rows.map((row, rowIndex) => {
+                                if (rowIndex !== index) return row;
+                                const projectIds = checked
+                                  ? row.projectIds.filter((id) => id !== project.id)
+                                  : [...row.projectIds, project.id];
+                                const linkedProjects = projects
+                                  .filter((item) => projectIds.includes(item.id))
+                                  .map((item) => ({
+                                    id: item.id,
+                                    title: item.title,
+                                    outcome: item.outcome,
+                                  }));
+                                return {
+                                  ...row,
+                                  projectIds,
+                                  projects: linkedProjects,
+                                  outcomes: linkedProjects
+                                    .map((item) => item.outcome?.trim())
+                                    .filter((value): value is string => Boolean(value)),
+                                };
+                              }),
+                            )
+                          }
+                        />
+                        {project.title}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <p className="mt-3 text-xs text-[color:var(--foreground)]/55">
+                Add Proof of Ability projects later, then link them here.
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      {capabilities.length < 8 ? (
+        <button
+          type="button"
+          className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary"
+          onClick={() =>
+            onChange((rows) => [
+              ...rows,
+              {
+                id: `draft-${crypto.randomUUID()}`,
+                label: "",
+                isPrimary: rows.length === 0,
+                sortOrder: rows.length,
+                skillNames: [],
+                projectIds: [],
+                projects: [],
+                outcomes: [],
+                confidence: null,
+                lastDemonstratedAt: null,
+                verificationStatus: null,
+              },
+            ])
+          }
+        >
+          Add capability
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function SkillsStep({
   skills,
-  yearsExperience,
+  primaryCapability,
   onChange,
   token,
 }: {
   skills: string[];
-  yearsExperience: number | null;
+  primaryCapability: string | null;
   onChange: (skills: string[]) => void;
   token: () => Promise<string>;
 }) {
@@ -795,7 +1111,7 @@ function SkillsStep({
 
   return (
     <StepShell
-      title="Core Skills"
+      title="Technical Skills"
       body="Skills are the first thing businesses see. Add at least 3 — React, Python, AWS, Figma, Marketing, Video Editing, anything demonstrable."
     >
       <div className="flex flex-wrap gap-2">
@@ -818,11 +1134,9 @@ function SkillsStep({
           ))
         )}
       </div>
-      {yearsExperience != null && yearsExperience >= 0 ? (
+      {primaryCapability ? (
         <p className="text-sm text-[color:var(--foreground)]/70">
-          {yearsExperience === 1
-            ? "1 year of experience"
-            : `${yearsExperience} years of experience`}
+          Primary capability: {primaryCapability}
         </p>
       ) : null}
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -885,18 +1199,24 @@ function ProjectsStep({
   onCreate: (body: {
     title: string;
     description?: string | null;
+    outcome?: string | null;
     role?: string | null;
     projectUrl?: string | null;
+    technologies?: string[];
     media?: ProjectMediaItem[];
+    featured?: boolean;
   }) => Promise<void>;
   onUpdate: (
     id: string,
     body: Partial<{
       title: string;
       description: string | null;
+      outcome: string | null;
       role: string | null;
       projectUrl: string | null;
+      technologies: string[];
       media: ProjectMediaItem[];
+      featured: boolean;
     }>,
   ) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
@@ -912,9 +1232,11 @@ function ProjectsStep({
   onDeleteQualification: (id: string) => Promise<void>;
   onSaveRecommendation: (
     body: {
-      authorName: string;
+      authorName?: string | null;
       relationship: string;
-      body: string;
+      publicSummary: string;
+      keyThemes?: string[];
+      body?: string | null;
     },
     id?: string,
   ) => Promise<void>;
@@ -931,7 +1253,7 @@ function ProjectsStep({
   return (
     <StepShell
       title="Proof of Ability"
-      body="Add evidence of what you can do: projects you’ve delivered, certificates you’ve earned, and recommendations from people you’ve worked with."
+      body="Add evidence of what you can do: projects you’ve delivered, certificates you’ve earned, and professional recommendations. Recommendation summaries are public; referee names stay private."
     >
       <ul className="space-y-3">
         {projects.map((project) =>
@@ -956,7 +1278,7 @@ function ProjectsStep({
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-primary-accent">
-                    Project
+                    {project.featured ? "Featured project" : "Project"}
                   </p>
                   <p className="font-semibold text-primary">{project.title}</p>
                   {project.role ? (
@@ -964,9 +1286,19 @@ function ProjectsStep({
                       {project.role}
                     </p>
                   ) : null}
+                  {project.outcome ? (
+                    <p className="mt-1 text-sm font-medium text-primary">
+                      {project.outcome}
+                    </p>
+                  ) : null}
                   {project.description ? (
                     <p className="mt-1 text-sm text-[color:var(--foreground)]/75">
                       {project.description}
+                    </p>
+                  ) : null}
+                  {(project.technologies ?? []).length > 0 ? (
+                    <p className="mt-1 text-xs text-[color:var(--foreground)]/65">
+                      {(project.technologies ?? []).join(" · ")}
                     </p>
                   ) : null}
                   {project.media.length > 0 ? (
@@ -1079,13 +1411,22 @@ function ProjectsStep({
                   <p className="text-xs font-medium text-primary-accent">
                     Recommendation
                   </p>
-                  <p className="font-semibold text-primary">{row.authorName}</p>
-                  <p className="text-sm text-[color:var(--foreground)]/70">
+                  <p className="font-semibold text-primary">
                     {row.relationship}
                   </p>
                   <p className="mt-1 text-sm text-[color:var(--foreground)]/75">
-                    {row.body}
+                    {row.publicSummary}
                   </p>
+                  {row.authorName ? (
+                    <p className="mt-1 text-xs text-[color:var(--foreground)]/55">
+                      Referee (private): {row.authorName}
+                    </p>
+                  ) : null}
+                  {(row.keyThemes ?? []).length > 0 ? (
+                    <p className="mt-1 text-xs text-[color:var(--foreground)]/65">
+                      Themes: {row.keyThemes.join(" · ")}
+                    </p>
+                  ) : null}
                 </div>
                 <div className="flex gap-3">
                   <button
@@ -1190,9 +1531,12 @@ function ProjectForm({
   onSave: (body: {
     title: string;
     description?: string | null;
+    outcome?: string | null;
     role?: string | null;
     projectUrl?: string | null;
+    technologies?: string[];
     media?: ProjectMediaItem[];
+    featured?: boolean;
   }) => Promise<void>;
   onCancel: () => void;
   onError: (message: string | null) => void;
@@ -1200,6 +1544,11 @@ function ProjectForm({
   const [title, setTitle] = useState(initial?.title ?? "");
   const [role, setRole] = useState(initial?.role ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
+  const [outcome, setOutcome] = useState(initial?.outcome ?? "");
+  const [technologies, setTechnologies] = useState(
+    (initial?.technologies ?? []).join(", "),
+  );
+  const [featured, setFeatured] = useState(initial?.featured ?? false);
   const [projectUrl, setProjectUrl] = useState(initial?.projectUrl ?? "");
   const [media, setMedia] = useState<ProjectMediaItem[]>(initial?.media ?? []);
   const [linkDraft, setLinkDraft] = useState("");
@@ -1220,9 +1569,16 @@ function ProjectForm({
             await onSave({
               title,
               description: description || null,
+              outcome: outcome.trim().slice(0, 500) || null,
               role: role || null,
               projectUrl: projectUrl || null,
+              technologies: technologies
+                .split(",")
+                .map((value) => value.trim())
+                .filter(Boolean)
+                .slice(0, 20),
               media,
+              featured,
             });
           } catch (err) {
             setLocalError(messageFrom(err));
@@ -1246,8 +1602,38 @@ function ProjectForm({
         value={description}
         onChange={setDescription}
         rows={3}
-        hint="What you built and the impact it had."
+        hint="What you built."
       />
+      <TextArea
+        label="Outcome (optional)"
+        value={outcome}
+        onChange={(value) => setOutcome(value.slice(0, 500))}
+        rows={2}
+        hint="What changed because of your work? e.g. Reduced warehouse lookup times by 80%"
+      />
+      <Field
+        label="Technologies used (optional)"
+        value={technologies}
+        onChange={setTechnologies}
+        hint="Comma-separated — e.g. React, TypeScript, PostgreSQL"
+      />
+      <label className="flex items-start gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={featured}
+          onChange={(e) => setFeatured(e.target.checked)}
+          className="mt-1"
+        />
+        <span>
+          <span className="font-medium text-primary">
+            Feature as Proof of Ability
+          </span>
+          <span className="mt-0.5 block text-[color:var(--foreground)]/65">
+            Shown first on your profile and on the browse card. Only one project
+            can be featured.
+          </span>
+        </span>
+      </label>
       <Field
         label="Project URL (optional)"
         value={projectUrl}
@@ -1614,12 +2000,12 @@ function EducationStep({
   return (
     <StepShell
       title="Education"
-      body="Add schools, degrees, and courses. Certificates and recommendations live under Proof of Ability."
+      body="Add at least one school, degree, or course. This is required for discovery. Certificates and recommendations live under Proof of Ability."
     >
       <ul className="space-y-3">
         {education.length === 0 ? (
           <li className="text-sm text-[color:var(--foreground)]/55">
-            No education added yet — optional.
+            No education added yet — required for your Skill Profile to appear in discovery.
           </li>
         ) : (
           education.map((row) =>
@@ -1879,14 +2265,22 @@ function RecommendationForm({
 }: {
   initial?: ProfileBundle["recommendations"][number];
   onSave: (body: {
-    authorName: string;
+    authorName?: string | null;
     relationship: string;
-    body: string;
+    publicSummary: string;
+    keyThemes?: string[];
+    body?: string | null;
   }) => Promise<void>;
   onCancel: () => void;
 }) {
   const [authorName, setAuthorName] = useState(initial?.authorName ?? "");
   const [relationship, setRelationship] = useState(initial?.relationship ?? "");
+  const [publicSummary, setPublicSummary] = useState(
+    initial?.publicSummary ?? "",
+  );
+  const [keyThemes, setKeyThemes] = useState(
+    (initial?.keyThemes ?? []).join(", "),
+  );
   const [body, setBody] = useState(initial?.body ?? "");
   const [pending, setPending] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -1901,9 +2295,15 @@ function RecommendationForm({
           setPending(true);
           try {
             await onSave({
-              authorName,
+              authorName: authorName.trim() || null,
               relationship,
-              body,
+              publicSummary: publicSummary.trim().slice(0, 400),
+              keyThemes: keyThemes
+                .split(",")
+                .map((value) => value.trim())
+                .filter(Boolean)
+                .slice(0, 8),
+              body: body.trim() || null,
             });
           } catch (err) {
             setLocalError(messageFrom(err));
@@ -1913,27 +2313,38 @@ function RecommendationForm({
         })();
       }}
     >
-      <div className="grid gap-3 md:grid-cols-2">
-        <Field
-          label="Author name"
-          value={authorName}
-          onChange={setAuthorName}
-          required
-        />
-        <Field
-          label="Relationship"
-          value={relationship}
-          onChange={setRelationship}
-          required
-          hint="e.g. Former manager, Client, Colleague"
-        />
-      </div>
+      <Field
+        label="Relationship / role"
+        value={relationship}
+        onChange={setRelationship}
+        required
+        hint="Shown publicly — e.g. Former engineering manager"
+      />
       <TextArea
-        label="Recommendation"
+        label="Public summary"
+        value={publicSummary}
+        onChange={(value) => setPublicSummary(value.slice(0, 400))}
+        rows={3}
+        hint="Short extract shown on your profile (max 400 characters). Not the full letter."
+      />
+      <Field
+        label="Key themes (optional)"
+        value={keyThemes}
+        onChange={setKeyThemes}
+        hint="Comma-separated — e.g. Technical leadership, Product delivery, Collaboration"
+      />
+      <Field
+        label="Referee name (private)"
+        value={authorName}
+        onChange={setAuthorName}
+        hint="Never shown publicly. Kept for your records and future controlled access."
+      />
+      <TextArea
+        label="Full reference text (private, optional)"
         value={body}
         onChange={setBody}
         rows={4}
-        hint="What they said about your work."
+        hint="Private full letter or notes. Not shown on your public profile. Document upload comes later."
       />
       {localError ? (
         <p className="text-sm text-red-700" role="alert">
@@ -1943,7 +2354,7 @@ function RecommendationForm({
       <div className="flex gap-2">
         <button
           type="submit"
-          disabled={pending || !authorName || !relationship || !body}
+          disabled={pending || !relationship || !publicSummary.trim()}
           className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
         >
           {initial ? "Update recommendation" : "Save recommendation"}
@@ -2006,7 +2417,12 @@ function ReviewStep({
           onEdit={() => onEditSection("skillProfile")}
         />
         <ReviewItem
-          label="Core Skills"
+          label="Capabilities"
+          value={user.primaryCapability?.trim() || "Not added"}
+          onEdit={() => onEditSection("skillProfile")}
+        />
+        <ReviewItem
+          label="Technical Skills"
           value={`${skillCount}`}
           onEdit={() => onEditSection("skills")}
         />

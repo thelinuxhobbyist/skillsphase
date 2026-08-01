@@ -9,6 +9,7 @@ import {
   deleteRecommendation,
   getProfileBundle,
   listSkills,
+  setCapabilitiesForUser,
   setUserSkillsByName,
   toPublicUser,
   updateAppUserProfile,
@@ -22,6 +23,7 @@ import {
   employmentHistorySchema,
   qualificationSchema,
   recommendationSchema,
+  setCapabilitiesSchema,
   setSkillsByNameSchema,
   updateCandidateProfileSchema,
 } from "@horizon/shared";
@@ -55,6 +57,7 @@ profileRoutes.get("/me/profile", requireRoles("job_seeker"), async (c) => {
     recommendations: bundle.recommendations,
     skills: bundle.skills,
     projects: bundle.projects,
+    capabilities: bundle.capabilities,
     completion: {
       profileCompleted: bundle.user.profileCompleted,
       required: [
@@ -63,6 +66,7 @@ profileRoutes.get("/me/profile", requireRoles("job_seeker"), async (c) => {
         "location",
         "professional title",
         "at least 3 skills",
+        "education",
       ],
     },
   });
@@ -119,6 +123,30 @@ profileRoutes.put("/me/skills", requireRoles("job_seeker"), async (c) => {
   const db = getDb(c);
   const skills = await setUserSkillsByName(db, appUser.id, parsed.data.skills);
   return ok(c, skills);
+});
+
+profileRoutes.put("/me/capabilities", requireRoles("job_seeker"), async (c) => {
+  const appUser = c.get("appUser");
+  if (!appUser) return fail(c, "UNAUTHORIZED", "Authentication required.", 401);
+
+  const body = await c.req.json().catch(() => null);
+  const parsed = setCapabilitiesSchema.safeParse(body);
+  if (!parsed.success) {
+    return fail(
+      c,
+      "VALIDATION_ERROR",
+      parsed.error.issues[0]?.message ?? "Invalid capabilities.",
+      400,
+    );
+  }
+
+  const db = getDb(c);
+  const capabilities = await setCapabilitiesForUser(
+    db,
+    appUser.id,
+    parsed.data.capabilities,
+  );
+  return ok(c, capabilities);
 });
 
 profileRoutes.post("/me/employment-history", requireRoles("job_seeker"), async (c) => {

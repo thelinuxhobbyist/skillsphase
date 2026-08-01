@@ -9,6 +9,7 @@ import {
   userSkills,
 } from "../schema/profile";
 import { users } from "../schema/users";
+import { listCapabilitiesForUser } from "./capabilities";
 import { listProjectsForUser } from "./projects";
 import { recomputeProfileCompleted } from "./users";
 
@@ -118,6 +119,7 @@ export async function createEducation(
     })
     .returning();
   if (!row) throw new Error("Failed to create education");
+  await syncProfileCompleted(db, userId);
   return row;
 }
 
@@ -152,6 +154,17 @@ export async function deleteEducation(db: Database, userId: string, id: string) 
   await db
     .delete(education)
     .where(and(eq(education.id, id), eq(education.userId, userId)));
+  await syncProfileCompleted(db, userId);
+}
+
+async function syncProfileCompleted(db: Database, userId: string) {
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (!user) return;
+  const profileCompleted = await recomputeProfileCompleted(db, user);
+  await db
+    .update(users)
+    .set({ profileCompleted, updatedAt: new Date() })
+    .where(eq(users.id, userId));
 }
 
 export async function listQualifications(db: Database, userId: string) {
@@ -221,6 +234,50 @@ export async function deleteQualification(
     .where(and(eq(qualifications.id, id), eq(qualifications.userId, userId)));
 }
 
+export type RecommendationInput = {
+  authorName?: string | null;
+  relationship: string;
+  publicSummary: string;
+  keyThemes?: string[];
+  body?: string | null;
+  verificationStatus?: "unverified" | "self_attested" | "verified" | null;
+};
+
+/** Owner-facing row (includes private referee name + full text + document meta). */
+export type OwnerRecommendation = typeof recommendations.$inferSelect;
+
+/** Public trust-signal shape — no referee identity or full document content. */
+export type PublicRecommendation = {
+  id: string;
+  relationship: string;
+  publicSummary: string;
+  keyThemes: string[];
+  verificationStatus: string | null;
+  hasFullDocument: boolean;
+  createdAt: Date;
+};
+
+function normaliseThemes(themes?: string[]) {
+  if (!themes) return [];
+  return [
+    ...new Set(themes.map((theme) => theme.trim()).filter(Boolean)),
+  ].slice(0, 8);
+}
+
+export function toPublicRecommendation(
+  row: OwnerRecommendation,
+): PublicRecommendation {
+  return {
+    id: row.id,
+    relationship: row.relationship,
+    publicSummary: row.publicSummary,
+    keyThemes: row.keyThemes ?? [],
+    verificationStatus: row.verificationStatus,
+    hasFullDocument: Boolean(row.documentKey || row.body?.trim()),
+    createdAt: row.createdAt,
+  };
+}
+
 export async function listRecommendations(db: Database, userId: string) {
   return db
     .select()
@@ -229,22 +286,26 @@ export async function listRecommendations(db: Database, userId: string) {
     .orderBy(asc(recommendations.createdAt));
 }
 
+export async function listPublicRecommendations(db: Database, userId: string) {
+  const rows = await listRecommendations(db, userId);
+  return rows.map(toPublicRecommendation);
+}
+
 export async function createRecommendation(
   db: Database,
   userId: string,
-  input: {
-    authorName: string;
-    relationship: string;
-    body: string;
-  },
+  input: RecommendationInput,
 ) {
   const [row] = await db
     .insert(recommendations)
     .values({
       userId,
-      authorName: input.authorName,
+      authorName: input.authorName?.trim() || null,
       relationship: input.relationship,
-      body: input.body,
+      publicSummary: input.publicSummary.trim(),
+      keyThemes: normaliseThemes(input.keyThemes),
+      body: input.body?.trim() || null,
+      verificationStatus: input.verificationStatus ?? "self_attested",
     })
     .returning();
   if (!row) throw new Error("Failed to create recommendation");
@@ -255,18 +316,34 @@ export async function updateRecommendation(
   db: Database,
   userId: string,
   id: string,
-  input: {
-    authorName: string;
-    relationship: string;
-    body: string;
-  },
+  input: RecommendationInput,
 ) {
+  const [existing] = await db
+    .select()
+    .from(recommendations)
+    .where(and(eq(recommendations.id, id), eq(recommendations.userId, userId)))
+    .limit(1);
+  if (!existing) throw new Error("Recommendation not found");
+
   const [row] = await db
     .update(recommendations)
     .set({
-      authorName: input.authorName,
+      authorName:
+        input.authorName === undefined
+          ? existing.authorName
+          : input.authorName?.trim() || null,
       relationship: input.relationship,
-      body: input.body,
+      publicSummary: input.publicSummary.trim(),
+      keyThemes:
+        input.keyThemes === undefined
+          ? existing.keyThemes
+          : normaliseThemes(input.keyThemes),
+      body:
+        input.body === undefined ? existing.body : input.body?.trim() || null,
+      verificationStatus:
+        input.verificationStatus === undefined
+          ? existing.verificationStatus
+          : input.verificationStatus,
       updatedAt: new Date(),
     })
     .where(and(eq(recommendations.id, id), eq(recommendations.userId, userId)))
@@ -369,6 +446,7 @@ export async function getProfileBundle(db: Database, userId: string) {
     recommendationRows,
     skillRows,
     projectRows,
+    capabilityRows,
   ] = await Promise.all([
     listEmploymentHistory(db, userId),
     listEducation(db, userId),
@@ -376,6 +454,7 @@ export async function getProfileBundle(db: Database, userId: string) {
     listRecommendations(db, userId),
     listUserSkills(db, userId),
     listProjectsForUser(db, userId),
+    listCapabilitiesForUser(db, userId),
   ]);
 
   return {
@@ -386,5 +465,6 @@ export async function getProfileBundle(db: Database, userId: string) {
     recommendations: recommendationRows,
     skills: skillRows,
     projects: projectRows,
+    capabilities: capabilityRows,
   };
 }

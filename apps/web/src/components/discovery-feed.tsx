@@ -299,10 +299,15 @@ function CandidateCardView({ card }: { card: CandidateCard }) {
       ) : null}
 
       <dl className="mt-4 space-y-1 text-sm text-[color:var(--foreground)]/75">
-        {card.yearsExperience != null ? (
+        {card.primaryCapability ? (
           <div>
-            <dt className="inline font-semibold text-primary">Experience: </dt>
-            <dd className="inline">{card.yearsExperience} years</dd>
+            <dt className="inline font-semibold text-primary">Primary capability: </dt>
+            <dd className="inline">{card.primaryCapability}</dd>
+            {card.additionalCapability ? (
+              <dd className="mt-0.5 block text-[color:var(--foreground)]/65">
+                + {card.additionalCapability}
+              </dd>
+            ) : null}
           </div>
         ) : null}
         {card.remotePreference ? (

@@ -26,41 +26,44 @@ export default async function PublicCandidateDetailPage({
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-3xl min-w-0 px-4 py-10 sm:px-6 sm:py-12">
-        <Link href="/discover-talent" className="text-sm text-primary underline">
+      <main className="mx-auto w-full max-w-[820px] min-w-0 px-4 py-9 sm:px-8 sm:py-14">
+        <Link
+          href="/discover-talent"
+          className="mb-7 inline-block text-[13px] text-[color:var(--ink-soft)] no-underline hover:text-primary"
+        >
           ← Back to Browse Talent
         </Link>
 
-        <div className="mt-4">
-          <CandidateProfileView
-            candidate={candidate}
-            name={name}
-            fallbackTitle="Skill Profile"
-            actions={
-              <div className="flex flex-wrap gap-3 rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-4">
-                <p className="flex-1 min-w-[220px] text-sm text-[color:var(--foreground)]/75">
-                  Want to contact {name || "this candidate"}? Sign in if
-                  you&apos;re already a verified business, or register to get
-                  started.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Link
-                    href="/login"
-                    className="rounded-md border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-semibold text-primary"
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/register?as=business"
-                    className="btn-primary rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-                  >
-                    Register as a business
-                  </Link>
-                </div>
+        <CandidateProfileView
+          candidate={candidate}
+          name={name}
+          fallbackTitle="Skill Profile"
+          actions={
+            <>
+              <p className="m-0 max-w-[420px] text-[14.5px] text-[color:var(--ink-soft)]">
+                <strong className="text-[color:var(--ink)]">
+                  Want to contact {name || "this candidate"}?
+                </strong>{" "}
+                Sign in if you&apos;re already a verified business, or register
+                to get started.
+              </p>
+              <div className="flex shrink-0 flex-wrap gap-2.5">
+                <Link
+                  href="/login"
+                  className="inline-block rounded-sm border border-primary bg-transparent px-5 py-2.5 text-sm font-semibold text-primary"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register?as=business"
+                  className="inline-block rounded-sm border border-primary bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+                >
+                  Register as a business
+                </Link>
               </div>
-            }
-          />
-        </div>
+            </>
+          }
+        />
       </main>
     </>
   );

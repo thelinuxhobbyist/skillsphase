@@ -51,12 +51,10 @@ export function PublicCandidateCardView({ card }: { card: PublicCandidateCard })
     ? mediaUrl(card.profilePhotoUrl)
     : null;
   const initials = initialsFor(card);
-  const experience =
-    card.yearsExperience != null
-      ? `${card.yearsExperience} yr${card.yearsExperience === 1 ? "" : "s"} experience`
-      : null;
+  const capability = card.primaryCapability?.trim() || null;
+  const additional = card.additionalCapability?.trim() || null;
   const project = card.topProject?.trim() || null;
-  const hasEvidence = experience != null || project != null;
+  const hasEvidence = capability != null || project != null;
   const skills = card.skills.slice(0, 3);
 
   return (
@@ -101,14 +99,19 @@ export function PublicCandidateCardView({ card }: { card: PublicCandidateCard })
 
           {hasEvidence ? (
             <div className="mb-4 space-y-3 border-y border-dashed border-[color:var(--line)] py-3">
-              {experience ? (
+              {capability ? (
                 <div>
                   <p className="mb-1 font-mono text-[10.5px] font-medium uppercase tracking-[0.08em] text-[color:var(--ink-soft)]">
-                    Experience
+                    Primary Capability
                   </p>
-                  <p className="text-[13.5px] font-semibold leading-snug text-[color:var(--ink)]">
-                    {experience}
+                  <p className="line-clamp-2 text-[13.5px] font-semibold leading-snug text-[color:var(--ink)]">
+                    {capability}
                   </p>
+                  {additional ? (
+                    <p className="mt-1.5 line-clamp-1 text-[12.5px] leading-snug text-[color:var(--ink-soft)]">
+                      + {additional}
+                    </p>
+                  ) : null}
                 </div>
               ) : null}
               {project ? (

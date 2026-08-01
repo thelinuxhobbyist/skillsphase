@@ -68,6 +68,8 @@ export const updateUserProfileSchema = z.object({
 /** Candidate Skill Profile fields (job_seeker role only). */
 export const updateCandidateProfileSchema = z.object({
   professionalTitle: z.string().trim().max(150).optional().nullable(),
+  /** Kept for backwards compatibility; prefer PUT /me/capabilities. */
+  primaryCapability: z.string().trim().max(120).optional().nullable(),
   careerSummary: z.string().trim().max(3000).optional().nullable(),
   remotePreference: z.enum(REMOTE_TYPES).optional().nullable(),
   availability: z.enum(AVAILABILITY_OPTIONS).optional().nullable(),
@@ -75,6 +77,18 @@ export const updateCandidateProfileSchema = z.object({
   salaryMin: z.number().nonnegative().optional().nullable(),
   salaryMax: z.number().nonnegative().optional().nullable(),
   salaryCurrency: z.string().trim().length(3).optional(),
+});
+
+export const capabilityInputSchema = z.object({
+  label: z.string().trim().min(1).max(120),
+  isPrimary: z.boolean().optional(),
+  sortOrder: z.number().int().min(0).max(100).optional(),
+  skillNames: z.array(z.string().trim().min(1).max(80)).max(20).optional(),
+  projectIds: z.array(z.string().uuid()).max(20).optional(),
+});
+
+export const setCapabilitiesSchema = z.object({
+  capabilities: z.array(capabilityInputSchema).max(8),
 });
 
 export const createCompanySchema = z.object({
@@ -147,9 +161,12 @@ export const projectMediaItemSchema = z.object({
 export const projectSchema = z.object({
   title: z.string().trim().min(1).max(200),
   description: z.string().trim().max(5000).optional().nullable(),
+  outcome: z.string().trim().max(500).optional().nullable(),
   role: z.string().trim().max(200).optional().nullable(),
   projectUrl: z.string().url().optional().nullable(),
+  technologies: z.array(z.string().trim().min(1).max(60)).max(20).optional(),
   media: z.array(projectMediaItemSchema).max(20).default([]),
+  featured: z.boolean().optional(),
   sortOrder: z.number().int().min(0).max(1000).optional(),
 });
 

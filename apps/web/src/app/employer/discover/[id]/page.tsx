@@ -49,21 +49,20 @@ export default async function CandidateDetailPage({
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-3xl min-w-0 px-4 py-10 sm:px-6 sm:py-12">
-        <Link href="/employer/discover" className="text-sm text-primary underline">
+      <main className="mx-auto w-full max-w-[820px] min-w-0 px-4 py-9 sm:px-8 sm:py-14">
+        <Link
+          href="/employer/discover"
+          className="mb-7 inline-block text-[13px] text-[color:var(--ink-soft)] no-underline hover:text-primary"
+        >
           ← Back to discovery
         </Link>
 
-        <div className="mt-4">
-          <CandidateProfileView
-            candidate={candidate}
-            name={name}
-            fallbackTitle="Candidate"
-            actions={
-              <CandidateDetailActions candidateId={id} initiallySaved={isSaved} />
-            }
-          />
-        </div>
+        <CandidateProfileView
+          candidate={candidate}
+          name={name}
+          fallbackTitle="Candidate"
+          actions={<CandidateDetailActions candidateId={id} initiallySaved={isSaved} />}
+        />
       </main>
     </>
   );

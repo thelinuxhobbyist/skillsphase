@@ -3,6 +3,7 @@ export * from "./users";
 export * from "./companies";
 export * from "./profile";
 export * from "./marketplace";
+export * from "./capabilities";
 export * from "./admin";
 export * from "./admin-sessions";
 export * from "./homepage";
