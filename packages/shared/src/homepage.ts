@@ -177,7 +177,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       {
         title: "Skill profiles",
         subtitle:
-          "Browse real Skill Profiles — skills, experience, and portfolio evidence.",
+          "Discover people by skills, experience, and evidence of their work.",
       },
       true,
     ),

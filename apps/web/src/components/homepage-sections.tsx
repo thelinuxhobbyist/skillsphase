@@ -248,7 +248,7 @@ function HomepageSectionBlock({
                 <p className="mt-2 text-base text-[color:var(--ink-soft)]">
                   {str(
                     c.subtitle,
-                    "Browse real Skill Profiles — skills, experience, and portfolio evidence.",
+                    "Discover people by skills, experience, and evidence of their work.",
                   )}
                 </p>
               </div>
