@@ -32,7 +32,7 @@ export function CandidateProfileView({
     <>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-sans text-3xl text-primary sm:text-4xl">
+          <h1 className="font-display text-3xl text-primary sm:text-4xl">
             {candidate.professionalTitle || name || fallbackTitle}
           </h1>
           <p className="mt-1 text-[color:var(--foreground)]/75">
@@ -63,7 +63,7 @@ export function CandidateProfileView({
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-accent">
             What they can do
           </p>
-          <h2 className="mt-1 font-sans text-xl text-primary">
+          <h2 className="mt-1 font-display text-xl text-primary">
             Core Skills
           </h2>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -112,7 +112,7 @@ export function CandidateProfileView({
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-accent">
             Evidence
           </p>
-          <h2 className="mt-1 font-sans text-xl text-primary">
+          <h2 className="mt-1 font-display text-xl text-primary">
             Proof of Ability
           </h2>
 
@@ -227,7 +227,7 @@ export function CandidateProfileView({
       {/* Work history — a simple timeline, no long descriptions. */}
       {candidate.employmentHistory.length > 0 ? (
         <section className="mt-10">
-          <h2 className="font-sans text-xl text-primary">
+          <h2 className="font-display text-xl text-primary">
             Work history
           </h2>
           <ul className="mt-4 space-y-4 border-l border-[color:var(--line)] pl-4">

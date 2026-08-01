@@ -20,7 +20,7 @@ export default async function DiscoverTalentPage() {
         <p className="text-sm font-medium text-primary">
           Skills First Hiring
         </p>
-        <h1 className="mt-3 font-sans text-4xl text-primary">
+        <h1 className="mt-3 font-display text-4xl text-primary">
           Browse Skill Profiles
         </h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[color:var(--foreground)]/80">

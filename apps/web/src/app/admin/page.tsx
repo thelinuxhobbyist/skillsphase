@@ -18,7 +18,7 @@ export default async function AdminDashboardPage() {
       <main className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6">
         <div className="mb-10">
           <p className="eyebrow">Administrator</p>
-          <h1 className="mt-3 font-sans text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
+          <h1 className="mt-3 font-display text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
             Admin dashboard
           </h1>
         </div>
@@ -56,7 +56,7 @@ export default async function AdminDashboardPage() {
 
         <div className="grid gap-12 lg:grid-cols-2">
           <section>
-            <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
+            <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
               Pending business approvals
             </h2>
             <div className="mt-5">
@@ -65,7 +65,7 @@ export default async function AdminDashboardPage() {
           </section>
           <section className="space-y-10">
             <div>
-              <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
+              <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
                 Find a user
               </h2>
               <p className="mt-2 text-base text-[color:var(--ink-soft)]">
@@ -93,7 +93,7 @@ export default async function AdminDashboardPage() {
               </form>
             </div>
             <div>
-              <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
+              <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
                 Your account
               </h2>
               <p className="mt-2 text-base text-[color:var(--ink-soft)]">
@@ -107,7 +107,7 @@ export default async function AdminDashboardPage() {
               </Link>
             </div>
             <div>
-              <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
+              <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
                 Recent admin actions
               </h2>
               <ul className="mt-4 space-y-2 text-sm">

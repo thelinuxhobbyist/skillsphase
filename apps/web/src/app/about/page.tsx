@@ -6,10 +6,10 @@ export default function AboutPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <h1 className="font-sans text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
+        <h1 className="font-display text-[clamp(2rem,4vw,2.75rem)] font-semibold text-[color:var(--ink)]">
           About SkillsPhase
         </h1>
-        <p className="mt-6 text-xl font-sans leading-snug text-[color:var(--stamp)]">
+        <p className="mt-6 text-xl font-display leading-snug text-[color:var(--stamp)]">
           Skills first. Because life happens.
         </p>
         <p className="mt-4 text-lg leading-relaxed text-[color:var(--ink-soft)]">
@@ -26,7 +26,7 @@ export default function AboutPage() {
         </p>
 
         <section className="mt-12 space-y-4 text-base leading-relaxed text-[color:var(--ink-soft)]">
-          <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
+          <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
             For candidates
           </h2>
           <p>
@@ -38,7 +38,7 @@ export default function AboutPage() {
         </section>
 
         <section className="mt-12 space-y-4 text-base leading-relaxed text-[color:var(--ink-soft)]">
-          <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
+          <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
             For businesses
           </h2>
           <p>
@@ -50,7 +50,7 @@ export default function AboutPage() {
         </section>
 
         <section className="mt-12 space-y-4 text-base leading-relaxed text-[color:var(--ink-soft)]">
-          <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
+          <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
             What we value
           </h2>
           <p>
@@ -73,7 +73,7 @@ export default function AboutPage() {
         </section>
 
         <section className="mt-14 rounded-[5px] border border-[color:var(--folder-line)] bg-[color:var(--folder)] p-6 sm:p-7">
-          <h2 className="font-sans text-[1.6rem] font-semibold text-[color:var(--ink)]">
+          <h2 className="font-display text-[1.6rem] font-semibold text-[color:var(--ink)]">
             Skills first. Because life happens.
           </h2>
           <p className="mt-3 text-base text-[color:var(--ink-soft)]">

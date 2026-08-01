@@ -17,11 +17,6 @@ import {
 
 const hasClerk = isClerkConfigured();
 
-const guestNavLinkClass =
-  "text-base text-muted-foreground transition-colors hover:text-foreground";
-const mobileNavLinkClass =
-  "block rounded-md px-3 py-3 text-base font-medium text-foreground transition-colors hover:bg-surface hover:text-primary";
-
 function GuestActions({
   onNavigate,
   stacked = false,
@@ -31,16 +26,20 @@ function GuestActions({
 }) {
   const layoutClass = stacked
     ? "flex flex-col gap-3"
-    : "flex items-center gap-4";
+    : "flex items-center gap-[18px]";
 
   return (
     <div className={layoutClass}>
-      <Link href="/login" className={guestNavLinkClass} onClick={onNavigate}>
+      <Link
+        href="/login"
+        className={`text-[14.5px] font-medium text-muted-foreground transition-colors hover:text-foreground ${stacked ? "" : "max-[920px]:hidden"}`}
+        onClick={onNavigate}
+      >
         Sign in
       </Link>
       <Link
         href="/register"
-        className={`btn-primary rounded-lg px-5 py-2.5 text-sm font-medium ${stacked ? "text-center" : ""}`}
+        className={`btn-primary rounded-lg px-[22px] py-2.5 text-sm font-semibold ${stacked ? "text-center" : ""}`}
         onClick={onNavigate}
       >
         Register
@@ -231,7 +230,7 @@ function AppHeaderChrome({
       <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3.5 sm:px-5">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 font-sans text-base font-semibold tracking-tight text-primary sm:text-lg"
+          className="flex shrink-0 items-center gap-2 font-display text-base font-semibold tracking-tight text-primary sm:text-lg"
         >
           <StampMark className="h-7 w-7 sm:h-8 sm:w-8" />
           <span>SkillsPhase</span>
@@ -252,17 +251,11 @@ function PublicHeaderChrome({
   user: HorizonUser | null;
   loadingUser: boolean;
 }) {
+  const pathname = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
   const menuId = useId();
   const close = () => setOpen(false);
   const links = user ? linksForUser(user) : PUBLIC_LINKS;
-
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -273,51 +266,79 @@ function PublicHeaderChrome({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  function publicLinkClass(href: string) {
+    const active = isNavLinkActive(pathname, href);
+    return [
+      "relative px-1 py-2 text-[14.5px] font-medium transition-colors",
+      "after:absolute after:right-1 after:bottom-0.5 after:left-1 after:h-0.5 after:origin-left after:bg-primary after:transition-transform after:duration-150",
+      active
+        ? "text-foreground after:scale-x-100"
+        : "text-muted-foreground after:scale-x-0 hover:text-foreground hover:after:scale-x-100",
+    ].join(" ");
+  }
+
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
-      <div className="mx-auto flex w-full max-w-[1180px] items-center gap-3 px-4 py-3 sm:px-6 sm:py-4">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-[10px]">
+      <nav
+        className="relative mx-auto flex w-full max-w-[1160px] items-center justify-between gap-6 px-5 py-4 sm:px-8"
+        aria-label="Main"
+      >
         <Link
           href="/"
-          className="mr-auto flex shrink-0 items-center gap-2.5 font-sans text-lg font-semibold tracking-tight text-primary sm:text-xl md:text-2xl"
+          className="flex shrink-0 items-center gap-2.5 font-display text-[19px] font-semibold tracking-tight text-foreground"
           onClick={close}
         >
-          <StampMark className="h-8 w-8 sm:h-9 sm:w-9" />
+          <StampMark className="h-[29px] w-[29px]" />
           <span>SkillsPhase</span>
         </Link>
 
-        <div className="flex shrink-0 items-center gap-2 md:hidden">
-          {hasClerk ? (
-            <SignedIn>
-              <SafeUserButton />
-            </SignedIn>
-          ) : null}
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-lg border border-border bg-surface p-2.5 text-foreground"
-            aria-expanded={open}
-            aria-controls={menuId}
-            aria-label={open ? "Close menu" : "Open menu"}
-            onClick={() => setOpen((value) => !value)}
+        <div
+          id={menuId}
+          className={[
+            "min-[921px]:flex min-[921px]:flex-1 min-[921px]:items-center",
+            open
+              ? "absolute top-full right-0 left-0 z-50 block border-b border-border bg-background"
+              : "hidden min-[921px]:flex",
+          ].join(" ")}
+        >
+          <ul
+            className={[
+              "flex list-none",
+              "max-[920px]:flex-col max-[920px]:items-stretch max-[920px]:px-5 max-[920px]:py-2 sm:max-[920px]:px-8",
+              "min-[921px]:ml-11 min-[921px]:flex-row min-[921px]:items-center",
+            ].join(" ")}
           >
-            <MenuIcon open={open} />
-          </button>
+            {!loadingUser
+              ? links.map((link, index) => (
+                  <li
+                    key={link.href}
+                    className={
+                      index > 0
+                        ? "min-[921px]:ml-7 max-[920px]:border-t max-[920px]:border-border"
+                        : ""
+                    }
+                  >
+                    <Link
+                      href={link.href}
+                      className={[
+                        publicLinkClass(link.href),
+                        "max-[920px]:block max-[920px]:px-0 max-[920px]:py-3 max-[920px]:after:hidden",
+                      ].join(" ")}
+                      onClick={close}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))
+              : null}
+          </ul>
         </div>
 
-        <nav
-          className="hidden min-w-0 shrink items-center justify-end gap-5 overflow-x-auto md:flex lg:gap-8"
-          aria-label="Main"
-        >
-          {!loadingUser
-            ? links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={guestNavLinkClass}
-                >
-                  {link.label}
-                </Link>
-              ))
-            : null}
+        <div className="flex shrink-0 items-center gap-[18px]">
           {hasClerk ? (
             <>
               <SignedOut>
@@ -330,44 +351,18 @@ function PublicHeaderChrome({
           ) : (
             <GuestActions />
           )}
-        </nav>
-      </div>
-
-      {open ? (
-        <div
-          id={menuId}
-          className="border-t border-border bg-background md:hidden"
-        >
-          <nav
-            className="mx-auto flex max-h-[calc(100dvh-4.5rem)] max-w-[1180px] flex-col overflow-y-auto px-4 py-4"
-            aria-label="Mobile"
+          <button
+            type="button"
+            className="inline-flex size-9 items-center justify-center text-foreground min-[921px]:hidden"
+            aria-expanded={open}
+            aria-controls={menuId}
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen((value) => !value)}
           >
-            {!loadingUser
-              ? links.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={mobileNavLinkClass}
-                    onClick={close}
-                  >
-                    {link.label}
-                  </Link>
-                ))
-              : null}
-            {hasClerk ? (
-              <SignedOut>
-                <div className="mt-3 border-t border-border pt-4">
-                  <GuestActions onNavigate={close} stacked />
-                </div>
-              </SignedOut>
-            ) : (
-              <div className="mt-3 border-t border-border pt-4">
-                <GuestActions onNavigate={close} stacked />
-              </div>
-            )}
-          </nav>
+            <MenuIcon open={open} />
+          </button>
         </div>
-      ) : null}
+      </nav>
     </header>
   );
 }

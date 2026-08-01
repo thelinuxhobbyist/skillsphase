@@ -83,7 +83,7 @@ export function AdminEmployersPanel({
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <h2 className="font-sans text-[1.35rem] font-semibold text-[color:var(--ink)]">
+                  <h2 className="font-display text-[1.35rem] font-semibold text-[color:var(--ink)]">
                     {employer.companyName}
                   </h2>
                   <span className="text-xs uppercase text-[color:var(--stamp)]">

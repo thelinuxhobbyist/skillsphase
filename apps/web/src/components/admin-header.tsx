@@ -121,7 +121,7 @@ export function AdminHeader() {
       <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-4">
         <Link
           href="/admin"
-          className="flex min-w-0 shrink items-center gap-2.5 font-sans text-lg font-semibold tracking-tight text-primary sm:text-xl lg:text-2xl"
+          className="flex min-w-0 shrink items-center gap-2.5 font-display text-lg font-semibold tracking-tight text-primary sm:text-xl lg:text-2xl"
           onClick={close}
         >
           <StampMark />

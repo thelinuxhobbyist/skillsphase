@@ -27,7 +27,7 @@ export default async function SettingsPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 py-12">
-        <h1 className="font-sans text-4xl text-primary">
+        <h1 className="font-display text-4xl text-primary">
           Account settings
         </h1>
         <p className="mt-2 text-[color:var(--foreground)]/75">

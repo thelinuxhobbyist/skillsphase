@@ -21,9 +21,9 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -190,8 +190,9 @@ html {
   h2,
   h3,
   h4 {
-    font-family: var(--font-sans);
-    letter-spacing: -0.015em;
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
     line-height: 1.25;
   }
 
@@ -201,12 +202,12 @@ html {
 }
 
 @utility eyebrow {
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: var(--color-muted-foreground);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-primary);
 }
 
 @utility shadow-soft {

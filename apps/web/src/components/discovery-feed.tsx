@@ -270,7 +270,7 @@ function CandidateCardView({ card }: { card: CandidateCard }) {
     <div className="rounded-2xl border border-[color:var(--line)] bg-white p-6 shadow-lg">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="font-sans text-2xl text-primary">
+          <h2 className="font-display text-2xl text-primary">
             {card.professionalTitle || name}
           </h2>
           <p className="text-sm text-[color:var(--foreground)]/70">{name}</p>

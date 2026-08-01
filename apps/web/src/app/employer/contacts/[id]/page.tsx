@@ -49,7 +49,7 @@ export default async function EmployerContactThreadPage({
         <Link href="/employer/contacts" className="text-sm text-primary underline">
           ← Back to contacts
         </Link>
-        <h1 className="mt-2 mb-4 font-sans text-2xl text-primary">
+        <h1 className="mt-2 mb-4 font-display text-2xl text-primary">
           {candidateName || "Conversation"}
         </h1>
         <div className="min-h-0 flex-1 rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-4">

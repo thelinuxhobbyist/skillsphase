@@ -42,7 +42,7 @@ export default async function CandidateDashboardPage() {
           <p className="text-sm font-medium text-primary">
             Candidate
           </p>
-          <h1 className="mt-2 font-sans text-3xl break-words text-primary sm:text-4xl">
+          <h1 className="mt-2 font-display text-3xl break-words text-primary sm:text-4xl">
             Welcome{user.firstName ? `, ${user.firstName}` : ""}
           </h1>
           <p className="mt-2 text-[color:var(--foreground)]/75">
@@ -79,7 +79,7 @@ export default async function CandidateDashboardPage() {
 
         <section className="mt-10">
           <div className="flex items-end justify-between gap-3">
-            <h2 className="font-sans text-2xl text-primary">
+            <h2 className="font-display text-2xl text-primary">
               Recent contacts
             </h2>
             <Link href="/contacts" className="text-sm text-primary underline">

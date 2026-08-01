@@ -106,7 +106,7 @@ export function CompanyRegistrationForm() {
         {step === 1 ? (
           <>
             <div>
-              <h2 className="font-sans text-2xl text-primary">
+              <h2 className="font-display text-2xl text-primary">
                 Find your company
               </h2>
               <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
@@ -132,7 +132,7 @@ export function CompanyRegistrationForm() {
         {step === 2 ? (
           <>
             <div>
-              <h2 className="font-sans text-2xl text-primary">
+              <h2 className="font-display text-2xl text-primary">
                 Company email
               </h2>
               <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
@@ -166,7 +166,7 @@ export function CompanyRegistrationForm() {
         {step === 3 ? (
           <>
             <div>
-              <h2 className="font-sans text-2xl text-primary">
+              <h2 className="font-display text-2xl text-primary">
                 Your contact details
               </h2>
               <p className="mt-1 text-sm text-[color:var(--foreground)]/70">

@@ -60,7 +60,7 @@ export default async function EmployerDashboardPage() {
         <p className="text-sm font-medium text-primary">
           Business
         </p>
-        <h1 className="mt-2 font-sans text-3xl break-words text-primary sm:text-4xl">
+        <h1 className="mt-2 font-display text-3xl break-words text-primary sm:text-4xl">
           Discover talent
         </h1>
 
@@ -104,7 +104,7 @@ export default async function EmployerDashboardPage() {
           </div>
         ) : (
           <section className="mt-8 rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-4 sm:p-6">
-            <h2 className="font-sans text-2xl text-primary">
+            <h2 className="font-display text-2xl text-primary">
               Register your UK company
             </h2>
             <p className="mt-2 mb-6 text-[color:var(--foreground)]/75">

@@ -36,7 +36,7 @@ export function SiteFooter({
     <footer className="mt-auto bg-ink text-ink-foreground">
       <div className="mx-auto grid w-full max-w-[1180px] gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div className="max-w-sm lg:col-span-1">
-          <p className="flex items-center gap-2.5 font-sans text-xl font-semibold">
+          <p className="flex items-center gap-2.5 font-display text-xl font-semibold">
             <span
               aria-hidden
               className="relative inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-[1.5px] border-primary text-primary"

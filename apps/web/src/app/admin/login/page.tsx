@@ -26,7 +26,7 @@ export default async function AdminLoginPage() {
       <p className="mb-2 text-sm font-medium text-primary">
         SkillsPhase
       </p>
-      <h1 className="mb-2 font-sans text-3xl text-primary">
+      <h1 className="mb-2 font-display text-3xl text-primary">
         Administrator sign-in
       </h1>
       <p className="mb-8 text-center text-sm text-[color:var(--foreground)]/70">

@@ -33,7 +33,7 @@ export default async function ProfilePage() {
         <Link href="/dashboard" className="text-sm text-primary underline">
           ← Back to dashboard
         </Link>
-        <h1 className="mt-4 font-sans text-3xl text-primary sm:text-4xl">
+        <h1 className="mt-4 font-display text-3xl text-primary sm:text-4xl">
           Your Skill Profile
         </h1>
         <p className="mt-2 mb-8 text-[color:var(--foreground)]/75">

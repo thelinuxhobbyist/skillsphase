@@ -43,7 +43,7 @@ export function CompanyStatusPanel({ company }: { company: HorizonCompany }) {
       <p className="text-sm font-medium text-primary">
         Verification status
       </p>
-      <h2 className="mt-2 font-sans text-2xl text-primary">
+      <h2 className="mt-2 font-display text-2xl text-primary">
         {copy.title}
       </h2>
       <p className="mt-2 text-[color:var(--foreground)]/75">{copy.body}</p>

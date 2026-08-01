@@ -63,7 +63,7 @@ function HomepageSectionBlock({
         <section className="border-b border-[color:var(--line)] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_2%,transparent),transparent_40%),var(--background)] px-4 pb-14 pt-12 sm:px-6 sm:pb-16 sm:pt-16 lg:pt-20">
           <div className="mx-auto max-w-[1180px]">
             <div className="animate-[dossier-rise_0.7s_ease_both] max-w-2xl">
-              <h1 className="font-sans text-[clamp(2rem,5vw,3.5rem)] leading-[1.08] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              <h1 className="font-display text-[clamp(2rem,5vw,3.5rem)] leading-[1.08] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
                 {formatHeroTitle(str(c.title, "Skills first. Because life happens."))}
               </h1>
               <p className="mt-5 max-w-[48ch] text-base leading-relaxed text-[color:var(--ink-soft)] sm:text-lg">
@@ -108,7 +108,7 @@ function HomepageSectionBlock({
       return (
         <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
-            <h2 className="max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+            <h2 className="max-w-2xl font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
               {str(c.title, "Three simple steps from profile to conversation.")}
             </h2>
             {c.subtitle ? (
@@ -125,7 +125,7 @@ function HomepageSectionBlock({
                   <p className="text-xs font-medium text-[color:var(--stamp)]">
                     FILE 0{index + 1}
                   </p>
-                  <h3 className="mt-2.5 font-sans text-[1.35rem] font-semibold text-[color:var(--ink)]">
+                  <h3 className="mt-2.5 font-display text-[1.35rem] font-semibold text-[color:var(--ink)]">
                     {step.title}
                   </h3>
                   <p className="mt-2.5 text-base leading-relaxed text-[color:var(--ink-soft)]">
@@ -148,7 +148,7 @@ function HomepageSectionBlock({
       return (
         <section className="py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
-            <h2 className="max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+            <h2 className="max-w-2xl font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
               {str(c.title, "What makes SkillsPhase different")}
             </h2>
             <p className="mt-3.5 max-w-2xl text-base text-[color:var(--ink-soft)]">
@@ -164,7 +164,7 @@ function HomepageSectionBlock({
                   className="border-l-4 bg-[color:var(--paper)] px-6 py-8 sm:px-8 sm:py-9"
                   style={{ borderLeftColor: accents[index % accents.length] }}
                 >
-                  <h3 className="font-sans text-[1.4rem] font-semibold text-[color:var(--ink)] sm:text-[1.5rem]">
+                  <h3 className="font-display text-[1.4rem] font-semibold text-[color:var(--ink)] sm:text-[1.5rem]">
                     {item.title}
                   </h3>
                   <p className="mt-3 text-base leading-relaxed text-[color:var(--ink-soft)]">
@@ -181,7 +181,7 @@ function HomepageSectionBlock({
     case "businesses_cta":
       return (
         <section className="bg-[color:var(--ink)] px-4 py-14 sm:py-20 text-center text-[color:var(--paper)] sm:px-6">
-          <h2 className="mx-auto max-w-3xl font-sans text-[clamp(1.95rem,4vw,2.75rem)] font-medium italic">
+          <h2 className="mx-auto max-w-3xl font-display text-[clamp(1.95rem,4vw,2.75rem)] font-medium italic">
             {str(c.title)}
           </h2>
           <p className="mx-auto mt-3.5 max-w-xl text-base leading-relaxed text-ink-foreground/70">
@@ -200,7 +200,7 @@ function HomepageSectionBlock({
       return (
         <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
-            <h2 className="font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+            <h2 className="font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
               {str(c.title)}
             </h2>
             {c.subtitle ? (
@@ -242,7 +242,7 @@ function HomepageSectionBlock({
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <h2 className="font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+                <h2 className="font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
                   {str(c.title, "Skill profiles")}
                 </h2>
                 <p className="mt-2 text-base text-[color:var(--ink-soft)]">
@@ -283,7 +283,7 @@ function HomepageSectionBlock({
       return (
         <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
-            <h2 className="max-w-2xl font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+            <h2 className="max-w-2xl font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
               {str(c.title)}
             </h2>
             {c.subtitle ? (
@@ -300,11 +300,11 @@ function HomepageSectionBlock({
                   >
                     <span
                       aria-hidden
-                      className="pointer-events-none absolute top-1.5 left-4 font-sans text-[46px] leading-none text-[color:var(--folder-line)]"
+                      className="pointer-events-none absolute top-1.5 left-4 font-display text-[46px] leading-none text-[color:var(--folder-line)]"
                     >
                       “
                     </span>
-                    <blockquote className="relative mt-3.5 font-sans text-lg leading-snug italic text-[color:var(--ink)]">
+                    <blockquote className="relative mt-3.5 font-display text-lg leading-snug italic text-[color:var(--ink)]">
                       {item.quote}
                     </blockquote>
                     <p className="mt-4 text-sm font-semibold text-[color:var(--ink)]">
@@ -324,7 +324,7 @@ function HomepageSectionBlock({
     case "closing_cta":
       return (
         <section className="px-4 py-14 sm:py-20 text-center sm:px-6">
-          <h2 className="font-sans text-[clamp(1.95rem,4vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+          <h2 className="font-display text-[clamp(1.95rem,4vw,2.65rem)] font-semibold text-[color:var(--ink)]">
             {str(c.title)}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[color:var(--ink-soft)]">
@@ -354,7 +354,7 @@ function HomepageSectionBlock({
           className="border-t border-[color:var(--line)] bg-[color:var(--paper-warm)] py-14 sm:py-20"
         >
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
-            <h2 className="font-sans text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+            <h2 className="font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
               {str(c.title, "Frequently asked questions")}
             </h2>
             {c.subtitle ? (
@@ -368,7 +368,7 @@ function HomepageSectionBlock({
                   key={item.q}
                   className="group border-b border-[color:var(--line-strong)]"
                 >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-sans text-[19px] font-semibold text-[color:var(--ink)] marker:content-none [&::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-display text-[19px] font-semibold text-[color:var(--ink)] marker:content-none [&::-webkit-details-marker]:hidden">
                     {item.q}
                     <span className="text-lg font-medium text-[color:var(--stamp)] transition group-open:rotate-45">
                       +

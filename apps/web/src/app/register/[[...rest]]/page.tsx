@@ -203,7 +203,7 @@ function ConfiguredRegisterContent() {
   if (bootstrapError) {
     return withChrome(
       <main className="mx-auto max-w-lg px-6 py-16 text-center">
-        <h1 className="font-sans text-3xl text-primary">
+        <h1 className="font-display text-3xl text-primary">
           Connection error
         </h1>
         <p className="mt-4 text-red-700" role="alert">
@@ -229,7 +229,7 @@ function ConfiguredRegisterContent() {
     const targetRole = queryRole ?? role;
     return withChrome(
       <main className="mx-auto max-w-lg px-6 py-16 text-center">
-        <h1 className="font-sans text-3xl text-primary">
+        <h1 className="font-display text-3xl text-primary">
           Account already active
         </h1>
         <p className="mt-4 text-[color:var(--foreground)]/75">
@@ -270,7 +270,7 @@ function ConfiguredRegisterContent() {
   if (!role) {
     return withChrome(
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <h1 className="font-sans text-4xl text-primary">
+        <h1 className="font-display text-4xl text-primary">
           Join SkillsPhase
         </h1>
         <p className="mt-3 max-w-xl text-[color:var(--foreground)]/75">
@@ -287,7 +287,7 @@ function ConfiguredRegisterContent() {
             <p className="text-sm font-medium text-primary-accent">
               For candidates
             </p>
-            <h2 className="mt-2 font-sans text-2xl text-primary">
+            <h2 className="mt-2 font-display text-2xl text-primary">
               I have skills to show
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/70">
@@ -307,7 +307,7 @@ function ConfiguredRegisterContent() {
             <p className="text-sm font-medium text-primary">
               For businesses
             </p>
-            <h2 className="mt-2 font-sans text-2xl text-primary">
+            <h2 className="mt-2 font-display text-2xl text-primary">
               I want to discover talent
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/70">
@@ -339,7 +339,7 @@ function ConfiguredRegisterContent() {
       >
         ← Change account type
       </button>
-      <h1 className="mb-2 font-sans text-3xl text-primary">
+      <h1 className="mb-2 font-display text-3xl text-primary">
         {role === "employer" ? "Business registration" : "Candidate registration"}
       </h1>
       <p className="mb-6 self-start text-sm text-[color:var(--foreground)]/70">
@@ -368,7 +368,7 @@ function UnconfiguredRegisterContent() {
   if (!role) {
     return withChrome(
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <h1 className="font-sans text-4xl text-primary">
+        <h1 className="font-display text-4xl text-primary">
           Join SkillsPhase
         </h1>
         <p className="mt-3 max-w-xl text-[color:var(--foreground)]/75">
@@ -387,7 +387,7 @@ function UnconfiguredRegisterContent() {
 
   return withChrome(
     <main className="mx-auto max-w-lg px-6 py-16">
-      <h1 className="font-sans text-3xl text-primary">
+      <h1 className="font-display text-3xl text-primary">
         {role === "employer" ? "Business registration" : "Candidate registration"}
       </h1>
       <p className="mt-4 text-[color:var(--foreground)]/75">

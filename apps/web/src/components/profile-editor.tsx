@@ -547,7 +547,7 @@ function ProfileProgress({
     <section className="rounded-md border border-[color:var(--line)] bg-[color:var(--surface)] p-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="font-sans text-2xl text-primary">
+          <h2 className="font-display text-2xl text-primary">
             Skill Profile progress
           </h2>
           <p className="mt-1 text-sm text-[color:var(--foreground)]/70">
@@ -2088,7 +2088,7 @@ function StepShell({
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-sans text-2xl text-primary">
+        <h2 className="font-display text-2xl text-primary">
           {title}
         </h2>
         <p className="mt-1 text-sm text-[color:var(--foreground)]/70">{body}</p>

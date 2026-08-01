@@ -43,7 +43,7 @@ export default async function DiscoverPage() {
       <>
         <SiteHeader />
         <main className="mx-auto max-w-2xl px-6 py-16 text-center">
-          <h1 className="font-sans text-3xl text-primary">
+          <h1 className="font-display text-3xl text-primary">
             {awaitingActivation ? "Activate your account" : "Discovery locked"}
           </h1>
           <p className="mt-4 text-[color:var(--foreground)]/75">
@@ -71,7 +71,7 @@ export default async function DiscoverPage() {
         <Link href="/employer" className="text-sm text-primary underline">
           ← Back to dashboard
         </Link>
-        <h1 className="mt-4 mb-2 font-sans text-3xl text-primary sm:text-4xl">
+        <h1 className="mt-4 mb-2 font-display text-3xl text-primary sm:text-4xl">
           Discover talent
         </h1>
         <p className="mb-8 text-[color:var(--foreground)]/75">

@@ -75,7 +75,7 @@ export function PublicCandidateCardView({ card }: { card: PublicCandidateCard })
               />
             ) : (
               <span
-                className="inline-flex size-[42px] shrink-0 items-center justify-center rounded-lg bg-brand/10 font-sans text-[15px] font-semibold text-primary"
+                className="inline-flex size-[42px] shrink-0 items-center justify-center rounded-lg bg-brand/10 font-display text-[15px] font-semibold text-primary"
                 aria-hidden
               >
                 {initials}
@@ -83,7 +83,7 @@ export function PublicCandidateCardView({ card }: { card: PublicCandidateCard })
             )}
 
             <div className="min-w-0 flex-1">
-              <h3 className="font-sans text-[17px] font-semibold leading-snug tracking-[-0.01em] break-words text-[color:var(--ink)]">
+              <h3 className="font-display text-[17px] font-semibold leading-snug tracking-[-0.01em] break-words text-[color:var(--ink)]">
                 {name}
               </h3>
               {role ? (

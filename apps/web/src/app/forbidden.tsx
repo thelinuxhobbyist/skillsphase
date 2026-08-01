@@ -9,7 +9,7 @@ export default function ForbiddenPage() {
         <p className="text-sm font-medium text-primary">
           403
         </p>
-        <h1 className="mt-3 font-sans text-4xl text-primary">
+        <h1 className="mt-3 font-display text-4xl text-primary">
           Access denied
         </h1>
         <p className="mt-3 text-[color:var(--foreground)]/75">

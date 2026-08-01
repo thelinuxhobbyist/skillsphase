@@ -10,8 +10,6 @@ export type NavLink = {
 export const PUBLIC_LINKS: NavLink[] = [
   { href: "/", label: "Home" },
   { href: "/discover-talent", label: "Browse Talent" },
-  { href: "/about", label: "About" },
-  { href: "/waitlist", label: "Waitlist" },
 ];
 
 export function linksForUser(user: HorizonUser | null): NavLink[] {
