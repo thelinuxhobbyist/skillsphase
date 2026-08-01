@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { HomepageSection } from "@horizon/shared";
-import { AVAILABILITY_LABELS } from "@horizon/shared";
+import { PublicCandidateCardView } from "@/components/public-candidate-card";
+import type { PublicCandidateCard } from "@/lib/api";
 
 function str(value: unknown, fallback = "") {
   return typeof value === "string" ? value : fallback;
@@ -8,13 +9,6 @@ function str(value: unknown, fallback = "") {
 
 function arr<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
-}
-
-function availabilityLabel(value: unknown): string {
-  if (typeof value === "string" && value in AVAILABILITY_LABELS) {
-    return AVAILABILITY_LABELS[value as keyof typeof AVAILABILITY_LABELS];
-  }
-  return typeof value === "string" ? value : "";
 }
 
 function formatHeroTitle(title: string) {
@@ -36,19 +30,31 @@ function formatHeroTitle(title: string) {
 
 export function HomepageSections({
   sections,
+  featuredCandidates = [],
 }: {
   sections: HomepageSection[];
+  featuredCandidates?: PublicCandidateCard[];
 }) {
   return (
     <>
       {sections.map((section) => (
-        <HomepageSectionBlock key={section.id} section={section} />
+        <HomepageSectionBlock
+          key={section.id}
+          section={section}
+          featuredCandidates={featuredCandidates}
+        />
       ))}
     </>
   );
 }
 
-function HomepageSectionBlock({ section }: { section: HomepageSection }) {
+function HomepageSectionBlock({
+  section,
+  featuredCandidates,
+}: {
+  section: HomepageSection;
+  featuredCandidates: PublicCandidateCard[];
+}) {
   const c = section.content;
 
   switch (section.type) {
@@ -231,14 +237,6 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
       );
 
     case "featured_candidates": {
-      const demoCards = arr<{
-        title: string;
-        skills: string[];
-        yearsExperience: number;
-        topProject: string;
-        availability: string;
-      }>(c.demoCards);
-
       return (
         <section className="py-14 sm:py-20">
           <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
@@ -248,7 +246,10 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                   {str(c.title, "Skill profiles")}
                 </h2>
                 <p className="mt-2 text-base text-[color:var(--ink-soft)]">
-                  {str(c.subtitle)}
+                  {str(
+                    c.subtitle,
+                    "Browse real Skill Profiles — skills, experience, and portfolio evidence.",
+                  )}
                 </p>
               </div>
               <Link
@@ -259,39 +260,20 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
               </Link>
             </div>
 
-            <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {demoCards.map((card) => (
-                <li
-                  key={card.title}
-                  className="min-w-0 rounded-[5px] border border-[color:var(--folder-line)] bg-[color:var(--folder)] p-5 sm:p-6"
-                >
-                  <h3 className="font-sans text-[1.25rem] font-semibold leading-snug text-[color:var(--ink)] sm:text-[1.35rem]">
-                    {card.title}
-                  </h3>
-                  {card.skills.length > 0 ? (
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {card.skills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="rounded-full border border-[color:var(--line-strong)] bg-[color:var(--paper)] px-2.5 py-1 text-xs text-muted-foreground"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                  <p className="mt-3.5 text-sm text-[color:var(--ink-soft)]">
-                    {card.yearsExperience} years experience
-                  </p>
-                  <p className="mt-1 text-base text-[color:var(--ink)]">
-                    {card.topProject}
-                  </p>
-                  <p className="mt-3.5 flex items-center gap-1.5 text-sm font-medium text-primary before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-[color:var(--verified)] before:content-['']">
-                    {availabilityLabel(card.availability)}
-                  </p>
-                </li>
-              ))}
-            </ul>
+            {featuredCandidates.length === 0 ? (
+              <div className="mt-10 rounded-lg border border-dashed border-[color:var(--line)] bg-[color:var(--surface)] p-10 text-center">
+                <p className="font-semibold text-primary">No skill profiles yet</p>
+                <p className="mt-2 text-sm text-[color:var(--foreground)]/70">
+                  Check back soon as more people join SkillsPhase.
+                </p>
+              </div>
+            ) : (
+              <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {featuredCandidates.map((card) => (
+                  <PublicCandidateCardView key={card.id} card={card} />
+                ))}
+              </ul>
+            )}
           </div>
         </section>
       );

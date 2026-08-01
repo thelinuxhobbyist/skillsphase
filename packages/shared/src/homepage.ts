@@ -81,30 +81,6 @@ export function filterHomepageBodySections(
   );
 }
 
-const EXAMPLE_SKILL_PROFILES = [
-  {
-    title: "Senior React Developer",
-    skills: ["React", "TypeScript", "Node.js", "AWS"],
-    yearsExperience: 8,
-    topProject: "Built SaaS platforms for two Series B startups.",
-    availability: "immediate",
-  },
-  {
-    title: "Brand & Marketing Lead",
-    skills: ["Marketing", "Content Strategy", "SEO", "Figma"],
-    yearsExperience: 5,
-    topProject: "Grew organic traffic 4x for a D2C retailer.",
-    availability: "within_one_month",
-  },
-  {
-    title: "Full-Stack Product Designer",
-    skills: ["Figma", "Design Systems", "React", "User Research"],
-    yearsExperience: 6,
-    topProject: "Designed and shipped a fintech mobile app.",
-    availability: "freelance",
-  },
-] as const;
-
 /** Canonical default homepage template (used until admin saves overrides). */
 export function getDefaultHomepageSections(): HomepageSection[] {
   return [
@@ -200,8 +176,8 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       70,
       {
         title: "Skill profiles",
-        subtitle: "A preview of how Skill Profiles look on SkillsPhase.",
-        demoCards: EXAMPLE_SKILL_PROFILES,
+        subtitle:
+          "Browse real Skill Profiles — skills, experience, and portfolio evidence.",
       },
       true,
     ),
