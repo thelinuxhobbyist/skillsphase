@@ -46,9 +46,9 @@ export default async function CandidateDashboardPage() {
             Welcome{user.firstName ? `, ${user.firstName}` : ""}
           </h1>
           <p className="mt-2 text-[color:var(--foreground)]/75">
-            {user.professionalTitle
-              ? user.professionalTitle
-              : "Add a professional title to complete your Skill Profile."}
+            {user.primaryCapability ||
+              user.professionalTitle ||
+              "Add a capability statement so employers see what you can do."}
             {user.availability
               ? ` · ${AVAILABILITY_LABELS[user.availability]}`
               : ""}
@@ -57,23 +57,23 @@ export default async function CandidateDashboardPage() {
 
         <section className="grid gap-4 md:grid-cols-3">
           <DashboardCard
-            title="Skill Profile"
+            title="Browse jobs"
+            body="Search roles and apply with your SkillsPhase profile — not a CV upload."
+            href="/jobs"
+          />
+          <DashboardCard
+            title="Applications"
+            body="Track where you've applied and how employers are progressing you."
+            href="/applications"
+          />
+          <DashboardCard
+            title="SkillsPhase profile"
             body={
               user.profileCompleted
-                ? "Your Skill Profile is ready to be discovered by businesses."
-                : "Complete your Skill Profile to be discovered by businesses."
+                ? "Your profile is ready to use as your application."
+                : "Complete your profile before applying for jobs."
             }
             href="/profile"
-          />
-          <DashboardCard
-            title="Portfolio"
-            body="Showcase projects, links, images, and videos as evidence of your ability."
-            href="/profile"
-          />
-          <DashboardCard
-            title="Messages"
-            body="See businesses that have contacted you and reply directly."
-            href="/contacts"
           />
         </section>
 
@@ -90,10 +90,14 @@ export default async function CandidateDashboardPage() {
             {recentContacts.length === 0 ? (
               <li className="text-[color:var(--foreground)]/70">
                 No businesses have contacted you yet.{" "}
-                <Link href="/profile" className="underline">
-                  Improve your Skill Profile
+                <Link href="/jobs" className="underline">
+                  Browse jobs
                 </Link>{" "}
-                to increase your chances of discovery.
+                or{" "}
+                <Link href="/profile" className="underline">
+                  strengthen your profile
+                </Link>
+                .
               </li>
             ) : (
               recentContacts.map((contact) => (
@@ -118,10 +122,10 @@ export default async function CandidateDashboardPage() {
 
         {!profile || !user.profileCompleted ? (
           <section className="mt-10 rounded-md border border-brand-accent/30 bg-brand-accent/5 p-5">
-            <h2 className="font-semibold text-primary">Finish your Skill Profile</h2>
+            <h2 className="font-semibold text-primary">Finish your SkillsPhase profile</h2>
             <p className="mt-2 text-sm text-[color:var(--foreground)]/75">
-              Add a professional title, at least 3 skills, and a portfolio
-              project so businesses can find you in discovery.
+              Add what you can do, at least 3 skills, and evidence so you can
+              apply for jobs with proof — documents stay available upon request.
             </p>
             <Link
               href="/profile"

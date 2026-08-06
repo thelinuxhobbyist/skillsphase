@@ -274,8 +274,8 @@ function ConfiguredRegisterContent() {
           Join SkillsPhase
         </h1>
         <p className="mt-3 max-w-xl text-[color:var(--foreground)]/75">
-          Skills first. Because life happens. Choose how you want to use
-          SkillsPhase — pick the path that fits you.
+          SkillsPhase is a jobs platform. Create an evidence-based profile to
+          apply — or register your business to post roles and recruit.
         </p>
 
         <div className="mt-10 grid gap-4 md:grid-cols-2">
@@ -288,14 +288,15 @@ function ConfiguredRegisterContent() {
               For candidates
             </p>
             <h2 className="mt-2 font-display text-2xl text-primary">
-              I have skills to show
+              I want to apply for jobs
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/70">
-              Build a Skill Profile with your skills, experience, and portfolio
-              evidence. No CV required.
+              Build a SkillsPhase profile with capabilities and evidence, then
+              apply without uploading a CV. Supporting documents stay available
+              upon request.
             </p>
             <span className="btn-primary mt-6 inline-block rounded-md bg-brand-accent px-4 py-2 text-sm font-semibold text-white">
-              Create your Skill Profile
+              Create your SkillsPhase profile
             </span>
           </button>
 
@@ -308,11 +309,11 @@ function ConfiguredRegisterContent() {
               For businesses
             </p>
             <h2 className="mt-2 font-display text-2xl text-primary">
-              I want to discover talent
+              I want to hire with proof
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/70">
-              Register your UK company, verify it, and browse skill-based
-              profiles with real portfolio evidence.
+              Register your UK company, post jobs, and review profile-based
+              applications. Request CVs or certificates later when you need them.
             </p>
             <span className="btn-primary mt-6 inline-block rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white">
               Register as a business
@@ -345,7 +346,7 @@ function ConfiguredRegisterContent() {
       <p className="mb-6 self-start text-sm text-[color:var(--foreground)]/70">
         {role === "employer"
           ? "Create your business account, then verify your UK company."
-          : "Create your candidate account to build your Skill Profile."}
+          : "Create your candidate account to build your SkillsPhase profile and apply for jobs."}
       </p>
       <AuthSignUp role={role} />
     </main>,
@@ -372,8 +373,8 @@ function UnconfiguredRegisterContent() {
           Join SkillsPhase
         </h1>
         <p className="mt-3 max-w-xl text-[color:var(--foreground)]/75">
-          Skills first. Because life happens. Choose how you want to use
-          SkillsPhase — pick the path that fits you.
+          SkillsPhase is a jobs platform. Create an evidence-based profile to
+          apply — or register your business to post roles and recruit.
         </p>
         <p className="mt-8 text-sm text-[color:var(--foreground)]/65">
           Already have an account?{" "}

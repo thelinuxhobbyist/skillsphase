@@ -42,6 +42,53 @@ export const REMOTE_TYPE_LABELS: Record<RemoteType, string> = {
 export const CANDIDATE_REVIEW_ACTIONS = ["skip", "viewed"] as const;
 export type CandidateReviewAction = (typeof CANDIDATE_REVIEW_ACTIONS)[number];
 
+export const JOB_STATUSES = ["draft", "published", "closed"] as const;
+export type JobStatus = (typeof JOB_STATUSES)[number];
+
+export const APPLICATION_STATUSES = [
+  "applied",
+  "under_review",
+  "interview",
+  "offer",
+  "hired",
+  "rejected",
+  "withdrawn",
+] as const;
+export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
+
+export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
+  applied: "Applied",
+  under_review: "Under review",
+  interview: "Interview",
+  offer: "Offer",
+  hired: "Hired",
+  rejected: "Rejected",
+  withdrawn: "Withdrawn",
+};
+
+export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
+  draft: "Draft",
+  published: "Published",
+  closed: "Closed",
+};
+
+export const EMPLOYMENT_TYPES = [
+  "full_time",
+  "part_time",
+  "contract",
+  "temporary",
+  "internship",
+] as const;
+export type EmploymentType = (typeof EMPLOYMENT_TYPES)[number];
+
+export const EMPLOYMENT_TYPE_LABELS: Record<EmploymentType, string> = {
+  full_time: "Full-time",
+  part_time: "Part-time",
+  contract: "Contract",
+  temporary: "Temporary",
+  internship: "Internship",
+};
+
 export const PROJECT_MEDIA_TYPES = ["image", "video", "document", "link"] as const;
 export type ProjectMediaType = (typeof PROJECT_MEDIA_TYPES)[number];
 

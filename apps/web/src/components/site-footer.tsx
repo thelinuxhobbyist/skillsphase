@@ -25,7 +25,7 @@ export function SiteFooter({
   const columns = arr<FooterColumn>(c.columns);
   const tagline = str(
     c.tagline,
-    "Skills first. Because life happens. A skills-first hiring platform connecting verified UK businesses with capable people through skills-first profiles and portfolio evidence.",
+    "SkillsPhase is a jobs platform that replaces the traditional CV with an evidence-based profile.",
   );
   const copyright = str(
     c.copyright,

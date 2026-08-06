@@ -8,7 +8,6 @@ import {
   ApiRequestError,
   getCurrentUser,
   getMyCompany,
-  listContacts,
   listSavedCandidates,
 } from "@/lib/api";
 import { dashboardPathForRole } from "@/lib/roles";
@@ -46,12 +45,11 @@ export default async function EmployerDashboardPage() {
 
   const canDiscover =
     company?.verificationStatus === "approved" && company.businessEmailVerified;
-  const [savedCandidates, contacts] = canDiscover
+  const [savedCandidates] = canDiscover
     ? await Promise.all([
         listSavedCandidates(token).catch(() => []),
-        listContacts(token).catch(() => []),
       ])
-    : [[], []];
+    : [[]];
 
   return (
     <>
@@ -60,9 +58,9 @@ export default async function EmployerDashboardPage() {
         <p className="text-sm font-medium text-primary">
           Business
         </p>
-        <h1 className="mt-2 font-display text-3xl break-words text-primary sm:text-4xl">
-          Discover talent
-        </h1>
+          <h1 className="mt-2 font-display text-3xl break-words text-primary sm:text-4xl">
+            Hire with proof
+          </h1>
 
         {company ? (
           <div className="mt-8 space-y-6">
@@ -72,19 +70,19 @@ export default async function EmployerDashboardPage() {
               <>
                 <section className="grid gap-4 md:grid-cols-3">
                   <DashboardCard
+                    title="Your jobs"
+                    body="Post roles and review SkillsPhase profile applications."
+                    href="/employer/jobs"
+                  />
+                  <DashboardCard
                     title="Discover talent"
-                    body="Browse fast skill-based cards and open full profiles for people who match what you need."
+                    body="Browse capability-based profiles beyond active applicants."
                     href="/employer/discover"
                   />
                   <DashboardCard
                     title="Saved candidates"
                     body={`${savedCandidates.length} candidate${savedCandidates.length === 1 ? "" : "s"} saved to your lists.`}
                     href="/employer/saved"
-                  />
-                  <DashboardCard
-                    title="Contacts"
-                    body={`${contacts.length} conversation${contacts.length === 1 ? "" : "s"} with candidates.`}
-                    href="/employer/contacts"
                   />
                 </section>
               </>

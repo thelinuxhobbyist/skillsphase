@@ -6,7 +6,7 @@ import { formatUkDateLabel } from "@/lib/dates";
 
 /**
  * Shared profile layout for public and employer detail views.
- * Skills-first hierarchy: capabilities → proof/outcomes → supporting CV context.
+ * Capability-first hierarchy with progressive trust (ADR 002).
  */
 export function CandidateProfileView({
   candidate,
@@ -32,6 +32,15 @@ export function CandidateProfileView({
   const additionalCapabilities = capabilities.filter(
     (cap) => cap.id !== primaryCapability?.id,
   );
+  const capabilityLead =
+    primaryCapability?.label ||
+    candidate.primaryCapability ||
+    candidate.professionalTitle ||
+    name ||
+    fallbackTitle;
+  const titleLine = candidate.professionalTitle
+    ? [candidate.professionalTitle, personLine].filter(Boolean).join(" · ")
+    : personLine;
   const hasCapabilities =
     capabilities.length > 0 ||
     Boolean(candidate.primaryCapability) ||
@@ -44,11 +53,11 @@ export function CandidateProfileView({
     <div className="min-w-0">
       <header className="rounded-sm border border-[color:var(--line)] bg-white px-6 py-8 shadow-[0_1px_0_var(--line)] sm:px-12 sm:py-11">
         <h1 className="font-display text-[32px] font-semibold leading-[1.05] text-primary sm:text-[44px]">
-          {candidate.professionalTitle || name || fallbackTitle}
+          {capabilityLead}
         </h1>
-        {personLine ? (
+        {titleLine ? (
           <p className="mt-2.5 text-base text-[color:var(--ink-soft)]">
-            {personLine}
+            {titleLine}
           </p>
         ) : null}
 
@@ -109,7 +118,7 @@ export function CandidateProfileView({
             {candidate.skills.length > 0 ? (
               <div className="px-8 py-[26px]">
                 <span className="mb-3.5 block font-display text-[19px] font-semibold text-[color:var(--ink)]">
-                  Technical Skills
+                  Skills
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {candidate.skills.map((skill) => (
@@ -153,9 +162,13 @@ export function CandidateProfileView({
           <p className="mb-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)]">
             Supporting trust signals
           </p>
-          <h2 className="mb-7 font-display text-[28px] font-semibold text-primary">
+          <h2 className="mb-3 font-display text-[28px] font-semibold text-primary">
             Certificates & recommendations
           </h2>
+          <p className="mb-7 max-w-2xl text-sm text-[color:var(--ink-soft)]">
+            Public summaries earn interest. Full certificates, reference letters,
+            and other documents remain available upon request.
+          </p>
 
           {candidate.qualifications.length > 0 ? (
             <ul className="grid gap-3 sm:grid-cols-2">
@@ -175,6 +188,9 @@ export function CandidateProfileView({
                       {row.issuingBody}
                     </p>
                   ) : null}
+                  <p className="mt-2 text-xs text-[color:var(--ink-soft)]">
+                    Full document — available upon request
+                  </p>
                 </li>
               ))}
             </ul>

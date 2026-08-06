@@ -51,6 +51,7 @@ import {
 import { isClerkConfigured } from "@/lib/clerk-config";
 import { formatUkDateLabel, isoToUk, normaliseUkDateInput, ukToIso } from "@/lib/dates";
 import { SKILL_SUGGESTIONS } from "@/lib/skill-suggestions";
+import { CapabilityStatementGuide } from "@/components/capability-statement-guide";
 
 type StepId =
   | "about"
@@ -63,9 +64,9 @@ type StepId =
 
 const STEPS: Array<{ id: StepId; label: string }> = [
   { id: "about", label: "About you" },
-  { id: "skillProfile", label: "Skill Profile" },
-  { id: "skills", label: "Technical Skills" },
-  { id: "projects", label: "Proof of Ability" },
+  { id: "skillProfile", label: "SkillsPhase profile" },
+  { id: "skills", label: "Skills" },
+  { id: "projects", label: "Evidence" },
   { id: "employment", label: "Work History" },
   { id: "education", label: "Education" },
   { id: "review", label: "Review" },
@@ -708,7 +709,7 @@ function AboutStep({
   return (
     <StepShell
       title="About you"
-      body="Businesses see your name and location when they view your Skill Profile."
+      body="Basic details employers need. Your capability statement comes next — we'll help you write it."
     >
       <div className="grid gap-3 md:grid-cols-2">
         <Field
@@ -732,13 +733,6 @@ function AboutStep({
           onChange={(country) => setUser((u) => ({ ...u, country }))}
         />
       </div>
-      <TextArea
-        label="Career summary (optional)"
-        value={user.careerSummary ?? ""}
-        onChange={(careerSummary) => setUser((u) => ({ ...u, careerSummary }))}
-        rows={4}
-        hint="A short line or two — your skills and projects do most of the talking."
-      />
       <p className="text-sm text-[color:var(--foreground)]/60">
         Email on file: {user.email}
       </p>
@@ -761,10 +755,41 @@ function SkillProfileStep({
   skillNames: string[];
   projects: Project[];
 }) {
+  function applyCapabilityStatement(statement: string) {
+    const trimmed = statement.trim();
+    setUser((u) => ({
+      ...u,
+      primaryCapability: trimmed.slice(0, 120),
+      careerSummary: trimmed.slice(0, 3000),
+    }));
+    onCapabilitiesChange((rows) => {
+      if (rows.length === 0) {
+        return [
+          {
+            id: `draft-${crypto.randomUUID()}`,
+            label: trimmed.slice(0, 120),
+            isPrimary: true,
+            sortOrder: 0,
+            skillNames: [],
+            projectIds: [],
+            projects: [],
+            outcomes: [],
+            confidence: null,
+            lastDemonstratedAt: null,
+            verificationStatus: null,
+          },
+        ];
+      }
+      return rows.map((row) =>
+        row.isPrimary ? { ...row, label: trimmed.slice(0, 120) } : row,
+      );
+    });
+  }
+
   return (
     <StepShell
-      title="Skill Profile"
-      body="These fields are the first thing businesses see: what you can do, your availability, and your rate."
+      title="SkillsPhase profile"
+      body="Lead with what you can do. We'll help you draft a capability statement employers can understand in seconds."
     >
       <Field
         label="Professional title"
@@ -773,8 +798,21 @@ function SkillProfileStep({
           setUser((u) => ({ ...u, professionalTitle }))
         }
         required
-        hint="e.g. Senior React Developer, Brand & Marketing Lead"
+        hint="Supporting context only — e.g. Secondary Teacher, Electrician, Graphic Designer"
       />
+
+      <CapabilityStatementGuide
+        value={user.careerSummary ?? user.primaryCapability ?? ""}
+        onChange={(statement) =>
+          setUser((u) => ({
+            ...u,
+            careerSummary: statement,
+            primaryCapability: statement.slice(0, 120),
+          }))
+        }
+        onApplyPrimary={applyCapabilityStatement}
+      />
+
       <CapabilitiesEditor
         capabilities={capabilities}
         onChange={onCapabilitiesChange}
@@ -887,7 +925,7 @@ function CapabilitiesEditor({
                       ),
                     )
                   }
-                  hint="e.g. Builds scalable web applications"
+                  hint="e.g. Helps GCSE students improve exam performance"
                 />
               </div>
               <button
@@ -1111,8 +1149,8 @@ function SkillsStep({
 
   return (
     <StepShell
-      title="Technical Skills"
-      body="Skills are the first thing businesses see. Add at least 3 — React, Python, AWS, Figma, Marketing, Video Editing, anything demonstrable."
+      title="Skills"
+      body="Add at least 3 searchable skills — lesson planning, commercial installs, brand identity, food costing, React… whatever proves your capability."
     >
       <div className="flex flex-wrap gap-2">
         {skills.length === 0 ? (
@@ -2448,7 +2486,9 @@ function ReviewStep({
         </p>
       ) : (
         <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
-          Required Skill Profile sections look complete. Businesses can now discover you.
+          Required profile sections look complete. You can apply for jobs with
+          this SkillsPhase profile — supporting documents stay available upon
+          request.
         </p>
       )}
       <p className="text-sm text-[color:var(--foreground)]/70">

@@ -34,3 +34,19 @@ export const candidateReviewActionEnum = pgEnum("candidate_review_action", [
   "skip",
   "viewed",
 ]);
+
+export const jobStatusEnum = pgEnum("job_status", [
+  "draft",
+  "published",
+  "closed",
+]);
+
+export const applicationStatusEnum = pgEnum("application_status", [
+  "applied",
+  "under_review",
+  "interview",
+  "offer",
+  "hired",
+  "rejected",
+  "withdrawn",
+]);

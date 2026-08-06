@@ -5,7 +5,7 @@
 
 ## Purpose
 
-How AI coding assistants must contribute. Documentation in `/docs` is authoritative. On conflict, prefer the newest version and [ADR 001](./decisions/001-canonical-product-decisions.md). Highlight ambiguity instead of guessing.
+How AI coding assistants must contribute. Documentation in `/docs` is authoritative. On conflict, prefer the newest version, [ADR 001](./decisions/001-canonical-product-decisions.md), and [ADR 002](./decisions/002-jobs-platform-evidence-profile.md). Highlight ambiguity instead of guessing.
 
 ## Required Reading Order
 

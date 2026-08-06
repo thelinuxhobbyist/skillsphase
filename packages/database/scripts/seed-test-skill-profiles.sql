@@ -1,149 +1,8 @@
--- Idempotent seed for public Skill Profiles with multi-capability + evidence.
+-- Idempotent seed for public SkillsPhase profiles (ADR 002).
+-- Profession-diverse demos: capability before title, evidence by profession.
 -- Identified by clerk_user_id prefix test-candidate: for easy cleanup.
 
-INSERT INTO skills (name) VALUES
-  ('TypeScript'),
-  ('React'),
-  ('Node.js'),
-  ('PostgreSQL'),
-  ('Python'),
-  ('SQL'),
-  ('Data Analysis'),
-  ('Figma'),
-  ('UX Research'),
-  ('Design Systems'),
-  ('API Design'),
-  ('System Design'),
-  ('Leadership'),
-  ('Performance'),
-  ('dbt'),
-  ('Looker'),
-  ('Prototyping')
-ON CONFLICT (name) DO NOTHING;
-
-INSERT INTO users (
-  clerk_user_id,
-  role,
-  email,
-  first_name,
-  last_name,
-  city,
-  country,
-  professional_title,
-  primary_capability,
-  career_summary,
-  remote_preference,
-  availability,
-  years_of_experience,
-  profile_completed
-) VALUES
-(
-  'test-candidate:maya-chen',
-  'job_seeker',
-  'test.maya.chen@example.com',
-  'Maya',
-  'Chen',
-  'Manchester',
-  'GB',
-  'Full-stack Engineer',
-  'Builds scalable web applications',
-  'Builds product-facing web apps with TypeScript and React. Comfortable owning features end to end — API design, UI, and shipping.',
-  'hybrid',
-  'within_one_month',
-  6,
-  true
-),
-(
-  'test-candidate:jordan-okonkwo',
-  'job_seeker',
-  'test.jordan.okonkwo@example.com',
-  'Jordan',
-  'Okonkwo',
-  'London',
-  'GB',
-  'Data Analyst',
-  'Turns operational data into decisions',
-  'Turns messy operational data into clear decisions for ops and finance teams. Strong in SQL, Python, and stakeholder reporting.',
-  'remote',
-  'immediate',
-  4,
-  true
-),
-(
-  'test-candidate:samira-patel',
-  'job_seeker',
-  'test.samira.patel@example.com',
-  'Samira',
-  'Patel',
-  'Bristol',
-  'GB',
-  'Product Designer',
-  'Designs clear B2B product workflows',
-  'Designs clear B2B workflows with research-backed prototypes and scalable design systems.',
-  'hybrid',
-  'freelance',
-  5,
-  true
-),
-(
-  'test-candidate:alex-rivera',
-  'job_seeker',
-  'test.alex.rivera@example.com',
-  'Alex',
-  'Rivera',
-  'Leeds',
-  'GB',
-  'Platform Engineer',
-  'Builds reliable internal platforms',
-  'Owns developer platforms and CI systems that help product teams ship safely.',
-  'remote',
-  'permanent',
-  7,
-  true
-),
-(
-  'test-candidate:riley-okafor',
-  'job_seeker',
-  'test.riley.okafor@example.com',
-  'Riley',
-  'Okafor',
-  'Edinburgh',
-  'GB',
-  'Full-stack Product Engineer',
-  'Ships customer-facing products end to end',
-  'Builds and ships product features with clear outcomes — from API design through UI polish. Comfortable pairing with design and talking trade-offs with stakeholders.',
-  'hybrid',
-  'immediate',
-  8,
-  true
-)
-ON CONFLICT (clerk_user_id) DO UPDATE SET
-  role = EXCLUDED.role,
-  email = EXCLUDED.email,
-  first_name = EXCLUDED.first_name,
-  last_name = EXCLUDED.last_name,
-  city = EXCLUDED.city,
-  country = EXCLUDED.country,
-  professional_title = EXCLUDED.professional_title,
-  primary_capability = EXCLUDED.primary_capability,
-  career_summary = EXCLUDED.career_summary,
-  remote_preference = EXCLUDED.remote_preference,
-  availability = EXCLUDED.availability,
-  years_of_experience = EXCLUDED.years_of_experience,
-  profile_completed = true,
-  deleted_at = NULL,
-  updated_at = now();
-
--- Full contact + rate fields for the showcase profile.
-UPDATE users SET
-  phone_number = '+44 7700 900123',
-  salary_min = 65000,
-  salary_max = 85000,
-  salary_currency = 'GBP',
-  updated_at = now()
-WHERE clerk_user_id = 'test-candidate:riley-okafor';
-
--- Reset linked evidence for test candidates.
+-- Remove previous demo candidates entirely, then recreate.
 DELETE FROM capability_projects
 WHERE capability_id IN (
   SELECT cc.id FROM candidate_capabilities cc
@@ -193,465 +52,598 @@ WHERE user_id IN (
   SELECT id FROM users WHERE clerk_user_id LIKE 'test-candidate:%'
 );
 
+DELETE FROM users
+WHERE clerk_user_id LIKE 'test-candidate:%';
+
+INSERT INTO skills (name) VALUES
+  ('Lesson planning'),
+  ('Assessment design'),
+  ('Classroom leadership'),
+  ('Safeguarding'),
+  ('Commercial installs'),
+  ('Electrical testing'),
+  ('Fault diagnosis'),
+  ('Health & safety'),
+  ('Brand identity'),
+  ('Visual design'),
+  ('Client briefing'),
+  ('Typography'),
+  ('Menu design'),
+  ('Food costing'),
+  ('Kitchen leadership'),
+  ('Food hygiene'),
+  ('Programme delivery'),
+  ('Stakeholder management'),
+  ('Risk management'),
+  ('Budget control'),
+  ('TypeScript'),
+  ('React'),
+  ('Node.js'),
+  ('System design')
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO users (
+  clerk_user_id,
+  role,
+  email,
+  first_name,
+  last_name,
+  city,
+  country,
+  professional_title,
+  primary_capability,
+  career_summary,
+  remote_preference,
+  availability,
+  years_of_experience,
+  profile_completed
+) VALUES
+(
+  'test-candidate:priya-rahman',
+  'job_seeker',
+  'test.priya.rahman@example.com',
+  'Priya',
+  'Rahman',
+  'Leeds',
+  'GB',
+  'Secondary Teacher',
+  'Helps GCSE students improve confidence and exam performance',
+  'Helps GCSE students improve confidence and exam performance through structured lesson plans, clear assessment, and calm classroom leadership. Full DBS check available upon request.',
+  'on_site',
+  'within_one_month',
+  9,
+  true
+),
+(
+  'test-candidate:jordan-mills',
+  'job_seeker',
+  'test.jordan.mills@example.com',
+  'Jordan',
+  'Mills',
+  'Birmingham',
+  'GB',
+  'Electrician',
+  'Installs and maintains safe commercial electrical systems',
+  'Installs and maintains safe commercial electrical systems for offices, retail units, and light industrial sites. Qualifications and certificates available upon request.',
+  'on_site',
+  'immediate',
+  11,
+  true
+),
+(
+  'test-candidate:aisha-lane',
+  'job_seeker',
+  'test.aisha.lane@example.com',
+  'Aisha',
+  'Lane',
+  'Bristol',
+  'GB',
+  'Graphic Designer',
+  'Creates memorable brands that help businesses stand out',
+  'Creates memorable brands that help businesses stand out — from identity systems to launch campaigns. Portfolio and client references available upon request.',
+  'hybrid',
+  'freelance',
+  7,
+  true
+),
+(
+  'test-candidate:sam-okonkwo',
+  'job_seeker',
+  'test.sam.okonkwo@example.com',
+  'Sam',
+  'Okonkwo',
+  'Manchester',
+  'GB',
+  'Chef',
+  'Designs seasonal menus that keep guests coming back',
+  'Designs seasonal menus that keep guests coming back, balancing flavour, cost control, and kitchen flow. Food hygiene certificates available upon request.',
+  'on_site',
+  'immediate',
+  8,
+  true
+),
+(
+  'test-candidate:morgan-ellis',
+  'job_seeker',
+  'test.morgan.ellis@example.com',
+  'Morgan',
+  'Ellis',
+  'London',
+  'GB',
+  'Project Manager',
+  'Delivers complex programmes on time for public-sector teams',
+  'Delivers complex programmes on time for public-sector teams, keeping stakeholders aligned and risks visible. References available upon request.',
+  'hybrid',
+  'permanent',
+  10,
+  true
+),
+(
+  'test-candidate:casey-nguyen',
+  'job_seeker',
+  'test.casey.nguyen@example.com',
+  'Casey',
+  'Nguyen',
+  'Edinburgh',
+  'GB',
+  'Software Engineer',
+  'Builds reliable platforms that help teams deliver software faster',
+  'Builds reliable platforms that help engineering teams deliver software faster. Technical case studies and references available upon request.',
+  'remote',
+  'within_one_month',
+  6,
+  true
+);
+
+-- Showcase contact + rate fields for the teacher profile.
+UPDATE users SET
+  phone_number = '+44 7700 900221',
+  salary_min = 38000,
+  salary_max = 46000,
+  salary_currency = 'GBP',
+  updated_at = now()
+WHERE clerk_user_id = 'test-candidate:priya-rahman';
+
 INSERT INTO user_skills (user_id, skill_id)
 SELECT u.id, s.id
 FROM users u
-JOIN skills s ON s.name IN ('TypeScript', 'React', 'Node.js', 'PostgreSQL', 'API Design', 'System Design', 'Performance')
-WHERE u.clerk_user_id = 'test-candidate:maya-chen'
+JOIN skills s ON s.name IN ('Lesson planning', 'Assessment design', 'Classroom leadership', 'Safeguarding')
+WHERE u.clerk_user_id = 'test-candidate:priya-rahman'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO user_skills (user_id, skill_id)
 SELECT u.id, s.id
 FROM users u
-JOIN skills s ON s.name IN ('Python', 'SQL', 'Data Analysis', 'dbt', 'Looker')
-WHERE u.clerk_user_id = 'test-candidate:jordan-okonkwo'
+JOIN skills s ON s.name IN ('Commercial installs', 'Electrical testing', 'Fault diagnosis', 'Health & safety')
+WHERE u.clerk_user_id = 'test-candidate:jordan-mills'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO user_skills (user_id, skill_id)
 SELECT u.id, s.id
 FROM users u
-JOIN skills s ON s.name IN ('Figma', 'UX Research', 'Design Systems', 'Prototyping')
-WHERE u.clerk_user_id = 'test-candidate:samira-patel'
+JOIN skills s ON s.name IN ('Brand identity', 'Visual design', 'Client briefing', 'Typography')
+WHERE u.clerk_user_id = 'test-candidate:aisha-lane'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO user_skills (user_id, skill_id)
 SELECT u.id, s.id
 FROM users u
-JOIN skills s ON s.name IN ('TypeScript', 'Node.js', 'PostgreSQL', 'System Design', 'Leadership')
-WHERE u.clerk_user_id = 'test-candidate:alex-rivera'
+JOIN skills s ON s.name IN ('Menu design', 'Food costing', 'Kitchen leadership', 'Food hygiene')
+WHERE u.clerk_user_id = 'test-candidate:sam-okonkwo'
 ON CONFLICT DO NOTHING;
 
--- Maya: two evidence projects
-INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
+INSERT INTO user_skills (user_id, skill_id)
+SELECT u.id, s.id
+FROM users u
+JOIN skills s ON s.name IN ('Programme delivery', 'Stakeholder management', 'Risk management', 'Budget control')
+WHERE u.clerk_user_id = 'test-candidate:morgan-ellis'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO user_skills (user_id, skill_id)
+SELECT u.id, s.id
+FROM users u
+JOIN skills s ON s.name IN ('TypeScript', 'React', 'Node.js', 'System design')
+WHERE u.clerk_user_id = 'test-candidate:casey-nguyen'
+ON CONFLICT DO NOTHING;
+
+-- Evidence projects (profession-specific)
+INSERT INTO projects (user_id, title, description, outcome, role, project_url, technologies, featured, sort_order)
 SELECT id,
-  'Warehouse Inventory Dashboard',
-  'Real-time stock and fulfilment views for warehouse ops, with role-based access and audit history.',
-  'Reduced warehouse lookup times by 80%.',
-  'Lead Engineer',
-  '["React","TypeScript","PostgreSQL","Node.js"]'::jsonb,
+  'GCSE Confidence Intervention',
+  'Eight-week booster programme with clear learning objectives, retrieval practice, and parent progress notes.',
+  'Raised cohort pass rate from 62% to 84% over two years.',
+  'Subject lead',
+  NULL,
+  '["Lesson planning","Assessment design"]'::jsonb,
   true,
   0
-FROM users WHERE clerk_user_id = 'test-candidate:maya-chen';
+FROM users WHERE clerk_user_id = 'test-candidate:priya-rahman';
 
 INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
 SELECT id,
-  'Customer Portal',
-  'Self-serve account and order management for B2B customers, replacing email-driven support.',
-  'Cut support ticket volume by 35% in the first quarter.',
-  'Full-stack Engineer',
+  'Classroom Resource Pack — Algebra',
+  'Reusable worksheets, worked examples, and exit tickets shared across the department.',
+  'Cut planning prep time for three colleagues by roughly a day each half-term.',
+  'Teacher',
+  '["Lesson planning"]'::jsonb,
+  false,
+  1
+FROM users WHERE clerk_user_id = 'test-candidate:priya-rahman';
+
+INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
+SELECT id,
+  'Retail Unit Rewire',
+  'Full commercial rewire for a high-street retail fit-out, including testing certificates and handover pack.',
+  'Completed ahead of soft-opening with zero snagging on electricals.',
+  'Lead electrician',
+  '["Commercial installs","Electrical testing"]'::jsonb,
+  true,
+  0
+FROM users WHERE clerk_user_id = 'test-candidate:jordan-mills';
+
+INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
+SELECT id,
+  'Office Lighting Upgrade',
+  'LED conversion and emergency lighting upgrade for a three-floor office block.',
+  'Cut energy use on lighting by an estimated 35% while meeting current regs.',
+  'Electrician',
+  '["Commercial installs","Health & safety"]'::jsonb,
+  false,
+  1
+FROM users WHERE clerk_user_id = 'test-candidate:jordan-mills';
+
+INSERT INTO projects (user_id, title, description, outcome, role, project_url, technologies, featured, sort_order)
+SELECT id,
+  'Harbour Bakery Rebrand',
+  'Full brand identity, packaging system, and launch assets for an independent bakery.',
+  'Owner reported a 40% increase in wholesale enquiries in the first quarter.',
+  'Lead designer',
+  'https://example.com/portfolio/harbour-bakery',
+  '["Brand identity","Typography"]'::jsonb,
+  true,
+  0
+FROM users WHERE clerk_user_id = 'test-candidate:aisha-lane';
+
+INSERT INTO projects (user_id, title, description, outcome, role, project_url, technologies, featured, sort_order)
+SELECT id,
+  'Trade Services Website',
+  'Visual identity and marketing site for a multi-trade contractor.',
+  'Improved quote request conversion from roughly 2% to 6% of visits.',
+  'Designer',
+  'https://example.com/portfolio/trade-services',
+  '["Visual design","Client briefing"]'::jsonb,
+  false,
+  1
+FROM users WHERE clerk_user_id = 'test-candidate:aisha-lane';
+
+INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
+SELECT id,
+  'Autumn Guest Menu',
+  'Seasonal tasting menu with local suppliers, allergen mapping, and kitchen prep guides.',
+  'Repeat guest bookings rose 25% across the season.',
+  'Head chef',
+  '["Menu design","Food costing"]'::jsonb,
+  true,
+  0
+FROM users WHERE clerk_user_id = 'test-candidate:sam-okonkwo';
+
+INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
+SELECT id,
+  'Service Efficiency Reset',
+  'Reworked station layout and prep lists for a 60-cover dining room.',
+  'Reduced average ticket time by 4 minutes on Friday service.',
+  'Sous chef',
+  '["Kitchen leadership","Food hygiene"]'::jsonb,
+  false,
+  1
+FROM users WHERE clerk_user_id = 'test-candidate:sam-okonkwo';
+
+INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
+SELECT id,
+  'Council Digital Services Programme',
+  'Coordinated delivery across five suppliers for a resident-facing services rollout.',
+  'Launched on the agreed public date with contingency unused.',
+  'Programme manager',
+  '["Programme delivery","Stakeholder management"]'::jsonb,
+  true,
+  0
+FROM users WHERE clerk_user_id = 'test-candidate:morgan-ellis';
+
+INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
+SELECT id,
+  'Office Relocation Programme',
+  'End-to-end relocation for a 220-person team, including risk registers and vendor control.',
+  'Zero lost working days during cutover weekend.',
+  'Project manager',
+  '["Risk management","Budget control"]'::jsonb,
+  false,
+  1
+FROM users WHERE clerk_user_id = 'test-candidate:morgan-ellis';
+
+INSERT INTO projects (user_id, title, description, outcome, role, project_url, technologies, featured, sort_order)
+SELECT id,
+  'Internal Developer Portal',
+  'Self-serve templates and golden paths so product teams can launch services safely.',
+  'Cut average service bootstrap time from five days to one.',
+  'Platform engineer',
+  'https://example.com/case-studies/dev-portal',
+  '["TypeScript","Node.js","System design"]'::jsonb,
+  true,
+  0
+FROM users WHERE clerk_user_id = 'test-candidate:casey-nguyen';
+
+INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
+SELECT id,
+  'Checkout Reliability Programme',
+  'Stabilised payment flows and observability for a high-traffic retail checkout.',
+  'Reduced payment-related support tickets by 40%.',
+  'Software engineer',
   '["React","TypeScript","Node.js"]'::jsonb,
   false,
   1
-FROM users WHERE clerk_user_id = 'test-candidate:maya-chen';
+FROM users WHERE clerk_user_id = 'test-candidate:casey-nguyen';
 
--- Jordan
-INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
-SELECT id,
-  'Ops KPI Reporting Suite',
-  'Automated weekly packs for ops leadership: incident trends, SLA breaches, and cost drivers.',
-  'Cut weekly reporting prep from 6 hours to 40 minutes.',
-  'Analyst',
-  '["Python","SQL","Looker"]'::jsonb,
-  true,
-  0
-FROM users WHERE clerk_user_id = 'test-candidate:jordan-okonkwo';
-
-INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
-SELECT id,
-  'Finance Self-Serve Metrics',
-  'Trusted metric layer and dashboards for finance controllers.',
-  'Reduced ad-hoc finance data requests by half.',
-  'Analytics Engineer',
-  '["SQL","dbt","Python"]'::jsonb,
-  false,
-  1
-FROM users WHERE clerk_user_id = 'test-candidate:jordan-okonkwo';
-
--- Samira
-INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
-SELECT id,
-  'B2B Onboarding Redesign',
-  'Guided setup flow and clearer empty states for new business customers.',
-  'Improved new-customer activation rate by 28% in the first 30 days.',
-  'Product Designer',
-  '["Figma","Prototyping"]'::jsonb,
-  true,
-  0
-FROM users WHERE clerk_user_id = 'test-candidate:samira-patel';
-
-INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
-SELECT id,
-  'Design System Foundations',
-  'Component library and contribution model shared across product squads.',
-  'Reduced UI inconsistency defects by 40% across three product teams.',
-  'Design Systems Lead',
-  '["Figma","Design Systems"]'::jsonb,
-  false,
-  1
-FROM users WHERE clerk_user_id = 'test-candidate:samira-patel';
-
--- Alex
-INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
-SELECT id,
-  'Developer Platform Portal',
-  'Self-serve service templates, golden paths, and observability defaults.',
-  'Reduced average service bootstrapping time from 5 days to 1 day.',
-  'Platform Lead',
-  '["TypeScript","Node.js","PostgreSQL"]'::jsonb,
-  true,
-  0
-FROM users WHERE clerk_user_id = 'test-candidate:alex-rivera';
-
-INSERT INTO projects (user_id, title, description, outcome, role, technologies, featured, sort_order)
-SELECT id,
-  'CI Reliability Programme',
-  'Flake reduction, caching, and pipeline SLOs for product engineering.',
-  'Improved main-branch CI pass rate from 82% to 97%.',
-  'Staff Engineer',
-  '["TypeScript","System Design"]'::jsonb,
-  false,
-  1
-FROM users WHERE clerk_user_id = 'test-candidate:alex-rivera';
-
--- Capabilities for Maya
+-- Capabilities
 INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
-SELECT id, 'Builds scalable web applications', true, 0
-FROM users WHERE clerk_user_id = 'test-candidate:maya-chen';
+SELECT id, 'Helps GCSE students improve confidence and exam performance', true, 0
+FROM users WHERE clerk_user_id = 'test-candidate:priya-rahman';
 
 INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
 SELECT id, label, false, sort_order
 FROM users
 CROSS JOIN (
   VALUES
-    ('API Architecture', 1),
-    ('Database Design', 2),
-    ('Technical Leadership', 3),
-    ('Performance Optimisation', 4)
+    ('Designs clear assessment pathways', 1),
+    ('Builds calm, focused classrooms', 2),
+    ('Supports colleagues with shared resources', 3)
 ) AS caps(label, sort_order)
-WHERE clerk_user_id = 'test-candidate:maya-chen';
+WHERE clerk_user_id = 'test-candidate:priya-rahman';
 
--- Capabilities for Jordan
 INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
-SELECT id, 'Turns operational data into decisions', true, 0
-FROM users WHERE clerk_user_id = 'test-candidate:jordan-okonkwo';
+SELECT id, 'Installs and maintains safe commercial electrical systems', true, 0
+FROM users WHERE clerk_user_id = 'test-candidate:jordan-mills';
 
 INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
 SELECT id, label, false, sort_order
 FROM users
 CROSS JOIN (
   VALUES
-    ('SQL Modelling', 1),
-    ('Executive Reporting', 2),
-    ('Data Quality', 3)
+    ('Diagnoses faults quickly on live sites', 1),
+    ('Delivers clean handover packs and certificates', 2)
 ) AS caps(label, sort_order)
-WHERE clerk_user_id = 'test-candidate:jordan-okonkwo';
+WHERE clerk_user_id = 'test-candidate:jordan-mills';
 
--- Capabilities for Samira
 INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
-SELECT id, 'Designs clear B2B product workflows', true, 0
-FROM users WHERE clerk_user_id = 'test-candidate:samira-patel';
+SELECT id, 'Creates memorable brands that help businesses stand out', true, 0
+FROM users WHERE clerk_user_id = 'test-candidate:aisha-lane';
 
 INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
 SELECT id, label, false, sort_order
 FROM users
 CROSS JOIN (
   VALUES
-    ('Design Systems', 1),
-    ('User Research', 2),
-    ('Interaction Design', 3)
+    ('Turns briefs into coherent visual systems', 1),
+    ('Designs launch assets that convert interest', 2)
 ) AS caps(label, sort_order)
-WHERE clerk_user_id = 'test-candidate:samira-patel';
+WHERE clerk_user_id = 'test-candidate:aisha-lane';
 
--- Capabilities for Alex
 INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
-SELECT id, 'Builds reliable internal platforms', true, 0
-FROM users WHERE clerk_user_id = 'test-candidate:alex-rivera';
+SELECT id, 'Designs seasonal menus that keep guests coming back', true, 0
+FROM users WHERE clerk_user_id = 'test-candidate:sam-okonkwo';
 
 INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
 SELECT id, label, false, sort_order
 FROM users
 CROSS JOIN (
   VALUES
-    ('Developer Experience', 1),
-    ('CI/CD Reliability', 2),
-    ('Technical Leadership', 3)
+    ('Controls food cost without dulling the plate', 1),
+    ('Leads calm, organised kitchen service', 2)
 ) AS caps(label, sort_order)
-WHERE clerk_user_id = 'test-candidate:alex-rivera';
+WHERE clerk_user_id = 'test-candidate:sam-okonkwo';
 
--- Link Maya primary capability → skills + both projects
+INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
+SELECT id, 'Delivers complex programmes on time for public-sector teams', true, 0
+FROM users WHERE clerk_user_id = 'test-candidate:morgan-ellis';
+
+INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
+SELECT id, label, false, sort_order
+FROM users
+CROSS JOIN (
+  VALUES
+    ('Keeps stakeholders aligned under pressure', 1),
+    ('Surfaces risk early enough to act', 2)
+) AS caps(label, sort_order)
+WHERE clerk_user_id = 'test-candidate:morgan-ellis';
+
+INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
+SELECT id, 'Builds reliable platforms that help teams deliver software faster', true, 0
+FROM users WHERE clerk_user_id = 'test-candidate:casey-nguyen';
+
+INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
+SELECT id, label, false, sort_order
+FROM users
+CROSS JOIN (
+  VALUES
+    ('Stabilises critical customer journeys', 1),
+    ('Documents platforms so teams can self-serve', 2)
+) AS caps(label, sort_order)
+WHERE clerk_user_id = 'test-candidate:casey-nguyen';
+
+-- Link primary capabilities to skills + evidence
 INSERT INTO capability_skills (capability_id, skill_id)
 SELECT cc.id, s.id
 FROM candidate_capabilities cc
 JOIN users u ON u.id = cc.user_id
-JOIN skills s ON s.name IN ('React', 'TypeScript', 'Node.js')
-WHERE u.clerk_user_id = 'test-candidate:maya-chen'
-  AND cc.is_primary = true;
+JOIN skills s ON s.name IN ('Lesson planning', 'Assessment design', 'Classroom leadership')
+WHERE u.clerk_user_id = 'test-candidate:priya-rahman' AND cc.is_primary = true;
 
 INSERT INTO capability_projects (capability_id, project_id)
 SELECT cc.id, p.id
 FROM candidate_capabilities cc
 JOIN users u ON u.id = cc.user_id
 JOIN projects p ON p.user_id = u.id
-WHERE u.clerk_user_id = 'test-candidate:maya-chen'
-  AND cc.is_primary = true;
+WHERE u.clerk_user_id = 'test-candidate:priya-rahman' AND cc.is_primary = true;
 
 INSERT INTO capability_skills (capability_id, skill_id)
 SELECT cc.id, s.id
 FROM candidate_capabilities cc
 JOIN users u ON u.id = cc.user_id
-JOIN skills s ON s.name IN ('API Design', 'Node.js')
-WHERE u.clerk_user_id = 'test-candidate:maya-chen'
-  AND cc.label = 'API Architecture';
-
-INSERT INTO capability_projects (capability_id, project_id)
-SELECT cc.id, p.id
-FROM candidate_capabilities cc
-JOIN users u ON u.id = cc.user_id
-JOIN projects p ON p.user_id = u.id AND p.title = 'Customer Portal'
-WHERE u.clerk_user_id = 'test-candidate:maya-chen'
-  AND cc.label = 'API Architecture';
-
--- Jordan links
-INSERT INTO capability_skills (capability_id, skill_id)
-SELECT cc.id, s.id
-FROM candidate_capabilities cc
-JOIN users u ON u.id = cc.user_id
-JOIN skills s ON s.name IN ('SQL', 'Python', 'Data Analysis')
-WHERE u.clerk_user_id = 'test-candidate:jordan-okonkwo'
-  AND cc.is_primary = true;
+JOIN skills s ON s.name IN ('Commercial installs', 'Electrical testing', 'Health & safety')
+WHERE u.clerk_user_id = 'test-candidate:jordan-mills' AND cc.is_primary = true;
 
 INSERT INTO capability_projects (capability_id, project_id)
 SELECT cc.id, p.id
 FROM candidate_capabilities cc
 JOIN users u ON u.id = cc.user_id
 JOIN projects p ON p.user_id = u.id
-WHERE u.clerk_user_id = 'test-candidate:jordan-okonkwo'
-  AND cc.is_primary = true;
+WHERE u.clerk_user_id = 'test-candidate:jordan-mills' AND cc.is_primary = true;
 
--- Samira links
 INSERT INTO capability_skills (capability_id, skill_id)
 SELECT cc.id, s.id
 FROM candidate_capabilities cc
 JOIN users u ON u.id = cc.user_id
-JOIN skills s ON s.name IN ('Figma', 'UX Research', 'Prototyping')
-WHERE u.clerk_user_id = 'test-candidate:samira-patel'
-  AND cc.is_primary = true;
-
-INSERT INTO capability_projects (capability_id, project_id)
-SELECT cc.id, p.id
-FROM candidate_capabilities cc
-JOIN users u ON u.id = cc.user_id
-JOIN projects p ON p.user_id = u.id AND p.title = 'B2B Onboarding Redesign'
-WHERE u.clerk_user_id = 'test-candidate:samira-patel'
-  AND cc.is_primary = true;
-
--- Alex links
-INSERT INTO capability_skills (capability_id, skill_id)
-SELECT cc.id, s.id
-FROM candidate_capabilities cc
-JOIN users u ON u.id = cc.user_id
-JOIN skills s ON s.name IN ('TypeScript', 'System Design', 'Leadership')
-WHERE u.clerk_user_id = 'test-candidate:alex-rivera'
-  AND cc.is_primary = true;
+JOIN skills s ON s.name IN ('Brand identity', 'Visual design', 'Typography')
+WHERE u.clerk_user_id = 'test-candidate:aisha-lane' AND cc.is_primary = true;
 
 INSERT INTO capability_projects (capability_id, project_id)
 SELECT cc.id, p.id
 FROM candidate_capabilities cc
 JOIN users u ON u.id = cc.user_id
 JOIN projects p ON p.user_id = u.id
-WHERE u.clerk_user_id = 'test-candidate:alex-rivera'
-  AND cc.is_primary = true;
-
--- Education required for discovery completeness (all test candidates).
-INSERT INTO education (user_id, institution, qualification, start_date, end_date, description)
-SELECT id, 'University of Manchester', 'BSc Computer Science', '2014-09-01', '2018-06-01', 'First-class honours.'
-FROM users WHERE clerk_user_id = 'test-candidate:maya-chen';
-
-INSERT INTO education (user_id, institution, qualification, start_date, end_date, description)
-SELECT id, 'London School of Economics', 'BSc Economics', '2016-09-01', '2019-06-01', NULL
-FROM users WHERE clerk_user_id = 'test-candidate:jordan-okonkwo';
-
-INSERT INTO education (user_id, institution, qualification, start_date, end_date, description)
-SELECT id, 'University of the West of England', 'BA Graphic Design', '2015-09-01', '2018-06-01', NULL
-FROM users WHERE clerk_user_id = 'test-candidate:samira-patel';
-
-INSERT INTO education (user_id, institution, qualification, start_date, end_date, description)
-SELECT id, 'University of Leeds', 'MEng Software Engineering', '2012-09-01', '2016-06-01', NULL
-FROM users WHERE clerk_user_id = 'test-candidate:alex-rivera';
-
--- ---------------------------------------------------------------------------
--- Showcase profile: Riley Okafor — every Skill Profile field populated.
--- ---------------------------------------------------------------------------
-
-INSERT INTO user_skills (user_id, skill_id)
-SELECT u.id, s.id
-FROM users u
-JOIN skills s ON s.name IN (
-  'TypeScript', 'React', 'Node.js', 'PostgreSQL', 'API Design', 'System Design', 'Leadership'
-)
-WHERE u.clerk_user_id = 'test-candidate:riley-okafor'
-ON CONFLICT DO NOTHING;
-
-INSERT INTO projects (
-  user_id, title, description, outcome, role, project_url, technologies, media, featured, sort_order
-)
-SELECT id,
-  'Marketplace Checkout Rebuild',
-  'Rebuilt multi-step checkout for a B2B marketplace with clearer error states and saved payment methods.',
-  'Increased completed checkouts by 22% and reduced payment-support tickets by 40%.',
-  'Lead Product Engineer',
-  'https://example.com/case-studies/checkout-rebuild',
-  '["TypeScript","React","Node.js","PostgreSQL"]'::jsonb,
-  '[
-    {"type":"link","url":"https://example.com/demo/checkout","label":"Interactive demo"},
-    {"type":"link","url":"https://github.com/example/checkout","label":"Source overview"}
-  ]'::jsonb,
-  true,
-  0
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
-
-INSERT INTO projects (
-  user_id, title, description, outcome, role, project_url, technologies, media, featured, sort_order
-)
-SELECT id,
-  'Partner API Platform',
-  'Designed and shipped a versioned partner API with docs, sandboxes, and usage metering.',
-  'Onboarded 18 partners in six months without adding headcount to integrations.',
-  'Staff Engineer',
-  'https://example.com/case-studies/partner-api',
-  '["Node.js","PostgreSQL","API Design"]'::jsonb,
-  '[
-    {"type":"link","url":"https://example.com/docs/partner-api","label":"API docs"}
-  ]'::jsonb,
-  false,
-  1
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
-
-INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
-SELECT id, 'Ships customer-facing products end to end', true, 0
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
-
-INSERT INTO candidate_capabilities (user_id, label, is_primary, sort_order)
-SELECT id, label, false, sort_order
-FROM users
-CROSS JOIN (
-  VALUES
-    ('API Platform Design', 1),
-    ('Cross-functional Delivery', 2),
-    ('Product Mentorship', 3)
-) AS caps(label, sort_order)
-WHERE clerk_user_id = 'test-candidate:riley-okafor';
+WHERE u.clerk_user_id = 'test-candidate:aisha-lane' AND cc.is_primary = true;
 
 INSERT INTO capability_skills (capability_id, skill_id)
 SELECT cc.id, s.id
 FROM candidate_capabilities cc
 JOIN users u ON u.id = cc.user_id
-JOIN skills s ON s.name IN ('TypeScript', 'React', 'Node.js', 'PostgreSQL')
-WHERE u.clerk_user_id = 'test-candidate:riley-okafor'
-  AND cc.is_primary = true;
+JOIN skills s ON s.name IN ('Menu design', 'Food costing', 'Kitchen leadership')
+WHERE u.clerk_user_id = 'test-candidate:sam-okonkwo' AND cc.is_primary = true;
 
 INSERT INTO capability_projects (capability_id, project_id)
 SELECT cc.id, p.id
 FROM candidate_capabilities cc
 JOIN users u ON u.id = cc.user_id
 JOIN projects p ON p.user_id = u.id
-WHERE u.clerk_user_id = 'test-candidate:riley-okafor'
-  AND cc.is_primary = true;
+WHERE u.clerk_user_id = 'test-candidate:sam-okonkwo' AND cc.is_primary = true;
 
 INSERT INTO capability_skills (capability_id, skill_id)
 SELECT cc.id, s.id
 FROM candidate_capabilities cc
 JOIN users u ON u.id = cc.user_id
-JOIN skills s ON s.name IN ('API Design', 'Node.js', 'PostgreSQL')
-WHERE u.clerk_user_id = 'test-candidate:riley-okafor'
-  AND cc.label = 'API Platform Design';
+JOIN skills s ON s.name IN ('Programme delivery', 'Stakeholder management', 'Risk management')
+WHERE u.clerk_user_id = 'test-candidate:morgan-ellis' AND cc.is_primary = true;
 
 INSERT INTO capability_projects (capability_id, project_id)
 SELECT cc.id, p.id
 FROM candidate_capabilities cc
 JOIN users u ON u.id = cc.user_id
-JOIN projects p ON p.user_id = u.id AND p.title = 'Partner API Platform'
-WHERE u.clerk_user_id = 'test-candidate:riley-okafor'
-  AND cc.label = 'API Platform Design';
+JOIN projects p ON p.user_id = u.id
+WHERE u.clerk_user_id = 'test-candidate:morgan-ellis' AND cc.is_primary = true;
+
+INSERT INTO capability_skills (capability_id, skill_id)
+SELECT cc.id, s.id
+FROM candidate_capabilities cc
+JOIN users u ON u.id = cc.user_id
+JOIN skills s ON s.name IN ('TypeScript', 'React', 'System design')
+WHERE u.clerk_user_id = 'test-candidate:casey-nguyen' AND cc.is_primary = true;
+
+INSERT INTO capability_projects (capability_id, project_id)
+SELECT cc.id, p.id
+FROM candidate_capabilities cc
+JOIN users u ON u.id = cc.user_id
+JOIN projects p ON p.user_id = u.id
+WHERE u.clerk_user_id = 'test-candidate:casey-nguyen' AND cc.is_primary = true;
+
+-- Education (required for profile completeness)
+INSERT INTO education (user_id, institution, qualification, start_date, end_date, description)
+SELECT id, 'University of Leeds', 'BA Education Studies', '2012-09-01', '2015-06-01', 'QTS completed via SCITT.'
+FROM users WHERE clerk_user_id = 'test-candidate:priya-rahman';
 
 INSERT INTO education (user_id, institution, qualification, start_date, end_date, description)
-SELECT id,
-  'University of Edinburgh',
-  'BEng Software Engineering',
-  '2012-09-01',
-  '2016-06-01',
-  'Dissertation on distributed systems reliability.'
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
+SELECT id, 'City College Birmingham', 'City & Guilds Level 3 Electrical Installation', '2010-09-01', '2012-06-01', NULL
+FROM users WHERE clerk_user_id = 'test-candidate:jordan-mills';
 
 INSERT INTO education (user_id, institution, qualification, start_date, end_date, description)
-SELECT id,
-  'Edinburgh Napier University',
-  'MSc Human-Computer Interaction',
-  '2016-09-01',
-  '2017-09-01',
-  NULL
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
+SELECT id, 'University of the West of England', 'BA Graphic Design', '2014-09-01', '2017-06-01', NULL
+FROM users WHERE clerk_user_id = 'test-candidate:aisha-lane';
 
+INSERT INTO education (user_id, institution, qualification, start_date, end_date, description)
+SELECT id, 'Manchester Catering College', 'Professional Cookery Diploma', '2013-09-01', '2015-06-01', NULL
+FROM users WHERE clerk_user_id = 'test-candidate:sam-okonkwo';
+
+INSERT INTO education (user_id, institution, qualification, start_date, end_date, description)
+SELECT id, 'University of Manchester', 'BSc Management', '2009-09-01', '2012-06-01', NULL
+FROM users WHERE clerk_user_id = 'test-candidate:morgan-ellis';
+
+INSERT INTO education (user_id, institution, qualification, start_date, end_date, description)
+SELECT id, 'University of Edinburgh', 'BSc Computer Science', '2015-09-01', '2019-06-01', NULL
+FROM users WHERE clerk_user_id = 'test-candidate:casey-nguyen';
+
+-- Showcase extras for Priya (progressive trust)
 INSERT INTO employment_history (
   user_id, employer_name, job_title, start_date, end_date, currently_working, description
 )
 SELECT id,
-  'Northwind Commerce',
-  'Lead Product Engineer',
-  '2021-03-01',
+  'West Riding Academy',
+  'Secondary Maths Teacher',
+  '2018-09-01',
   NULL,
   true,
-  'Owns checkout and post-purchase experiences for UK marketplace sellers.'
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
-
-INSERT INTO employment_history (
-  user_id, employer_name, job_title, start_date, end_date, currently_working, description
-)
-SELECT id,
-  'Cascade Systems',
-  'Senior Software Engineer',
-  '2018-01-01',
-  '2021-02-28',
-  false,
-  'Built partner integrations and internal tooling for ops teams.'
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
+  'Teaches GCSE maths and leads a department confidence intervention.'
+FROM users WHERE clerk_user_id = 'test-candidate:priya-rahman';
 
 INSERT INTO qualifications (user_id, name, issuing_body, date_awarded, description)
 SELECT id,
-  'AWS Certified Developer – Associate',
-  'Amazon Web Services',
-  '2022-05-15',
-  'Cloud fundamentals for product engineering teams.'
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
+  'DBS Check (Enhanced)',
+  'Disclosure and Barring Service',
+  '2025-01-12',
+  'Full certificate available upon request.'
+FROM users WHERE clerk_user_id = 'test-candidate:priya-rahman';
 
 INSERT INTO qualifications (user_id, name, issuing_body, date_awarded, description)
 SELECT id,
-  'Professional Scrum Master I',
-  'Scrum.org',
-  '2020-11-01',
-  NULL
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
+  'Qualified Teacher Status',
+  'Department for Education',
+  '2016-07-01',
+  'Certificate available upon request.'
+FROM users WHERE clerk_user_id = 'test-candidate:priya-rahman';
 
 INSERT INTO recommendations (
   user_id, author_name, relationship, public_summary, key_themes, body, verification_status
 )
 SELECT id,
-  'Amelia Grant',
-  'Former engineering manager',
-  'Strong technical ownership, product thinking and mentoring ability across ambiguous delivery work.',
-  '["Technical leadership","Product delivery","Collaboration"]'::jsonb,
-  'Riley consistently turns ambiguous product goals into shipped outcomes. They raise the quality bar on APIs and frontend polish, and they mentor juniors without slowing delivery. Full private letter retained for controlled employer access.',
+  'Helen Shaw',
+  'Head of department',
+  'Calm classroom leadership with measurable improvement in student confidence and outcomes.',
+  '["Student outcomes","Classroom leadership","Collaboration"]'::jsonb,
+  'Priya turns anxious GCSE groups into confident exam candidates. Full private reference available upon request.',
   'verified'
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
+FROM users WHERE clerk_user_id = 'test-candidate:priya-rahman';
 
 INSERT INTO recommendations (
   user_id, author_name, relationship, public_summary, key_themes, body, verification_status
 )
 SELECT id,
-  'Jonah Blake',
-  'Product design partner',
-  'Constructive design partnership with clear customer-experience trade-offs and reliable delivery follow-through.',
-  '["Collaboration","Product thinking"]'::jsonb,
-  'One of the easiest engineers I have partnered with. Riley challenges design decisions constructively and always protects the customer experience in trade-offs.',
+  'Parent governor panel',
+  'Parent feedback summary',
+  'Parents regularly note clearer progress updates and stronger exam confidence.',
+  '["Communication","Student confidence"]'::jsonb,
+  'Collected parent feedback summaries retained for controlled employer access.',
   'self_attested'
-FROM users WHERE clerk_user_id = 'test-candidate:riley-okafor';
+FROM users WHERE clerk_user_id = 'test-candidate:priya-rahman';
+
+INSERT INTO qualifications (user_id, name, issuing_body, date_awarded, description)
+SELECT id,
+  '18th Edition Wiring Regulations',
+  'City & Guilds',
+  '2023-04-20',
+  'Certificate available upon request.'
+FROM users WHERE clerk_user_id = 'test-candidate:jordan-mills';
+
+INSERT INTO qualifications (user_id, name, issuing_body, date_awarded, description)
+SELECT id,
+  'Level 2 Food Hygiene',
+  'Highfield',
+  '2024-09-01',
+  'Certificate available upon request.'
+FROM users WHERE clerk_user_id = 'test-candidate:sam-okonkwo';

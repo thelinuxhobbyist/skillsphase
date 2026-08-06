@@ -11,6 +11,11 @@ import {
 import { companyRoutes } from "./companies";
 import { contactRoutes } from "./contacts";
 import { adminHomepageRoutes, contentRoutes } from "./content";
+import {
+  applicationRoutes,
+  employerJobRoutes,
+  jobRoutes,
+} from "./jobs";
 import { mediaRoutes } from "./media";
 import { profileRoutes } from "./profile";
 import { projectRoutes } from "./projects";
@@ -32,6 +37,9 @@ v1Routes.route("/users", profileRoutes);
 v1Routes.route("/projects", projectRoutes);
 v1Routes.route("/media", mediaRoutes);
 v1Routes.route("/companies", companyRoutes);
+v1Routes.route("/jobs", jobRoutes);
+v1Routes.route("/applications", applicationRoutes);
+v1Routes.route("/employer/jobs", employerJobRoutes);
 v1Routes.route("/discover", discoveryRoutes);
 v1Routes.route("/public/candidates", publicDiscoveryRoutes);
 v1Routes.route("/saved-candidates", savedCandidateRoutes);

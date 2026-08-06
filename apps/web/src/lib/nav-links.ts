@@ -9,15 +9,19 @@ export type NavLink = {
 
 export const PUBLIC_LINKS: NavLink[] = [
   { href: "/", label: "Home" },
+  { href: "/jobs", label: "Jobs" },
   { href: "/discover-talent", label: "Browse Talent" },
+  { href: "/about", label: "About" },
 ];
 
 export function linksForUser(user: HorizonUser | null): NavLink[] {
   if (user?.role === "job_seeker") {
     return [
       { href: "/", label: "Home" },
+      { href: "/jobs", label: "Jobs" },
       { href: "/dashboard", label: "Dashboard" },
-      { href: "/profile", label: "Skill Profile" },
+      { href: "/applications", label: "Applications" },
+      { href: "/profile", label: "SkillsPhase profile" },
       { href: "/contacts", label: "Messages", collapsible: true },
       { href: "/settings", label: "Settings", collapsible: true },
     ];
@@ -26,8 +30,9 @@ export function linksForUser(user: HorizonUser | null): NavLink[] {
     return [
       { href: "/", label: "Home" },
       { href: "/employer", label: "Dashboard" },
+      { href: "/employer/jobs", label: "Jobs" },
       { href: "/employer/discover", label: "Discover Talent" },
-      { href: "/employer/saved", label: "Saved" },
+      { href: "/employer/saved", label: "Saved", collapsible: true },
       { href: "/employer/contacts", label: "Contacts", collapsible: true },
       { href: "/employer/company", label: "Company", collapsible: true },
       { href: "/employer/settings", label: "Settings", collapsible: true },

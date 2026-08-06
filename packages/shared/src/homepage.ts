@@ -3,7 +3,10 @@
 export const HOMEPAGE_SECTION_TYPES = [
   "hero",
   "trust",
+  "career_journeys",
   "how_it_works",
+  "product_showcase",
+  "comparison",
   "differentiators",
   "businesses_cta",
   "stats",
@@ -24,11 +27,14 @@ export type HomepageSectionType = (typeof HOMEPAGE_SECTION_TYPES)[number];
 export const HOMEPAGE_SECTION_LABELS: Record<HomepageSectionType, string> = {
   hero: "Hero",
   trust: "Trust signals",
+  career_journeys: "Career journeys",
   how_it_works: "How it works",
-  differentiators: "What makes us different",
+  product_showcase: "Product showcase",
+  comparison: "CV comparison",
+  differentiators: "Benefits",
   businesses_cta: "Business call-to-action",
   stats: "Platform statistics",
-  featured_candidates: "Featured skill profiles",
+  featured_candidates: "SkillsProfile anatomy",
   testimonials: "Testimonials",
   closing_cta: "Closing call-to-action",
   faq: "FAQ",
@@ -40,6 +46,7 @@ export const HOMEPAGE_OPTIONAL_SECTION_TYPES = [
   "trust",
   "businesses_cta",
   "stats",
+  "differentiators",
   "testimonials",
   "faq",
 ] as const satisfies readonly HomepageSectionType[];
@@ -85,71 +92,157 @@ export function filterHomepageBodySections(
 export function getDefaultHomepageSections(): HomepageSection[] {
   return [
     section("hero", 10, {
-      title: "Skills first. Because life happens.",
-      body: "People should be hired for what they can do today—not whether their career followed a straight line. Build a profile around your skills, experience, certifications, and real evidence of your work.",
-      primaryCtaLabel: "Create your Skill Profile",
+      title: "Apply for jobs with proof, not just a CV.",
+      titleAccent: "not just a CV.",
+      body: "SkillsPhase is a jobs platform that replaces the traditional CV with an evidence-based profile—so employers can see what you are capable of doing.",
+      primaryCtaLabel: "Create your SkillsPhase profile",
       primaryCtaHref: "/register?as=candidate",
-      secondaryCtaLabel: "Discover talent",
-      secondaryCtaHref: "/discover-talent",
+      secondaryCtaLabel: "Browse jobs",
+      secondaryCtaHref: "/jobs",
     }),
     section(
       "trust",
-      20,
+      15,
       {
         items: [
-          "Skills-first profiles",
-          "Evidence over timelines",
+          "Jobs you can apply for",
+          "Evidence-based profiles",
           "Verified UK businesses",
           "Free for candidates",
         ],
       },
       false,
     ),
-    section("how_it_works", 30, {
-      title: "Three simple steps from profile to conversation.",
+    section("featured_candidates", 20, {
+      title: "Your application, rebuilt around proof",
+      subtitle:
+        "Instead of a CV timeline, employers see what you can do—supported by evidence that works for any profession.",
+      callouts: [
+        {
+          label: "Capabilities",
+          detail: "What you help people achieve—not just a job title",
+        },
+        {
+          label: "Evidence",
+          detail: "Proof that demonstrates capability, linked to real sources",
+        },
+        {
+          label: "Impact",
+          detail: "Outcomes you have delivered, in plain language",
+        },
+        {
+          label: "Skills",
+          detail: "Searchable abilities employers can filter by",
+        },
+        {
+          label: "Trust signals",
+          detail: "Qualifications and checks available upon request",
+        },
+        {
+          label: "Availability",
+          detail: "Ready to apply or start—without burying the signal",
+        },
+      ],
+      primaryCtaLabel: "Create your SkillsPhase profile",
+      primaryCtaHref: "/register?as=candidate",
+    }),
+    section("career_journeys", 30, {
+      title: "Real careers aren't linear.",
+      subtitle:
+        "Evidence-based applications work whether skills came from employment, training, caring, or building something yourself.",
+      items: [
+        { title: "Career Change" },
+        { title: "Career Break" },
+        { title: "Illness & Recovery" },
+        { title: "Caring Responsibilities" },
+        { title: "Self-Taught Learning" },
+        { title: "Certifications" },
+        { title: "Side Projects" },
+        { title: "Freelancing" },
+        { title: "Small Business" },
+        { title: "Volunteering" },
+        { title: "Returning to Work" },
+        { title: "Redundancy" },
+        { title: "Military Service" },
+        { title: "Community Projects" },
+      ],
+      body: "Traditional CVs see gaps. SkillsPhase sees capability.",
+    }),
+    section("how_it_works", 40, {
+      title: "How it works",
       steps: [
         {
-          title: "Build your skills-first profile",
-          body: "Show what you can do today. Add your skills, experience, certifications, and projects, supported by real portfolio evidence instead of a generic personal statement.",
+          title: "Build your profile",
+          body: "Capabilities and evidence—ready to use as your application.",
         },
         {
-          title: "Get discovered",
-          body: "Verified businesses search for people by skills and experience—not career timelines. When your profile fits what they're looking for, they can view your work and learn more about your capabilities.",
+          title: "Find and apply",
+          body: "Search jobs, read the description, apply with your SkillsPhase profile.",
         },
         {
-          title: "Start the conversation",
-          body: "There is no automatic matching. Businesses decide who they want to contact based on your skills and evidence of your work. You choose whether to continue the conversation.",
+          title: "Employers review proof",
+          body: "They see what you can do first—then request more if needed.",
         },
       ],
     }),
-    section("differentiators", 40, {
-      title: "What makes SkillsPhase different",
-      subtitle: "A hiring platform built around skills and evidence.",
-      items: [
-        {
-          title: "Skills come first",
-          body: "Employers see what you can do today — skills, experience, and real evidence of your work. The path you took to get here matters less than what you can deliver now.",
-        },
-        {
-          title: "Proof over platitudes",
-          body: "Your profile leads with projects, certifications, and real work — not phrases like “motivated team player with excellent communication skills.”",
-        },
-        {
-          title: "Direct discovery for businesses",
-          body: "Browse skill profiles, filter by capability, and contact people who fit — without sorting through cover letters.",
-        },
-        {
-          title: "Verified UK businesses only",
-          body: "Every business is checked against Companies House and activates with a verified company email before contacting candidates.",
-        },
+    section("product_showcase", 50, {
+      title: "Recruit by capability, not keyword bingo",
+      subtitle:
+        "Browse candidates across professions—teachers, trades, designers, nurses, engineers—and shortlist on evidence.",
+      primaryCtaLabel: "Browse candidates",
+      primaryCtaHref: "/discover-talent",
+    }),
+    section("comparison", 60, {
+      title: "A better application than a CV",
+      traditionalTitle: "Traditional CV",
+      traditionalItems: [
+        "Job titles first",
+        "Employment dates and gaps",
+        "Claims without proof",
+        "One-page document dump",
+      ],
+      skillsphaseTitle: "SkillsPhase profile",
+      skillsphaseItems: [
+        "Capabilities first",
+        "Evidence of what you can do",
+        "Impact and outcomes",
+        "Progressive trust",
+        "Works for every profession",
+        "Becomes the application",
       ],
     }),
     section(
-      "businesses_cta",
-      50,
+      "differentiators",
+      70,
       {
-        title: "Hire for skills, not CV timelines.",
-        body: "Browse skills-first profiles with real evidence, then reach out directly to people who can do the work.",
+        title: "Why teams use SkillsPhase",
+        items: [
+          {
+            title: "Familiar hiring journey",
+            body: "Search, apply, review, interview—modernised at the application.",
+          },
+          {
+            title: "Proof over timelines",
+            body: "Evidence of capability beats keyword-stuffed CVs.",
+          },
+          {
+            title: "Verified businesses",
+            body: "Only verified UK businesses can make contact.",
+          },
+          {
+            title: "Every profession",
+            body: "The same profile structure works from teaching to trades.",
+          },
+        ],
+      },
+      false,
+    ),
+    section(
+      "businesses_cta",
+      80,
+      {
+        title: "Hire for what people can do.",
+        body: "Post roles, review evidence-based applications, and contact candidates directly.",
         ctaLabel: "Register as a business",
         ctaHref: "/register?as=business",
       },
@@ -157,36 +250,28 @@ export function getDefaultHomepageSections(): HomepageSection[] {
     ),
     section(
       "stats",
-      60,
+      85,
       {
         title: "Platform at a glance",
         subtitle: "Live metrics when we have enough activity to share.",
         items: [
-          { value: "—", label: "Skill profiles" },
+          { value: "—", label: "Open roles" },
+          { value: "—", label: "SkillsPhase profiles" },
           { value: "—", label: "Verified businesses" },
-          { value: "—", label: "Skills listed" },
-          { value: "—", label: "Direct conversations" },
+          { value: "—", label: "Applications with proof" },
         ],
-        footnote: "Enable this section from admin when you have real numbers to show.",
+        footnote:
+          "Enable this section from admin when you have real numbers to show.",
       },
       false,
     ),
     section(
-      "featured_candidates",
-      70,
-      {
-        title: "Skill profiles",
-        subtitle:
-          "Discover people by skills, experience, and evidence of their work.",
-      },
-      true,
-    ),
-    section(
       "testimonials",
-      80,
+      88,
       {
         title: "What people are saying",
-        subtitle: "Add real quotes from candidates and businesses when you have them.",
+        subtitle:
+          "Add real quotes from candidates and businesses when you have them.",
         items: [
           {
             quote:
@@ -199,9 +284,10 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       false,
     ),
     section("closing_cta", 90, {
-      title: "Skills first. Because life happens.",
-      body: "Whether you’re showcasing what you can do, or looking for people who can do it — start with skills and evidence.",
-      primaryCtaLabel: "Create your Skill Profile",
+      title: "Apply for jobs with proof, not just a CV.",
+      titleAccent: "not just a CV.",
+      body: "Create a SkillsPhase profile once—then use it to apply.",
+      primaryCtaLabel: "Create your SkillsPhase profile",
       primaryCtaHref: "/register?as=candidate",
       secondaryCtaLabel: "Register as a business",
       secondaryCtaHref: "/register?as=business",
@@ -213,53 +299,59 @@ export function getDefaultHomepageSections(): HomepageSection[] {
         title: "Frequently asked questions",
         subtitle: "Quick answers for candidates and businesses.",
         items: [
-        {
-          q: "Who is SkillsPhase for?",
-          a: "Anyone who wants to be hired for what they can do today. Your profile leads with skills, experience, certifications, and portfolio evidence — not whether your career followed a straight line.",
-        },
-        {
-          q: "Is it free for candidates?",
-          a: "Yes. Creating a Skill Profile, adding portfolio evidence, and being discovered by businesses is free.",
-        },
-        {
-          q: "Do I need a CV?",
-          a: "No. Your skills-first profile — skills, qualifications, experience, certifications, and projects — stands in for a traditional CV.",
-        },
-        {
-          q: "How do businesses find me?",
-          a: "Verified businesses browse and filter by skills. When your profile fits what they need, they can open your full details and contact you directly.",
-        },
-        {
-          q: "Who can register as a business?",
-          a: "Any UK company verified against Companies House with a confirmed company email address.",
-        },
-        {
-          q: "Is this only for the UK?",
-          a: "Business registration is UK-only today. Non-UK organisations can join the waitlist.",
-        },
+          {
+            q: "What is SkillsPhase?",
+            a: "A jobs platform that modernises applications by replacing the traditional CV with an evidence-based SkillsPhase profile.",
+          },
+          {
+            q: "Who is SkillsPhase for?",
+            a: "Anyone looking for work or hiring—across teaching, healthcare, trades, design, hospitality, professional services, engineering, and more.",
+          },
+          {
+            q: "Is it free for candidates?",
+            a: "Yes. Creating a SkillsPhase profile and applying for jobs is free.",
+          },
+          {
+            q: "Do I need a CV?",
+            a: "You apply with your SkillsPhase profile. Supporting documents such as a CV, certificates, or references can be shared later when an employer requests them.",
+          },
+          {
+            q: "How do businesses find candidates?",
+            a: "Verified businesses browse profiles by capability and evidence, then contact candidates or review applications directly.",
+          },
+          {
+            q: "Who can register as a business?",
+            a: "Any UK company verified against Companies House with a confirmed company email.",
+          },
+          {
+            q: "Is this only for the UK?",
+            a: "Business registration is UK-only today. Non-UK organisations can join the waitlist.",
+          },
         ],
       },
       false,
     ),
     section("footer", 110, {
       tagline:
-        "Skills first. Because life happens. A skills-first hiring platform connecting verified UK businesses with capable people through skills-first profiles and portfolio evidence.",
+        "SkillsPhase is a jobs platform that replaces the traditional CV with an evidence-based profile.",
       copyright: "© {year} SkillsPhase. UK only for business registration.",
       columns: [
         {
           title: "FOR CANDIDATES",
           links: [
             {
-              label: "Create your Skill Profile",
+              label: "Create your SkillsPhase profile",
               href: "/register?as=candidate",
             },
+            { label: "Browse jobs", href: "/jobs" },
             { label: "About", href: "/about" },
           ],
         },
         {
           title: "FOR BUSINESSES",
           links: [
-            { label: "Browse Skill Profiles", href: "/discover-talent" },
+            { label: "Post jobs", href: "/register?as=business" },
+            { label: "Browse candidates", href: "/discover-talent" },
             {
               label: "Register as a business",
               href: "/register?as=business",

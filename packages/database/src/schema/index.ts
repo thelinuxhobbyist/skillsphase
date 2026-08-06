@@ -4,6 +4,7 @@ export * from "./companies";
 export * from "./profile";
 export * from "./marketplace";
 export * from "./capabilities";
+export * from "./jobs";
 export * from "./admin";
 export * from "./admin-sessions";
 export * from "./homepage";

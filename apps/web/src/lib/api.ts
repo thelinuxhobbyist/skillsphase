@@ -1142,3 +1142,228 @@ export function resetAdminHomepageSections(token: string) {
     token,
   });
 }
+
+/* ─── Jobs & applications (ADR 002: profile-as-application) ─── */
+
+export type PublicJob = {
+  id: number;
+  title: string;
+  slug: string;
+  location: string;
+  remoteType: "on_site" | "hybrid" | "remote";
+  employmentType: string;
+  industry: string;
+  salaryMin: string | null;
+  salaryMax: string | null;
+  salaryCurrency: string;
+  closingDate: string | null;
+  companyName: string;
+  createdAt: string;
+};
+
+export type PublicJobDetail = PublicJob & {
+  description: string;
+  skills: string[];
+  companyWebsite: string | null;
+  status: "draft" | "published" | "closed";
+};
+
+export type EmployerJob = PublicJob & {
+  status: "draft" | "published" | "closed";
+  applicationCount: number;
+};
+
+export type EmployerJobDetail = {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  location: string;
+  remoteType: "on_site" | "hybrid" | "remote";
+  employmentType: string;
+  industry: string;
+  salaryMin: string | null;
+  salaryMax: string | null;
+  salaryCurrency: string;
+  closingDate: string | null;
+  status: "draft" | "published" | "closed";
+  skills: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type MyApplication = {
+  id: string;
+  status:
+    | "applied"
+    | "under_review"
+    | "interview"
+    | "offer"
+    | "hired"
+    | "rejected"
+    | "withdrawn";
+  coverLetter: string | null;
+  createdAt: string;
+  updatedAt: string;
+  job: {
+    id: number;
+    title: string;
+    slug: string;
+    location: string;
+    companyName: string;
+    status: "draft" | "published" | "closed";
+  };
+};
+
+export type EmployerApplication = {
+  id: string;
+  status: MyApplication["status"];
+  coverLetter: string | null;
+  createdAt: string;
+  updatedAt: string;
+  candidate: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    professionalTitle: string | null;
+    primaryCapability: string | null;
+    city: string | null;
+    profileCompleted: boolean;
+  };
+  profileSnapshot: Record<string, unknown> | null;
+};
+
+export function listPublishedJobs(params?: {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+  location?: string;
+  remoteType?: string;
+  employmentType?: string;
+  industry?: string;
+}) {
+  const search = new URLSearchParams();
+  if (params?.page) search.set("page", String(params.page));
+  if (params?.pageSize) search.set("pageSize", String(params.pageSize));
+  if (params?.q) search.set("q", params.q);
+  if (params?.location) search.set("location", params.location);
+  if (params?.remoteType) search.set("remoteType", params.remoteType);
+  if (params?.employmentType) search.set("employmentType", params.employmentType);
+  if (params?.industry) search.set("industry", params.industry);
+  const qs = search.toString();
+  return apiFetch<{ jobs: PublicJob[] }>(`/jobs${qs ? `?${qs}` : ""}`, {
+    revalidate: 30,
+  });
+}
+
+export function getJobBySlug(slug: string) {
+  return apiFetch<PublicJobDetail>(`/jobs/by-slug/${encodeURIComponent(slug)}`, {
+    revalidate: 30,
+  });
+}
+
+export function applyToJob(
+  token: string,
+  jobId: number,
+  body?: { coverLetter?: string | null },
+) {
+  return apiFetch<{
+    id: string;
+    status: string;
+    jobId: number;
+    message: string;
+  }>(`/jobs/${jobId}/apply`, {
+    method: "POST",
+    token,
+    body: JSON.stringify(body ?? {}),
+  });
+}
+
+export function listMyApplications(token: string) {
+  return apiFetch<{ applications: MyApplication[] }>("/applications/me", {
+    token,
+  });
+}
+
+export function withdrawApplication(token: string, applicationId: string) {
+  return apiFetch<{ id: string; status: string }>(
+    `/applications/${applicationId}/withdraw`,
+    { method: "POST", token },
+  );
+}
+
+export function listEmployerJobs(token: string) {
+  return apiFetch<{ jobs: EmployerJob[] }>("/employer/jobs", { token });
+}
+
+export function getEmployerJob(token: string, jobId: number) {
+  return apiFetch<EmployerJobDetail>(`/employer/jobs/${jobId}`, { token });
+}
+
+export function createEmployerJob(
+  token: string,
+  body: {
+    title: string;
+    description: string;
+    location: string;
+    remoteType: "on_site" | "hybrid" | "remote";
+    employmentType: string;
+    industry: string;
+    salaryMin?: number | null;
+    salaryMax?: number | null;
+    salaryCurrency?: string;
+    closingDate?: string | null;
+    skillNames?: string[];
+    publish?: boolean;
+  },
+) {
+  return apiFetch<EmployerJobDetail>("/employer/jobs", {
+    method: "POST",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export function updateEmployerJob(
+  token: string,
+  jobId: number,
+  body: Record<string, unknown>,
+) {
+  return apiFetch<EmployerJobDetail>(`/employer/jobs/${jobId}`, {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export function deleteEmployerJob(token: string, jobId: number) {
+  return apiFetch<{ deleted: boolean }>(`/employer/jobs/${jobId}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export function listJobApplications(token: string, jobId: number) {
+  return apiFetch<{ applications: EmployerApplication[]; note: string }>(
+    `/employer/jobs/${jobId}/applications`,
+    { token },
+  );
+}
+
+export function updateJobApplicationStatus(
+  token: string,
+  applicationId: string,
+  status: Exclude<
+    MyApplication["status"],
+    "applied" | "withdrawn"
+  >,
+) {
+  return apiFetch<{ id: string; status: string }>(
+    `/employer/jobs/applications/${applicationId}`,
+    {
+      method: "PATCH",
+      token,
+      body: JSON.stringify({ status }),
+    },
+  );
+}

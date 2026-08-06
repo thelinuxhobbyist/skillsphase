@@ -2,7 +2,7 @@
 
 This folder is the **single source of truth** for Project Horizon (a Career Return Platform).
 
-Before implementing any feature, read the relevant documents and [ADR 001](./decisions/001-canonical-product-decisions.md).
+Before implementing any feature, read the relevant documents, [ADR 001](./decisions/001-canonical-product-decisions.md), and [ADR 002](./decisions/002-jobs-platform-evidence-profile.md).
 
 ## Reading order
 
@@ -24,6 +24,7 @@ Before implementing any feature, read the relevant documents and [ADR 001](./dec
 ## Decisions
 
 - [001 — Canonical Product Decisions](./decisions/001-canonical-product-decisions.md)
+- [002 — Jobs Platform + Evidence-Based Profile](./decisions/002-jobs-platform-evidence-profile.md)
 
 ## Archive
 

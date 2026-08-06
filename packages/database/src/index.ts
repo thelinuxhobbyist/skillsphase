@@ -12,4 +12,5 @@ export * from "./queries/admin";
 export * from "./queries/admin-sessions";
 export * from "./queries/export";
 export * from "./queries/homepage";
+export * from "./queries/jobs";
 
