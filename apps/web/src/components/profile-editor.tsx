@@ -139,6 +139,22 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
     return value;
   }, [getToken]);
 
+  function applyProfileCompleted(updated: HorizonUser) {
+    setUser((current) =>
+      current.profileCompleted === updated.profileCompleted
+        ? current
+        : { ...current, profileCompleted: updated.profileCompleted },
+    );
+  }
+
+  function toOptionalNumber(value: string | null | undefined): number | null {
+    if (value === null || value === undefined || value.trim() === "") {
+      return null;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
   useDebouncedEffect(
     () => {
       void (async () => {
@@ -153,9 +169,10 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
             country: snapshot.country || "United Kingdom",
             careerSummary: snapshot.careerSummary,
           });
-          setUser(updated);
+          // Never replace the whole user object — an in-flight save can
+          // overwrite newer keystrokes (e.g. professional title).
+          applyProfileCompleted(updated);
           setSaveState("saved");
-          router.refresh();
         } catch (err) {
           setSaveState("error");
           setError(messageFrom(err));
@@ -169,7 +186,6 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
       user.country,
       user.careerSummary,
       token,
-      router,
     ],
     700,
   );
@@ -183,15 +199,15 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
         try {
           const updated = await updateCandidateProfile(await token(), {
             professionalTitle: snapshot.professionalTitle,
+            primaryCapability: snapshot.primaryCapability,
             remotePreference: snapshot.remotePreference,
             availability: snapshot.availability,
             yearsExperience: snapshot.yearsExperience,
-            salaryMin: snapshot.salaryMin,
-            salaryMax: snapshot.salaryMax,
+            salaryMin: toOptionalNumber(snapshot.salaryMin),
+            salaryMax: toOptionalNumber(snapshot.salaryMax),
           });
-          setUser(updated);
+          applyProfileCompleted(updated);
           setSaveState("saved");
-          router.refresh();
         } catch (err) {
           setSaveState("error");
           setError(messageFrom(err));
@@ -200,13 +216,13 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
     },
     [
       user.professionalTitle,
+      user.primaryCapability,
       user.remotePreference,
       user.availability,
       user.yearsExperience,
       user.salaryMin,
       user.salaryMax,
       token,
-      router,
     ],
     700,
   );
@@ -219,16 +235,22 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
         setError(null);
         try {
           const rows = await setSkillsByName(await token(), names);
-          setSkillList(rows.map((r) => r.name));
+          // Only sync if the user hasn't kept editing skills meanwhile.
+          const latest = skillListRef.current;
+          const same =
+            latest.length === names.length &&
+            latest.every((name, index) => name === names[index]);
+          if (same) {
+            setSkillList(rows.map((r) => r.name));
+          }
           setSaveState("saved");
-          router.refresh();
         } catch (err) {
           setSaveState("error");
           setError(messageFrom(err));
         }
       })();
     },
-    [skillList.join("\u0001"), token, router],
+    [skillList.join("\u0001"), token],
     700,
   );
 
@@ -236,6 +258,7 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
     () => {
       void (async () => {
         const snapshot = capabilitiesRef.current;
+        const saveKey = capabilitySaveKey(snapshot);
         setSaveState("saving");
         setError(null);
         try {
@@ -243,6 +266,11 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
             await token(),
             toCapabilityInputs(snapshot),
           );
+          // Ignore stale responses if the user kept editing capabilities.
+          if (capabilitySaveKey(capabilitiesRef.current) !== saveKey) {
+            setSaveState("saved");
+            return;
+          }
           setCapabilitiesState((current) => {
             const emptyDrafts = current.filter((row) => !row.label.trim());
             return [...rows, ...emptyDrafts];
@@ -255,14 +283,13 @@ function ConfiguredProfileEditor({ initial }: { initial: ProfileBundle }) {
               : { ...current, primaryCapability: primary },
           );
           setSaveState("saved");
-          router.refresh();
         } catch (err) {
           setSaveState("error");
           setError(messageFrom(err));
         }
       })();
     },
-    [capabilitySaveKey(capabilities), token, router],
+    [capabilitySaveKey(capabilities), token],
     700,
   );
 
@@ -798,6 +825,7 @@ function SkillProfileStep({
           setUser((u) => ({ ...u, professionalTitle }))
         }
         required
+        autoComplete="organization-title"
         hint="Supporting context only — e.g. Secondary Teacher, Electrician, Graphic Designer"
       />
 
@@ -2561,6 +2589,7 @@ function Field({
   required,
   disabled,
   hint,
+  autoComplete,
 }: {
   label: string;
   value: string;
@@ -2568,6 +2597,7 @@ function Field({
   required?: boolean;
   disabled?: boolean;
   hint?: string;
+  autoComplete?: string;
 }) {
   return (
     <label className="block text-sm">
@@ -2575,6 +2605,7 @@ function Field({
       <input
         required={required}
         disabled={disabled}
+        autoComplete={autoComplete}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2 disabled:opacity-50"
