@@ -19,11 +19,13 @@ function formatHeroTitle(title: string, accent?: string) {
   const marker =
     accent && title.includes(accent)
       ? accent
-      : title.includes("not just a CV.")
-        ? "not just a CV."
+      : title.includes("because life happens.")
+        ? "because life happens."
         : title.includes("Because life happens")
           ? "Because life happens"
-          : null;
+          : title.includes("not just a CV.")
+            ? "not just a CV."
+            : null;
   if (!marker) {
     return <>{title}</>;
   }
@@ -119,14 +121,14 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
             <div className="animate-[dossier-rise_0.7s_ease_both] max-w-2xl">
               <h1 className="font-display text-[clamp(2.625rem,5.4vw,4.125rem)] leading-[1.02] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
                 {formatHeroTitle(
-                  str(c.title, "Apply for jobs with proof, not just a CV."),
+                  str(c.title, "Skills first, because life happens."),
                   str(c.titleAccent) || undefined,
                 )}
               </h1>
               <p className="mt-[26px] max-w-[480px] text-lg leading-relaxed text-[color:var(--ink-soft)]">
                 {str(
                   c.body,
-                  "SkillsPhase is a jobs platform that replaces the traditional CV with an evidence-based profile—so employers can see what you are capable of doing.",
+                  "Your ability isn't defined by a perfect CV. Build an evidence-based skills profile that helps employers see what you're capable of through your experience, projects and achievements.",
                 )}
               </p>
               <div className="mt-[38px] flex flex-wrap gap-3.5">

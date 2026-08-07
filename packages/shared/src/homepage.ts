@@ -92,9 +92,9 @@ export function filterHomepageBodySections(
 export function getDefaultHomepageSections(): HomepageSection[] {
   return [
     section("hero", 10, {
-      title: "Apply for jobs with proof, not just a CV.",
-      titleAccent: "not just a CV.",
-      body: "SkillsPhase is a jobs platform that replaces the traditional CV with an evidence-based profile—so employers can see what you are capable of doing.",
+      title: "Skills first, because life happens.",
+      titleAccent: "because life happens.",
+      body: "Your ability isn't defined by a perfect CV. Build an evidence-based skills profile that helps employers see what you're capable of through your experience, projects and achievements.",
       primaryCtaLabel: "Create your SkillsPhase profile",
       primaryCtaHref: "/register?as=candidate",
       secondaryCtaLabel: "Browse jobs",

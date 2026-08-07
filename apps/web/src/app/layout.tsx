@@ -24,9 +24,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SkillsPhase — Apply for jobs with proof, not just a CV",
+  title: "SkillsPhase — Skills first, because life happens",
   description:
-    "SkillsPhase is a jobs platform that replaces the traditional CV with an evidence-based profile—so employers can see what candidates are capable of doing.",
+    "Your ability isn't defined by a perfect CV. Build an evidence-based skills profile that helps employers see what you're capable of through your experience, projects and achievements.",
 };
 
 export default function RootLayout({
