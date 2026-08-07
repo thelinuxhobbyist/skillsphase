@@ -56,45 +56,55 @@ export function CandidateDetailActions({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          disabled={savePending}
-          className={`rounded-md border px-4 py-2 text-sm font-semibold disabled:opacity-60 ${
-            saved
-              ? "border-brand bg-brand text-white"
-              : "border-[color:var(--line)] bg-white text-primary"
-          }`}
-          onClick={() => {
-            void (async () => {
-              setSavePending(true);
-              setError(null);
-              try {
-                const token = await withToken();
-                if (saved) {
-                  await unsaveCandidate(token, candidateId);
-                  setSaved(false);
-                } else {
-                  setShowListPicker(true);
+    <div className="space-y-4 w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full">
+        <div>
+          <h3 className="font-display text-xl font-semibold text-primary">
+            Interested in this candidate?
+          </h3>
+          <p className="mt-1 text-sm text-[color:var(--ink-soft)]">
+            Save candidate to your shortlist or send a direct message.
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={savePending}
+            className={`rounded-sm border px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-60 ${
+              saved
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-primary bg-transparent text-primary hover:bg-primary/5"
+            }`}
+            onClick={() => {
+              void (async () => {
+                setSavePending(true);
+                setError(null);
+                try {
+                  const token = await withToken();
+                  if (saved) {
+                    await unsaveCandidate(token, candidateId);
+                    setSaved(false);
+                  } else {
+                    setShowListPicker(true);
+                  }
+                } catch (err) {
+                  setError(messageFrom(err));
+                } finally {
+                  setSavePending(false);
                 }
-              } catch (err) {
-                setError(messageFrom(err));
-              } finally {
-                setSavePending(false);
-              }
-            })();
-          }}
-        >
-          {saved ? "Saved ✓" : "Save candidate"}
-        </button>
-        <button
-          type="button"
-          className="rounded-md bg-brand-accent px-4 py-2 text-sm font-semibold text-white"
-          onClick={() => setShowContact((v) => !v)}
-        >
-          Contact candidate
-        </button>
+              })();
+            }}
+          >
+            {saved ? "Saved ✓" : "Save candidate"}
+          </button>
+          <button
+            type="button"
+            className="rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+            onClick={() => setShowContact((v) => !v)}
+          >
+            Contact candidate
+          </button>
+        </div>
       </div>
 
       {showListPicker && !saved ? (
