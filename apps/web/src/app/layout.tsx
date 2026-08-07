@@ -24,9 +24,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SkillsPhase — Skills first, because life happens",
+  title: "SkillsPhase — Skills first. Because life happens.",
   description:
-    "Your ability isn't defined by a perfect CV. Build an evidence-based skills profile that helps employers see what you're capable of through your experience, projects and achievements.",
+    "You shouldn't have to hide your experience or apologise for your journey. Every skill you've gained is valuable. Showcase it with pride.",
 };
 
 export default function RootLayout({

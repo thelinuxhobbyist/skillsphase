@@ -92,13 +92,13 @@ export function filterHomepageBodySections(
 export function getDefaultHomepageSections(): HomepageSection[] {
   return [
     section("hero", 10, {
-      title: "Skills first, because life happens.",
-      titleAccent: "because life happens.",
-      body: "Your ability isn't defined by a perfect CV. Build an evidence-based skills profile that helps employers see what you're capable of through your experience, projects and achievements.",
-      primaryCtaLabel: "Create your SkillsPhase profile",
+      title: "Skills first. Because life happens.",
+      titleAccent: "Because life happens",
+      body: "You shouldn't have to hide your experience or apologise for your journey. Every skill you've gained is valuable. Showcase it with pride.",
+      primaryCtaLabel: "Create your Skill Profile",
       primaryCtaHref: "/register?as=candidate",
-      secondaryCtaLabel: "Browse jobs",
-      secondaryCtaHref: "/jobs",
+      secondaryCtaLabel: "Discover talent",
+      secondaryCtaHref: "/discover-talent",
     }),
     section(
       "trust",
