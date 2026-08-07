@@ -1,6 +1,7 @@
 const DEFAULT_API_BASE = "http://localhost:8787/api/v1";
 
-import type { HomepageSectionType } from "@horizon/shared";
+import type { ApplicationStatus, HomepageSectionType } from "@horizon/shared";
+
 
 export type ApiSuccess<T> = {
   success: true;
@@ -1194,14 +1195,7 @@ export type EmployerJobDetail = {
 
 export type MyApplication = {
   id: string;
-  status:
-    | "applied"
-    | "under_review"
-    | "interview"
-    | "offer"
-    | "hired"
-    | "rejected"
-    | "withdrawn";
+  status: ApplicationStatus;
   coverLetter: string | null;
   createdAt: string;
   updatedAt: string;
@@ -1353,10 +1347,7 @@ export function listJobApplications(token: string, jobId: number) {
 export function updateJobApplicationStatus(
   token: string,
   applicationId: string,
-  status: Exclude<
-    MyApplication["status"],
-    "applied" | "withdrawn"
-  >,
+  status: ApplicationStatus,
 ) {
   return apiFetch<{ id: string; status: string }>(
     `/employer/jobs/applications/${applicationId}`,

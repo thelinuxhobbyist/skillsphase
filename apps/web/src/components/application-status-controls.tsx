@@ -3,15 +3,18 @@
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { APPLICATION_STATUS_LABELS, type ApplicationStatus } from "@horizon/shared";
 import { updateJobApplicationStatus, type MyApplication } from "@/lib/api";
 
-const NEXT_STATUSES = [
-  "under_review",
-  "interview",
-  "offer",
-  "hired",
-  "rejected",
-] as const;
+const NEXT_STATUSES: Array<{ value: ApplicationStatus; label: string; primary?: boolean }> = [
+  { value: "viewed", label: "Mark as Viewed" },
+  { value: "interested", label: "Show Interest", primary: true },
+  { value: "info_requested", label: "Request Info (CV / References / Licences)", primary: true },
+  { value: "interview", label: "Invite to Interview", primary: true },
+  { value: "offer", label: "Make Offer" },
+  { value: "hired", label: "Mark Position Filled" },
+  { value: "rejected", label: "Not Proceeding" },
+];
 
 export function ApplicationStatusControls({
   applicationId,
@@ -29,20 +32,24 @@ export function ApplicationStatusControls({
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {NEXT_STATUSES.filter((value) => value !== status).map((value) => (
+    <div className="flex flex-wrap items-center gap-2">
+      {NEXT_STATUSES.filter((item) => item.value !== status).map((item) => (
         <button
-          key={value}
+          key={item.value}
           type="button"
           disabled={busy}
-          className="rounded-md border border-[color:var(--line)] px-3 py-1.5 text-xs font-medium capitalize disabled:opacity-60"
+          className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all disabled:opacity-60 ${
+            item.primary
+              ? "bg-primary text-white hover:bg-primary/90"
+              : "border border-[color:var(--line)] bg-white text-[color:var(--ink)] hover:bg-black/5"
+          }`}
           onClick={() => {
             void (async () => {
               setBusy(true);
               try {
                 const token = await getToken();
                 if (!token) return;
-                await updateJobApplicationStatus(token, applicationId, value);
+                await updateJobApplicationStatus(token, applicationId, item.value);
                 router.refresh();
               } finally {
                 setBusy(false);
@@ -50,7 +57,7 @@ export function ApplicationStatusControls({
             })();
           }}
         >
-          Mark {value.replaceAll("_", " ")}
+          {item.label}
         </button>
       ))}
     </div>

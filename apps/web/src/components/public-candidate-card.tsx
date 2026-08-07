@@ -14,9 +14,21 @@ const AVAILABILITY_STATUS: Record<
     label: "Available now",
     dot: "bg-emerald-500",
   },
+  one_week: {
+    label: "1 week notice",
+    dot: "bg-emerald-500",
+  },
+  two_weeks: {
+    label: "2 weeks notice",
+    dot: "bg-amber-500",
+  },
   within_one_month: {
     label: "Available in 1 month",
     dot: "bg-amber-500",
+  },
+  negotiable: {
+    label: "Negotiable",
+    dot: "bg-sky-500",
   },
   freelance: {
     label: AVAILABILITY_LABELS.freelance,
@@ -27,6 +39,7 @@ const AVAILABILITY_STATUS: Record<
     dot: "bg-slate-500",
   },
 };
+
 
 function initialsFor(card: PublicCandidateCard) {
   const first = card.firstName?.trim()?.[0];

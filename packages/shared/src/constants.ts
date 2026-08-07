@@ -21,6 +21,9 @@ export type RemoteType = (typeof REMOTE_TYPES)[number];
 export const AVAILABILITY_OPTIONS = [
   "immediate",
   "within_one_month",
+  "one_week",
+  "two_weeks",
+  "negotiable",
   "freelance",
   "permanent",
 ] as const;
@@ -28,10 +31,14 @@ export type AvailabilityOption = (typeof AVAILABILITY_OPTIONS)[number];
 
 export const AVAILABILITY_LABELS: Record<AvailabilityOption, string> = {
   immediate: "Available immediately",
-  within_one_month: "Available within one month",
+  one_week: "1 week notice",
+  two_weeks: "2 weeks notice",
+  within_one_month: "Available within 1 month",
+  negotiable: "Negotiable",
   freelance: "Freelance",
   permanent: "Permanent",
 };
+
 
 export const REMOTE_TYPE_LABELS: Record<RemoteType, string> = {
   on_site: "On-site",
@@ -47,7 +54,10 @@ export type JobStatus = (typeof JOB_STATUSES)[number];
 
 export const APPLICATION_STATUSES = [
   "applied",
+  "viewed",
   "under_review",
+  "interested",
+  "info_requested",
   "interview",
   "offer",
   "hired",
@@ -58,13 +68,17 @@ export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
 
 export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   applied: "Applied",
-  under_review: "Under review",
-  interview: "Interview",
-  offer: "Offer",
-  hired: "Hired",
-  rejected: "Rejected",
+  viewed: "Viewed by Employer",
+  under_review: "Under Review",
+  interested: "Employer Interested",
+  info_requested: "Additional Information Requested",
+  interview: "Interview Invited",
+  offer: "Offer Made",
+  hired: "Position Filled",
+  rejected: "Not Proceeding",
   withdrawn: "Withdrawn",
 };
+
 
 export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
   draft: "Draft",
@@ -225,3 +239,31 @@ export function isCompanyEmailAllowed(email: string): boolean {
 
 export const COMPANY_EMAIL_HINT =
   "Use a company email (not Gmail, Outlook, Yahoo, etc.). Activation is sent here after approval.";
+
+export const SUPPORTING_INFO_TYPES = [
+  "portfolio",
+  "website",
+  "github",
+  "cv",
+  "references",
+  "certifications",
+  "professional_registrations",
+  "licences",
+  "awards",
+  "other",
+] as const;
+export type SupportingInfoType = (typeof SUPPORTING_INFO_TYPES)[number];
+
+export const SUPPORTING_INFO_LABELS: Record<SupportingInfoType, string> = {
+  portfolio: "Portfolio",
+  website: "Website",
+  github: "GitHub",
+  cv: "CV / Resume",
+  references: "References",
+  certifications: "Certifications",
+  professional_registrations: "Professional Registration",
+  licences: "Licence (e.g. Forklift, Trade, Driver)",
+  awards: "Awards",
+  other: "Other Supporting Material",
+};
+

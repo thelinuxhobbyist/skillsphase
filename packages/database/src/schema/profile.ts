@@ -128,3 +128,35 @@ export const userSkills = pgTable(
   },
   (table) => [primaryKey({ columns: [table.userId, table.skillId] })],
 );
+
+export type SupportingInformationType =
+  | "portfolio"
+  | "website"
+  | "github"
+  | "cv"
+  | "references"
+  | "certifications"
+  | "professional_registrations"
+  | "licences"
+  | "awards"
+  | "other";
+
+export const supportingInformation = pgTable("supporting_information", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  type: text("type").$type<SupportingInformationType>().notNull().default("other"),
+  title: text("title").notNull(),
+  url: text("url"),
+  description: text("description"),
+  documentKey: text("document_key"),
+  documentFileName: text("document_file_name"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+

@@ -130,39 +130,53 @@ export function DiscoverySearchMock() {
           <circle cx="11" cy="11" r="7" />
           <path d="m21 21-4.35-4.35" />
         </svg>
-        <span className="flex-1">Teaching, electrical, branding…</span>
+        <span className="flex-1">Warehouse, teaching, electrical, nursing, software…</span>
         <span className="rounded-md bg-[color:var(--paper-warm)] px-2.5 py-1 text-xs text-[color:var(--ink-soft)]">
           Available now
         </span>
       </div>
 
-      <ul>
+      <ul className="space-y-1">
         {[
           {
             initials: "PR",
             name: "Priya R.",
-            role: "Helps GCSE students improve exam performance",
-            skill: "Lesson planning",
+            role: "Teacher · Improves GCSE exam performance & confidence",
+            skill: "Lesson Planning",
             tone: "bg-primary",
+          },
+          {
+            initials: "MT",
+            name: "Marcus T.",
+            role: "Warehouse Operative · FLT license & inventory control",
+            skill: "Forklift Driver",
+            tone: "bg-emerald-700",
           },
           {
             initials: "JM",
             name: "Jordan M.",
-            role: "Installs safe commercial electrical systems",
-            skill: "Commercial installs",
-            tone: "bg-[color:var(--ink-soft)]",
+            role: "Electrician · Commercial wiring & 18th edition testing",
+            skill: "18th Edition",
+            tone: "bg-slate-700",
+          },
+          {
+            initials: "SK",
+            name: "Sarah K.",
+            role: "Registered Nurse · Patient care & acute clinical triage",
+            skill: "NMC Registered",
+            tone: "bg-teal-700",
           },
           {
             initials: "AL",
             name: "Aisha L.",
-            role: "Creates brands that help businesses stand out",
-            skill: "Brand identity",
-            tone: "bg-[color:var(--stamp-dark,var(--primary))]",
+            role: "Designer · Creates brand identities that convert",
+            skill: "Brand Design",
+            tone: "bg-amber-700",
           },
         ].map((row, index) => (
           <li
             key={row.name}
-            className={`flex items-center gap-3.5 px-1.5 py-3.5 ${
+            className={`flex items-center gap-3.5 px-1.5 py-3 ${
               index === 0 ? "" : "border-t border-[color:var(--line)]"
             }`}
           >
@@ -192,6 +206,7 @@ export function DiscoverySearchMock() {
       </ul>
     </div>
   );
+
 }
 
 export function StepIcon({ index }: { index: number }) {

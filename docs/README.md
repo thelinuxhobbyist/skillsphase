@@ -25,6 +25,7 @@ Before implementing any feature, read the relevant documents, [ADR 001](./decisi
 
 - [001 — Canonical Product Decisions](./decisions/001-canonical-product-decisions.md)
 - [002 — Jobs Platform + Evidence-Based Profile](./decisions/002-jobs-platform-evidence-profile.md)
+- [003 — Skills-First Universal Profile & Flexible Supporting Information](./decisions/003-skills-first-universal-profile.md)
 
 ## Archive
 

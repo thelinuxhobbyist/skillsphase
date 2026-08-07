@@ -63,14 +63,15 @@ type StepId =
   | "review";
 
 const STEPS: Array<{ id: StepId; label: string }> = [
+  { id: "skillProfile", label: "Desired Role" },
   { id: "about", label: "About you" },
-  { id: "skillProfile", label: "SkillsPhase profile" },
   { id: "skills", label: "Skills" },
-  { id: "projects", label: "Evidence" },
-  { id: "employment", label: "Work History" },
-  { id: "education", label: "Education" },
-  { id: "review", label: "Review" },
+  { id: "projects", label: "Supporting Info" },
+  { id: "employment", label: "Work History (Optional)" },
+  { id: "education", label: "Education & Licences (Optional)" },
+  { id: "review", label: "Review & Apply" },
 ];
+
 
 export function ProfileEditor({ initial }: { initial: ProfileBundle }) {
   if (!isClerkConfigured()) {
@@ -635,19 +636,19 @@ function buildSectionStatus(input: {
     input.projectCount + input.qualificationCount + input.recommendationCount;
   return [
     {
+      id: "skillProfile",
+      label: "Desired Role",
+      done: Boolean(u.professionalTitle?.trim() || u.primaryCapability?.trim()),
+    },
+    {
       id: "about",
       label: "About you",
-      done: Boolean(u.firstName?.trim() && u.lastName?.trim() && u.city?.trim() && u.country?.trim()),
+      done: Boolean(u.firstName?.trim() && u.lastName?.trim() && u.city?.trim()),
     },
-    {
-      id: "skillProfile",
-      label: "Skill Profile basics",
-      done: Boolean(u.professionalTitle?.trim()),
-    },
-    { id: "skills", label: "Technical Skills (min. 3)", done: input.skillCount >= 3 },
+    { id: "skills", label: "Skills (min. 1)", done: input.skillCount >= 1 },
     {
       id: "projects",
-      label: "Proof of Ability",
+      label: "Supporting Info",
       done: proofCount >= 1,
       optional: true,
     },
@@ -659,11 +660,13 @@ function buildSectionStatus(input: {
     },
     {
       id: "education",
-      label: "Education",
+      label: "Education & Licences",
       done: input.educationCount >= 1,
+      optional: true,
     },
   ];
 }
+
 
 function ProfileProgress({
   sections,
@@ -815,18 +818,18 @@ function SkillProfileStep({
 
   return (
     <StepShell
-      title="SkillsPhase profile"
-      body="Lead with what you can do. We'll help you draft a capability statement employers can understand in seconds."
+      title="What kind of job are you looking for?"
+      body="Start with your desired role so employers immediately understand the position you're seeking."
     >
       <Field
-        label="Professional title"
+        label="What kind of job are you looking for?"
         value={user.professionalTitle ?? ""}
         onChange={(professionalTitle) =>
           setUser((u) => ({ ...u, professionalTitle }))
         }
         required
         autoComplete="organization-title"
-        hint="Supporting context only — e.g. Secondary Teacher, Electrician, Graphic Designer"
+        hint="e.g. Warehouse Operative, Retail Assistant, Secondary Science Teacher, Commercial Electrician, Care Worker"
       />
 
       <CapabilityStatementGuide
@@ -847,30 +850,9 @@ function SkillProfileStep({
         skillNames={skillNames}
         projects={projects}
       />
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <label className="block text-sm">
-          <span className="font-medium text-primary">Remote preference</span>
-          <select
-            value={user.remotePreference ?? ""}
-            onChange={(e) =>
-              setUser((u) => ({
-                ...u,
-                remotePreference:
-                  (e.target.value || null) as HorizonUser["remotePreference"],
-              }))
-            }
-            className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2"
-          >
-            <option value="">Not specified</option>
-            {REMOTE_TYPES.map((value) => (
-              <option key={value} value={value}>
-                {REMOTE_TYPE_LABELS[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm">
-          <span className="font-medium text-primary">Availability</span>
+          <span className="font-medium text-primary">Notice period / Availability</span>
           <select
             value={user.availability ?? ""}
             onChange={(e) =>
@@ -880,14 +862,49 @@ function SkillProfileStep({
                   (e.target.value || null) as HorizonUser["availability"],
               }))
             }
-            className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2"
+            className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
           >
-            <option value="">Not specified</option>
-            {AVAILABILITY_OPTIONS.map((value) => (
-              <option key={value} value={value}>
-                {AVAILABILITY_LABELS[value]}
+            <option value="">Select notice period…</option>
+            {AVAILABILITY_OPTIONS.map((key) => (
+              <option key={key} value={key}>
+                {AVAILABILITY_LABELS[key]}
               </option>
             ))}
+          </select>
+        </label>
+
+        <label className="block text-sm">
+          <span className="font-medium text-primary">Desired location / setup</span>
+          <select
+            value={user.remotePreference ?? ""}
+            onChange={(e) =>
+              setUser((u) => ({
+                ...u,
+                remotePreference:
+                  (e.target.value || null) as HorizonUser["remotePreference"],
+              }))
+            }
+            className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
+          >
+            <option value="">Select location preference…</option>
+            {REMOTE_TYPES.map((key) => (
+              <option key={key} value={key}>
+                {REMOTE_TYPE_LABELS[key]}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="block text-sm">
+          <span className="font-medium text-primary">Work arrangement</span>
+          <select
+            defaultValue="full_time"
+            className="mt-1 w-full rounded-md border border-[color:var(--line)] bg-white px-3 py-2 text-sm"
+          >
+            <option value="full_time">Full-time</option>
+            <option value="part_time">Part-time</option>
+            <option value="contract">Contract / Temporary</option>
+            <option value="any">Flexible / Any</option>
           </select>
         </label>
       </div>
