@@ -125,17 +125,26 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                   str(c.titleAccent) || undefined,
                 )}
               </h1>
-              <p className="mt-[26px] max-w-[480px] text-lg leading-relaxed text-[color:var(--ink-soft)]">
+              {c.tagline ? (
+                <p className="mt-[22px] max-w-[540px] font-display text-[1.35rem] leading-snug italic text-[color:var(--ink)] sm:text-[1.5rem]">
+                  {str(c.tagline)}
+                </p>
+              ) : null}
+              <p
+                className={`max-w-[540px] text-lg leading-relaxed text-[color:var(--ink-soft)] ${
+                  c.tagline ? "mt-4" : "mt-[26px]"
+                }`}
+              >
                 {str(
                   c.body,
-                  "You shouldn't have to hide your experience or apologise for your journey. Every skill you've gained is valuable. Showcase it with pride.",
+                  "Build a profile around what you can do, the evidence behind it, and the impact you've made — then use it to apply for jobs.",
                 )}
               </p>
               <div className="mt-[38px] flex flex-wrap gap-3.5">
                 <PrimaryButton
                   href={str(c.primaryCtaHref, "/register?as=candidate")}
                 >
-                  {str(c.primaryCtaLabel, "Create your Skill Profile")}
+                  {str(c.primaryCtaLabel, "Create your SkillsPhase profile")}
                 </PrimaryButton>
                 <GhostButton href={str(c.secondaryCtaHref, "/discover-talent")}>
                   {str(c.secondaryCtaLabel, "Discover talent")}
@@ -201,7 +210,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
             <div className="mx-auto mb-[50px] max-w-[560px] text-center">
               {c.eyebrow ? <Eyebrow center>{str(c.eyebrow)}</Eyebrow> : null}
               <h2 className="font-display text-[clamp(1.75rem,3.4vw,2.375rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
-                {str(c.title, "Real careers aren't linear.")}
+                {str(c.title, "Your skills don't stop when work does.")}
               </h2>
               {c.subtitle ? (
                 <p className="mt-3.5 text-[16.5px] text-[color:var(--ink-soft)]">

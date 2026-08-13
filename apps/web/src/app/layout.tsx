@@ -26,7 +26,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "SkillsPhase — Skills first. Because life happens.",
   description:
-    "You shouldn't have to hide your experience or apologise for your journey. Every skill you've gained is valuable. Showcase it with pride.",
+    "Work changes. Life changes. Your skills don't disappear. Build a SkillsPhase profile around what you can do, the evidence behind it, and the impact you've made — then use it to apply for jobs.",
 };
 
 export default function RootLayout({

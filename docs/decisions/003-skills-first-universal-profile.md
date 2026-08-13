@@ -12,9 +12,11 @@ These decisions are authoritative for product messaging, homepage copy, database
 
 > **Skills first. Because life happens.**
 
-Careers are not linear. Interruptions happen—illness, raising children, caring for family, military service, education, redundancy, relocation, career changes, and other life events.
+Life happens. Careers have different phases. Skills, experience and capability don't simply disappear.
 
-Traditional CVs force employers to focus on timeline gaps rather than actual capability. SkillsPhase turns this around: employers understand what someone is capable of before making assumptions based on career timelines.
+Work changes. Life changes. People remain capable and continue to grow — whether skills come from employment, training, caring, volunteering, building something yourself, or simply continuing to learn.
+
+Traditional CVs see gaps. SkillsPhase sees capability: employers understand what someone can do, the evidence behind it, and the impact they've made.
 
 ---
 
