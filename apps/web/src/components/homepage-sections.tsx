@@ -23,9 +23,11 @@ function formatHeroTitle(title: string, accent?: string) {
         ? "because life happens."
         : title.includes("Because life happens")
           ? "Because life happens"
-          : title.includes("not just a CV.")
-            ? "not just a CV."
-            : null;
+          : title.includes("just because your work changed.")
+            ? "just because your work changed."
+            : title.includes("not just a CV.")
+              ? "not just a CV."
+              : null;
   if (!marker) {
     return <>{title}</>;
   }
@@ -178,12 +180,12 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
             <div className="mb-12 max-w-[600px] sm:mb-16">
               {c.eyebrow ? <Eyebrow>{str(c.eyebrow)}</Eyebrow> : null}
               <h2 className="font-display text-[clamp(1.875rem,3.6vw,2.625rem)] leading-[1.1] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
-                {str(c.title, "Your application, rebuilt around proof")}
+                {str(c.title, "This is what replaces your CV")}
               </h2>
               <p className="mt-4 text-[17px] text-[color:var(--ink-soft)]">
                 {str(
                   c.subtitle,
-                  "Instead of a CV timeline, employers see what you can do—supported by evidence that works for any profession.",
+                  "A SkillsPhase profile leads with what you can do — capabilities, evidence, impact, skills, trust signals, and availability — not a chronological employment timeline.",
                 )}
               </p>
             </div>
@@ -304,7 +306,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
             <div>
               {c.eyebrow ? <Eyebrow>{str(c.eyebrow)}</Eyebrow> : null}
               <h2 className="font-display text-[clamp(1.75rem,3.2vw,2.25rem)] leading-[1.15] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
-                {str(c.title, "Recruit by capability, not keyword bingo")}
+                {str(c.title, "Recruit by capability, not keyword bingo.")}
               </h2>
               {c.subtitle ? (
                 <p className="mt-4 text-[16.5px] text-[color:var(--ink-soft)]">
@@ -315,7 +317,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                 href={str(c.primaryCtaHref, "/discover-talent")}
                 className="mt-[22px] inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-[color:var(--stamp-dark,var(--primary))] hover:underline"
               >
-                {str(c.primaryCtaLabel, "Browse candidates")} →
+                {str(c.primaryCtaLabel, "Discover talent")} →
               </Link>
             </div>
             <DiscoverySearchMock />
@@ -458,12 +460,18 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
         <section className="border-y border-[color-mix(in_oklch,var(--primary)_35%,var(--line))] bg-[color-mix(in_oklch,var(--primary)_14%,white)] px-5 py-[72px] text-center sm:px-8 sm:py-[110px]">
           <h2 className="font-display text-[clamp(1.875rem,4vw,2.875rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
             {formatHeroTitle(
-              str(c.title, "Apply for jobs with proof, not just a CV."),
+              str(
+                c.title,
+                "Your skills didn't disappear just because your work changed.",
+              ),
               str(c.titleAccent) || undefined,
             )}
           </h2>
           <p className="mt-[18px] text-[17px] text-[color:var(--ink-soft)]">
-            {str(c.body, "Create a SkillsPhase profile once—then use it to apply.")}
+            {str(
+              c.body,
+              "Build a SkillsPhase profile once around what you can do — then use it to apply for jobs.",
+            )}
           </p>
           <div className="mt-[34px] flex flex-wrap justify-center gap-3.5">
             <PrimaryButton

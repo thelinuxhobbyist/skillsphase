@@ -115,17 +115,17 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       false,
     ),
     section("featured_candidates", 20, {
-      title: "Your application, rebuilt around proof",
+      title: "This is what replaces your CV",
       subtitle:
-        "Instead of a CV timeline, employers see what you can do—supported by evidence that works for any profession.",
+        "A SkillsPhase profile leads with what you can do — capabilities, evidence, impact, skills, trust signals, and availability — not a chronological employment timeline.",
       callouts: [
         {
           label: "Capabilities",
-          detail: "What you help people achieve—not just a job title",
+          detail: "What you can do — not just a job title",
         },
         {
           label: "Evidence",
-          detail: "Proof that demonstrates capability, linked to real sources",
+          detail: "Proof that demonstrates capability",
         },
         {
           label: "Impact",
@@ -141,7 +141,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
         },
         {
           label: "Availability",
-          detail: "Ready to apply or start—without burying the signal",
+          detail: "Ready to apply — without burying the signal",
         },
       ],
       primaryCtaLabel: "Create your SkillsPhase profile",
@@ -150,20 +150,20 @@ export function getDefaultHomepageSections(): HomepageSection[] {
     section("career_journeys", 30, {
       title: "Your skills don't stop when work does.",
       subtitle:
-        "Skills can come from employment, training, caring, volunteering, building something yourself, or simply continuing to learn.",
+        "Skills can come from employment, training, caring, volunteering, building something independently, or continuing to learn. These are phases of a person's life and career — not gaps to hide.",
       items: [
         { title: "Career Change" },
         { title: "Career Break" },
-        { title: "Illness & Recovery" },
         { title: "Caring Responsibilities" },
+        { title: "Returning to Work" },
+        { title: "Redundancy" },
+        { title: "Illness & Recovery" },
         { title: "Self-Taught Learning" },
         { title: "Certifications" },
         { title: "Side Projects" },
         { title: "Freelancing" },
         { title: "Small Business" },
         { title: "Volunteering" },
-        { title: "Returning to Work" },
-        { title: "Redundancy" },
         { title: "Military Service" },
         { title: "Community Projects" },
       ],
@@ -174,7 +174,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       steps: [
         {
           title: "Build your profile",
-          body: "Capabilities and evidence—ready to use as your application.",
+          body: "Capabilities, evidence, and impact — ready to use as your application.",
         },
         {
           title: "Find and apply",
@@ -182,15 +182,15 @@ export function getDefaultHomepageSections(): HomepageSection[] {
         },
         {
           title: "Employers review proof",
-          body: "They see what you can do first—then request more if needed.",
+          body: "They see what you can do first — then request more if needed.",
         },
       ],
     }),
     section("product_showcase", 50, {
-      title: "Recruit by capability, not keyword bingo",
+      title: "Recruit by capability, not keyword bingo.",
       subtitle:
-        "Browse candidates across professions—teachers, trades, designers, nurses, engineers—and shortlist on evidence.",
-      primaryCtaLabel: "Browse candidates",
+        "See what someone can do — not just where they've worked. Discover people across professions — teachers, trades, designers, nurses, engineers, warehouse and retail workers, developers, administrators, hospitality — based on capability and evidence.",
+      primaryCtaLabel: "Discover talent",
       primaryCtaHref: "/discover-talent",
     }),
     section("comparison", 60, {
@@ -198,18 +198,19 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       traditionalTitle: "Traditional CV",
       traditionalItems: [
         "Job titles first",
-        "Employment dates and gaps",
+        "Employment dates",
+        "Career gaps",
         "Claims without proof",
-        "One-page document dump",
+        "Chronological history",
       ],
       skillsphaseTitle: "SkillsPhase profile",
       skillsphaseItems: [
         "Capabilities first",
-        "Evidence of what you can do",
-        "Impact and outcomes",
+        "Evidence",
+        "Impact",
+        "Skills",
         "Progressive trust",
-        "Works for every profession",
-        "Becomes the application",
+        "Availability",
       ],
     }),
     section(
@@ -219,8 +220,8 @@ export function getDefaultHomepageSections(): HomepageSection[] {
         title: "Why teams use SkillsPhase",
         items: [
           {
-            title: "Familiar hiring journey",
-            body: "Search, apply, review, interview—modernised at the application.",
+            title: "Capabilities over chronology",
+            body: "See what someone can do first — not only where they have worked.",
           },
           {
             title: "Proof over timelines",
@@ -232,7 +233,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
           },
           {
             title: "Every profession",
-            body: "The same profile structure works from teaching to trades.",
+            body: "The same profile structure works from teaching to trades to warehousing.",
           },
         ],
       },
@@ -242,7 +243,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       "businesses_cta",
       80,
       {
-        title: "Hire for what people can do.",
+        title: "See what someone can do — not just where they've worked.",
         body: "Post roles, review evidence-based applications, and contact candidates directly.",
         ctaLabel: "Register as a business",
         ctaHref: "/register?as=business",
@@ -285,9 +286,9 @@ export function getDefaultHomepageSections(): HomepageSection[] {
       false,
     ),
     section("closing_cta", 90, {
-      title: "Apply for jobs with proof, not just a CV.",
-      titleAccent: "not just a CV.",
-      body: "Create a SkillsPhase profile once—then use it to apply.",
+      title: "Your skills didn't disappear just because your work changed.",
+      titleAccent: "just because your work changed.",
+      body: "Build a SkillsPhase profile once around what you can do — then use it to apply for jobs.",
       primaryCtaLabel: "Create your SkillsPhase profile",
       primaryCtaHref: "/register?as=candidate",
       secondaryCtaLabel: "Register as a business",
@@ -302,11 +303,11 @@ export function getDefaultHomepageSections(): HomepageSection[] {
         items: [
           {
             q: "What is SkillsPhase?",
-            a: "A jobs platform that modernises applications by replacing the traditional CV with an evidence-based SkillsPhase profile.",
+            a: "A modern jobs platform built around the belief that people are more than their employment timeline. You build an evidence-based profile around what you can do — then use it to apply for jobs.",
           },
           {
             q: "Who is SkillsPhase for?",
-            a: "Anyone looking for work or hiring—across teaching, healthcare, trades, design, hospitality, professional services, engineering, and more.",
+            a: "Anyone looking for work or hiring — across teaching, healthcare, trades, design, hospitality, warehousing, retail, professional services, engineering, and more. Including people returning to work, changing careers, or coming from non-traditional paths.",
           },
           {
             q: "Is it free for candidates?",
@@ -314,11 +315,11 @@ export function getDefaultHomepageSections(): HomepageSection[] {
           },
           {
             q: "Do I need a CV?",
-            a: "You apply with your SkillsPhase profile. Supporting documents such as a CV, certificates, or references can be shared later when an employer requests them.",
+            a: "No — you apply with your SkillsPhase profile. Supporting documents such as a CV, certificates, or references can be shared later when an employer requests them.",
           },
           {
             q: "How do businesses find candidates?",
-            a: "Verified businesses browse profiles by capability and evidence, then contact candidates or review applications directly.",
+            a: "Verified businesses discover talent by capability and evidence — not keyword bingo — then contact candidates or review applications directly.",
           },
           {
             q: "Who can register as a business?",
@@ -334,7 +335,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
     ),
     section("footer", 110, {
       tagline:
-        "SkillsPhase is a jobs platform that replaces the traditional CV with an evidence-based profile.",
+        "Your career may have phases. Your skills don't disappear. SkillsPhase is a modern jobs platform built around capabilities, evidence, and impact.",
       copyright: "© {year} SkillsPhase. UK only for business registration.",
       columns: [
         {
@@ -352,7 +353,7 @@ export function getDefaultHomepageSections(): HomepageSection[] {
           title: "FOR BUSINESSES",
           links: [
             { label: "Post jobs", href: "/register?as=business" },
-            { label: "Browse candidates", href: "/discover-talent" },
+            { label: "Discover talent", href: "/discover-talent" },
             {
               label: "Register as a business",
               href: "/register?as=business",

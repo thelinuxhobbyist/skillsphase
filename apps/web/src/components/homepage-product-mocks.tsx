@@ -20,7 +20,7 @@ export const PROFILE_EXAMPLE_FIELDS = [
   {
     id: 4,
     label: "Skills",
-    chips: ["Lesson planning", "Assessment design", "Classroom leadership"],
+    chips: ["Lesson Planning", "Assessment Design", "Classroom Leadership"],
   },
   {
     id: 5,
@@ -59,7 +59,7 @@ export function ProfileShell({
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
           <p className="font-display text-[21px] font-semibold text-[color:var(--ink)]">
-            Helps GCSE students improve exam performance
+            Helps GCSE students improve confidence and exam performance
           </p>
           <p className="mt-[3px] text-[13px] text-[color:var(--ink-soft)]">
             Teacher · Leeds · Example application profile

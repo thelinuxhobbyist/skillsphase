@@ -577,4 +577,148 @@ SET
   ),
   updated_at = now()
 WHERE type = 'career_journeys';`,
+
+  // 0016_homepage_brand_copy.sql
+  `UPDATE homepage_sections
+SET
+  content = content || jsonb_build_object(
+    'title', 'This is what replaces your CV',
+    'subtitle', 'A SkillsPhase profile leads with what you can do — capabilities, evidence, impact, skills, trust signals, and availability — not a chronological employment timeline.',
+    'primaryCtaLabel', 'Create your SkillsPhase profile',
+    'primaryCtaHref', '/register?as=candidate',
+    'callouts', jsonb_build_array(
+      jsonb_build_object('label', 'Capabilities', 'detail', 'What you can do — not just a job title'),
+      jsonb_build_object('label', 'Evidence', 'detail', 'Proof that demonstrates capability'),
+      jsonb_build_object('label', 'Impact', 'detail', 'Outcomes you have delivered, in plain language'),
+      jsonb_build_object('label', 'Skills', 'detail', 'Searchable abilities employers can filter by'),
+      jsonb_build_object('label', 'Trust signals', 'detail', 'Qualifications and checks available upon request'),
+      jsonb_build_object('label', 'Availability', 'detail', 'Ready to apply — without burying the signal')
+    )
+  ),
+  updated_at = now()
+WHERE type = 'featured_candidates';
+UPDATE homepage_sections
+SET
+  content = content || jsonb_build_object(
+    'title', 'Your skills don''t stop when work does.',
+    'subtitle', 'Skills can come from employment, training, caring, volunteering, building something independently, or continuing to learn. These are phases of a person''s life and career — not gaps to hide.',
+    'body', 'Traditional CVs see gaps. SkillsPhase sees capability.',
+    'items', jsonb_build_array(
+      jsonb_build_object('title', 'Career Change'),
+      jsonb_build_object('title', 'Career Break'),
+      jsonb_build_object('title', 'Caring Responsibilities'),
+      jsonb_build_object('title', 'Returning to Work'),
+      jsonb_build_object('title', 'Redundancy'),
+      jsonb_build_object('title', 'Illness & Recovery'),
+      jsonb_build_object('title', 'Self-Taught Learning'),
+      jsonb_build_object('title', 'Certifications'),
+      jsonb_build_object('title', 'Side Projects'),
+      jsonb_build_object('title', 'Freelancing'),
+      jsonb_build_object('title', 'Small Business'),
+      jsonb_build_object('title', 'Volunteering'),
+      jsonb_build_object('title', 'Military Service'),
+      jsonb_build_object('title', 'Community Projects')
+    )
+  ),
+  updated_at = now()
+WHERE type = 'career_journeys';
+UPDATE homepage_sections
+SET
+  content = content || jsonb_build_object(
+    'title', 'How it works',
+    'steps', jsonb_build_array(
+      jsonb_build_object('title', 'Build your profile', 'body', 'Capabilities, evidence, and impact — ready to use as your application.'),
+      jsonb_build_object('title', 'Find and apply', 'body', 'Search jobs, read the description, apply with your SkillsPhase profile.'),
+      jsonb_build_object('title', 'Employers review proof', 'body', 'They see what you can do first — then request more if needed.')
+    )
+  ),
+  updated_at = now()
+WHERE type = 'how_it_works';
+UPDATE homepage_sections
+SET
+  content = content || jsonb_build_object(
+    'title', 'Recruit by capability, not keyword bingo.',
+    'subtitle', 'See what someone can do — not just where they''ve worked. Discover people across professions — teachers, trades, designers, nurses, engineers, warehouse and retail workers, developers, administrators, hospitality — based on capability and evidence.',
+    'primaryCtaLabel', 'Discover talent',
+    'primaryCtaHref', '/discover-talent'
+  ),
+  updated_at = now()
+WHERE type = 'product_showcase';
+UPDATE homepage_sections
+SET
+  content = content || jsonb_build_object(
+    'title', 'A better application than a CV',
+    'traditionalTitle', 'Traditional CV',
+    'traditionalItems', jsonb_build_array(
+      'Job titles first',
+      'Employment dates',
+      'Career gaps',
+      'Claims without proof',
+      'Chronological history'
+    ),
+    'skillsphaseTitle', 'SkillsPhase profile',
+    'skillsphaseItems', jsonb_build_array(
+      'Capabilities first',
+      'Evidence',
+      'Impact',
+      'Skills',
+      'Progressive trust',
+      'Availability'
+    )
+  ),
+  updated_at = now()
+WHERE type = 'comparison';
+UPDATE homepage_sections
+SET
+  content = content || jsonb_build_object(
+    'title', 'Your skills didn''t disappear just because your work changed.',
+    'titleAccent', 'just because your work changed.',
+    'body', 'Build a SkillsPhase profile once around what you can do — then use it to apply for jobs.',
+    'primaryCtaLabel', 'Create your SkillsPhase profile',
+    'primaryCtaHref', '/register?as=candidate',
+    'secondaryCtaLabel', 'Register as a business',
+    'secondaryCtaHref', '/register?as=business'
+  ),
+  updated_at = now()
+WHERE type = 'closing_cta';
+UPDATE homepage_sections
+SET
+  content = content || jsonb_build_object(
+    'tagline', 'Your career may have phases. Your skills don''t disappear. SkillsPhase is a modern jobs platform built around capabilities, evidence, and impact.'
+  ),
+  updated_at = now()
+WHERE type = 'footer';
+UPDATE homepage_sections
+SET
+  content = jsonb_set(
+    content,
+    '{columns,1,links,1,label}',
+    '"Discover talent"'
+  ),
+  updated_at = now()
+WHERE type = 'footer'
+  AND content #>> '{columns,1,links,1,href}' = '/discover-talent';
+UPDATE homepage_sections
+SET
+  content = content || jsonb_build_object(
+    'title', 'See what someone can do — not just where they''ve worked.',
+    'body', 'Post roles, review evidence-based applications, and contact candidates directly.',
+    'ctaLabel', 'Register as a business',
+    'ctaHref', '/register?as=business'
+  ),
+  updated_at = now()
+WHERE type = 'businesses_cta';
+UPDATE homepage_sections
+SET
+  content = content || jsonb_build_object(
+    'title', 'Why teams use SkillsPhase',
+    'items', jsonb_build_array(
+      jsonb_build_object('title', 'Capabilities over chronology', 'body', 'See what someone can do first — not only where they have worked.'),
+      jsonb_build_object('title', 'Proof over timelines', 'body', 'Evidence of capability beats keyword-stuffed CVs.'),
+      jsonb_build_object('title', 'Verified businesses', 'body', 'Only verified UK businesses can make contact.'),
+      jsonb_build_object('title', 'Every profession', 'body', 'The same profile structure works from teaching to trades to warehousing.')
+    )
+  ),
+  updated_at = now()
+WHERE type = 'differentiators';`,
 ];

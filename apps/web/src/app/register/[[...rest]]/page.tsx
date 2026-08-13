@@ -274,8 +274,9 @@ function ConfiguredRegisterContent() {
           Join SkillsPhase
         </h1>
         <p className="mt-3 max-w-xl text-[color:var(--foreground)]/75">
-          SkillsPhase is a jobs platform. Create an evidence-based profile to
-          apply — or register your business to post roles and recruit.
+          Skills first. Because life happens. Create an evidence-based profile
+          to apply for jobs — or register your business to discover talent by
+          capability.
         </p>
 
         <div className="mt-10 grid gap-4 md:grid-cols-2">
@@ -309,11 +310,12 @@ function ConfiguredRegisterContent() {
               For businesses
             </p>
             <h2 className="mt-2 font-display text-2xl text-primary">
-              I want to hire with proof
+              I want to hire by capability
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-[color:var(--foreground)]/70">
-              Register your UK company, post jobs, and review profile-based
-              applications. Request CVs or certificates later when you need them.
+              Register your UK company, post jobs, and see what people can do —
+              not just where they&apos;ve worked. Request CVs or certificates
+              later when you need them.
             </p>
             <span className="btn-primary mt-6 inline-block rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white">
               Register as a business
@@ -373,8 +375,9 @@ function UnconfiguredRegisterContent() {
           Join SkillsPhase
         </h1>
         <p className="mt-3 max-w-xl text-[color:var(--foreground)]/75">
-          SkillsPhase is a jobs platform. Create an evidence-based profile to
-          apply — or register your business to post roles and recruit.
+          Skills first. Because life happens. Create an evidence-based profile
+          to apply for jobs — or register your business to discover talent by
+          capability.
         </p>
         <p className="mt-8 text-sm text-[color:var(--foreground)]/65">
           Already have an account?{" "}

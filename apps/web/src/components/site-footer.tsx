@@ -25,7 +25,7 @@ export function SiteFooter({
   const columns = arr<FooterColumn>(c.columns);
   const tagline = str(
     c.tagline,
-    "SkillsPhase is a jobs platform that replaces the traditional CV with an evidence-based profile.",
+    "Your career may have phases. Your skills don't disappear. SkillsPhase is a modern jobs platform built around capabilities, evidence, and impact.",
   );
   const copyright = str(
     c.copyright,
@@ -66,7 +66,7 @@ export function SiteFooter({
             <p className="text-xs font-semibold text-primary">{column.title}</p>
             <ul className="mt-3.5 space-y-2.5 text-sm text-ink-foreground/80">
               {arr<FooterLink>(column.links).map((link) => (
-                <li key={`${column.title}-${link.href}`}>
+                <li key={`${column.title}-${link.label}-${link.href}`}>
                   <Link href={link.href} className="hover:text-ink-foreground">
                     {link.label}
                   </Link>
