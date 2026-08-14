@@ -37,7 +37,7 @@ function formatHeroTitle(title: string, accent?: string) {
   return (
     <>
       <span className="block">{lead}</span>
-      <em className="mt-1 block text-[0.92em] font-medium text-primary italic">
+      <em className="mt-1 block text-[0.92em] font-semibold text-primary italic">
         {marker}
         {trail}
       </em>
@@ -54,7 +54,7 @@ function Eyebrow({
 }) {
   return (
     <p
-      className={`mb-3.5 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[color:var(--stamp-dark,var(--primary))] ${
+      className={`eyebrow mb-4 flex items-center gap-2 ${
         center ? "justify-center" : ""
       }`}
     >
@@ -74,7 +74,7 @@ function PrimaryButton({
   return (
     <Link
       href={href}
-      className="btn-primary inline-flex items-center justify-center rounded-full px-[26px] py-3.5 text-[15px] font-semibold transition hover:-translate-y-px"
+      className="btn-primary inline-flex h-11 items-center justify-center px-6 text-[15px] transition hover:-translate-y-px hover:shadow-lift"
     >
       {children}
     </Link>
@@ -91,10 +91,33 @@ function GhostButton({
   return (
     <Link
       href={href}
-      className="inline-flex items-center justify-center rounded-full border-[1.5px] border-[color:var(--ink)] px-[26px] py-3.5 text-[15px] font-semibold text-[color:var(--ink)] transition hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)]"
+      className="inline-flex h-11 items-center justify-center rounded-lg border-[1.5px] border-[color:var(--ink)] px-6 text-[15px] font-semibold tracking-[-0.01em] text-[color:var(--ink)] transition hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)]"
     >
       {children}
     </Link>
+  );
+}
+
+function SectionFrame({
+  children,
+  className = "",
+  innerClassName = "",
+  id,
+}: {
+  children: ReactNode;
+  className?: string;
+  innerClassName?: string;
+  id?: string;
+}) {
+  return (
+    <section
+      id={id}
+      className={`px-5 py-16 sm:px-8 sm:py-24 ${className}`.trim()}
+    >
+      <div className={`mx-auto max-w-[1180px] ${innerClassName}`.trim()}>
+        {children}
+      </div>
+    </section>
   );
 }
 
@@ -118,23 +141,27 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
   switch (section.type) {
     case "hero":
       return (
-        <section className="px-5 pb-[72px] pt-16 sm:px-8 sm:pb-[120px] sm:pt-24">
-          <div className="mx-auto max-w-[1180px]">
+        <section className="relative overflow-hidden px-5 pb-16 pt-12 sm:px-8 sm:pb-24 sm:pt-20">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[image:var(--gradient-hero)]"
+          />
+          <div className="relative mx-auto max-w-[1180px]">
             <div className="animate-[dossier-rise_0.7s_ease_both] max-w-2xl">
-              <h1 className="font-display text-[clamp(2.625rem,5.4vw,4.125rem)] leading-[1.02] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              <h1 className="font-display text-[clamp(2.5rem,5vw,4rem)] leading-[1.05] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
                 {formatHeroTitle(
                   str(c.title, "Skills first. Because life happens."),
                   str(c.titleAccent) || undefined,
                 )}
               </h1>
               {c.tagline ? (
-                <p className="mt-[22px] max-w-[540px] font-display text-[1.35rem] leading-snug italic text-[color:var(--ink)] sm:text-[1.5rem]">
+                <p className="mt-6 max-w-[34rem] font-display text-[1.25rem] leading-snug font-medium text-[color:var(--ink)] sm:text-[1.4rem]">
                   {str(c.tagline)}
                 </p>
               ) : null}
               <p
-                className={`max-w-[540px] text-lg leading-relaxed text-[color:var(--ink-soft)] ${
-                  c.tagline ? "mt-4" : "mt-[26px]"
+                className={`max-w-[34rem] text-base leading-relaxed text-[color:var(--ink-soft)] sm:text-lg ${
+                  c.tagline ? "mt-4" : "mt-6"
                 }`}
               >
                 {str(
@@ -142,7 +169,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                   "Build a profile around what you can do, the evidence behind it, and the impact you've made — then use it to apply for jobs.",
                 )}
               </p>
-              <div className="mt-[38px] flex flex-wrap gap-3.5">
+              <div className="mt-9 flex flex-wrap items-center gap-3.5">
                 <PrimaryButton
                   href={str(c.primaryCtaHref, "/register?as=candidate")}
                 >
@@ -175,14 +202,13 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
 
     case "featured_candidates":
       return (
-        <section id="product" className="px-5 py-[72px] sm:px-8 sm:py-[110px]">
-          <div className="mx-auto max-w-[1180px]">
+        <SectionFrame id="product">
             <div className="mb-12 max-w-[600px] sm:mb-16">
               {c.eyebrow ? <Eyebrow>{str(c.eyebrow)}</Eyebrow> : null}
-              <h2 className="font-display text-[clamp(1.875rem,3.6vw,2.625rem)] leading-[1.1] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              <h2 className="font-display text-[clamp(1.875rem,3.6vw,2.625rem)] leading-[1.1] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
                 {str(c.title, "This is what replaces your CV")}
               </h2>
-              <p className="mt-4 text-[17px] text-[color:var(--ink-soft)]">
+              <p className="mt-4 text-[17px] leading-relaxed text-[color:var(--ink-soft)]">
                 {str(
                   c.subtitle,
                   "A SkillsPhase profile leads with what you can do — capabilities, evidence, impact, skills, trust signals, and availability — not a chronological employment timeline.",
@@ -201,17 +227,15 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                   {str(c.primaryCtaLabel, "Create your SkillsPhase profile")}
                 </PrimaryButton>
             </div>
-          </div>
-        </section>
+        </SectionFrame>
       );
 
     case "career_journeys":
       return (
-        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] px-5 py-[72px] sm:px-8 sm:py-[100px]">
-          <div className="mx-auto max-w-[1180px]">
-            <div className="mx-auto mb-[50px] max-w-[560px] text-center">
+        <SectionFrame className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)]">
+            <div className="mx-auto mb-12 max-w-[560px] text-center">
               {c.eyebrow ? <Eyebrow center>{str(c.eyebrow)}</Eyebrow> : null}
-              <h2 className="font-display text-[clamp(1.75rem,3.4vw,2.375rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              <h2 className="font-display text-[clamp(1.75rem,3.4vw,2.375rem)] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
                 {str(c.title, "Your skills don't stop when work does.")}
               </h2>
               {c.subtitle ? (
@@ -233,7 +257,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
             </ul>
 
             {c.body ? (
-              <p className="mt-[46px] text-center font-display text-[19px] italic text-[color:var(--ink-soft)]">
+              <p className="mt-12 text-center font-display text-[19px] italic text-[color:var(--ink-soft)]">
                 {(() => {
                   const body = str(c.body);
                   const highlight = body.includes("SkillsPhase sees capability.")
@@ -255,23 +279,21 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                 })()}
               </p>
             ) : null}
-          </div>
-        </section>
+        </SectionFrame>
       );
 
     case "how_it_works": {
       const steps = arr<{ title: string; body: string }>(c.steps);
       return (
-        <section className="px-5 py-[72px] sm:px-8 sm:py-[110px]">
-          <div className="mx-auto max-w-[1180px]">
-            <div className="mb-[70px] text-center">
+        <SectionFrame>
+            <div className="mb-14 text-center md:mb-16">
               {c.eyebrow ? <Eyebrow center>{str(c.eyebrow)}</Eyebrow> : null}
-              <h2 className="font-display text-[clamp(1.75rem,3.4vw,2.375rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              <h2 className="font-display text-[clamp(1.75rem,3.4vw,2.375rem)] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
                 {str(c.title, "How it works")}
               </h2>
             </div>
 
-            <ol className="relative grid gap-12 md:grid-cols-3 md:gap-0">
+            <ol className="relative grid gap-12 md:grid-cols-3 md:gap-8">
               <div
                 aria-hidden
                 className="absolute top-[29px] right-[16%] left-[16%] hidden h-[1.5px] bg-[repeating-linear-gradient(to_right,color-mix(in_oklch,var(--primary)_35%,var(--line))_0_8px,transparent_8px_16px)] md:block"
@@ -285,63 +307,62 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                   <p className="mt-[22px] font-mono text-[11.5px] uppercase tracking-[0.1em] text-[color:var(--stamp-dark,var(--primary))]">
                     Step {index + 1}
                   </p>
-                  <h3 className="mt-2.5 font-display text-xl font-semibold text-[color:var(--ink)]">
+                  <h3 className="mt-2.5 font-display text-xl font-bold tracking-[-0.03em] text-[color:var(--ink)]">
                     {step.title}
                   </h3>
-                  <p className="mx-auto mt-2 max-w-[220px] text-[14.5px] leading-relaxed text-[color:var(--ink-soft)]">
+                  <p className="mx-auto mt-2 max-w-[240px] text-[14.5px] leading-relaxed text-[color:var(--ink-soft)]">
                     {step.body}
                   </p>
                 </li>
               ))}
             </ol>
-          </div>
-        </section>
+        </SectionFrame>
       );
     }
 
     case "product_showcase":
       return (
-        <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] px-5 py-[72px] sm:px-8 sm:py-[100px]">
-          <div className="mx-auto grid max-w-[1180px] items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-[70px]">
+        <SectionFrame
+          className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)]"
+          innerClassName="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16"
+        >
             <div>
               {c.eyebrow ? <Eyebrow>{str(c.eyebrow)}</Eyebrow> : null}
-              <h2 className="font-display text-[clamp(1.75rem,3.2vw,2.25rem)] leading-[1.15] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              <h2 className="font-display text-[clamp(1.75rem,3.2vw,2.25rem)] leading-[1.15] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
                 {str(c.title, "Recruit by capability, not keyword bingo.")}
               </h2>
               {c.subtitle ? (
-                <p className="mt-4 text-[16.5px] text-[color:var(--ink-soft)]">
+                <p className="mt-4 text-[16.5px] leading-relaxed text-[color:var(--ink-soft)]">
                   {str(c.subtitle)}
                 </p>
               ) : null}
               <Link
                 href={str(c.primaryCtaHref, "/discover-talent")}
-                className="mt-[22px] inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-[color:var(--stamp-dark,var(--primary))] hover:underline"
+                className="mt-6 inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-[color:var(--stamp-dark,var(--primary))] hover:underline"
               >
                 {str(c.primaryCtaLabel, "Discover talent")} →
               </Link>
             </div>
             <DiscoverySearchMock />
-          </div>
-        </section>
+        </SectionFrame>
       );
 
     case "comparison":
       return (
-        <section className="px-5 py-[72px] sm:px-8 sm:py-[110px]">
-          <div className="mx-auto max-w-[1180px]">
-            <div className="mb-[60px] text-center">
+        <SectionFrame>
+            <div className="mb-12 text-center sm:mb-14">
               {c.eyebrow ? <Eyebrow center>{str(c.eyebrow)}</Eyebrow> : null}
-              <h2 className="font-display text-[clamp(1.75rem,3.4vw,2.375rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+              <h2 className="font-display text-[clamp(1.75rem,3.4vw,2.375rem)] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
                 {str(c.title, "A better application than a CV")}
               </h2>
             </div>
 
-            <div className="mx-auto grid max-w-[820px] gap-[26px] md:grid-cols-2">
-              <div className="rounded-[18px] border border-[color:var(--line)] bg-[color:var(--paper-warm)] p-[34px]">
+            <div className="mx-auto grid max-w-[860px] items-stretch gap-6 md:grid-cols-2">
+              <div className="rounded-xl border border-[color:var(--line)] bg-[color:var(--paper-warm)] p-8">
                 <p className="mb-2.5 font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)]">
                   Before
                 </p>
-                <h3 className="mb-5 font-display text-[22px] font-semibold text-[color:var(--ink)]">
+                <h3 className="mb-5 font-display text-[22px] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
                   {str(c.traditionalTitle, "Traditional CV")}
                 </h3>
                 <ul>
@@ -357,11 +378,11 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                 </ul>
               </div>
 
-              <div className="rounded-[18px] border-[1.5px] border-primary bg-white p-[34px] shadow-[0_20px_50px_-20px_rgba(11,23,18,0.25)]">
+              <div className="rounded-xl border-[1.5px] border-primary bg-white p-8 shadow-lift">
                 <p className="mb-2.5 font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--stamp-dark,var(--primary))]">
                   After
                 </p>
-                <h3 className="mb-5 font-display text-[22px] font-semibold text-[color:var(--ink)]">
+                <h3 className="mb-5 font-display text-[22px] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
                   {str(c.skillsphaseTitle, "SkillsPhase profile")}
                 </h3>
                 <ul>
@@ -373,7 +394,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                       <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-primary">
                         <svg
                           viewBox="0 0 24 24"
-                          className="size-2.5 text-primary-foreground"
+                          className="size-2.5 text-white"
                           fill="none"
                           stroke="currentColor"
                           strokeWidth="3"
@@ -390,8 +411,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                 </ul>
               </div>
             </div>
-          </div>
-        </section>
+        </SectionFrame>
       );
 
     case "businesses_cta":
@@ -405,7 +425,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
           </p>
           <Link
             href={str(c.ctaHref, "/register?as=business")}
-            className="mt-8 inline-flex items-center rounded-full border border-white/50 px-5 py-3 text-sm font-medium text-[color:var(--paper)] transition hover:border-white hover:bg-white hover:text-[color:var(--ink)]"
+            className="mt-8 inline-flex h-11 items-center rounded-lg border border-white/50 px-6 text-sm font-semibold tracking-[-0.01em] text-[color:var(--paper)] transition hover:border-white hover:bg-white hover:text-[color:var(--ink)]"
           >
             {str(c.ctaLabel, "Register as a business")}
           </Link>
@@ -416,7 +436,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
       return (
         <section className="border-y border-[color:var(--line)] bg-[color:var(--paper-warm)] px-5 py-14 sm:px-8 sm:py-20">
           <div className="mx-auto max-w-[1180px]">
-            <h2 className="font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+            <h2 className="font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
               {str(c.title)}
             </h2>
             {c.subtitle ? (
@@ -457,8 +477,9 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
 
     case "closing_cta":
       return (
-        <section className="border-y border-[color-mix(in_oklch,var(--primary)_35%,var(--line))] bg-[color-mix(in_oklch,var(--primary)_14%,white)] px-5 py-[72px] text-center sm:px-8 sm:py-[110px]">
-          <h2 className="font-display text-[clamp(1.875rem,4vw,2.875rem)] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">
+        <section className="border-y border-[color-mix(in_oklch,var(--primary)_35%,var(--line))] bg-[color-mix(in_oklch,var(--primary)_14%,white)] px-5 py-16 text-center sm:px-8 sm:py-24">
+          <div className="mx-auto max-w-[720px]">
+          <h2 className="font-display text-[clamp(1.875rem,4vw,2.875rem)] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
             {formatHeroTitle(
               str(
                 c.title,
@@ -467,13 +488,13 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
               str(c.titleAccent) || undefined,
             )}
           </h2>
-          <p className="mt-[18px] text-[17px] text-[color:var(--ink-soft)]">
+          <p className="mt-5 text-[17px] leading-relaxed text-[color:var(--ink-soft)]">
             {str(
               c.body,
               "Build a SkillsPhase profile once around what you can do — then use it to apply for jobs.",
             )}
           </p>
-          <div className="mt-[34px] flex flex-wrap justify-center gap-3.5">
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3.5">
             <PrimaryButton
               href={str(c.primaryCtaHref, "/register?as=candidate")}
             >
@@ -482,6 +503,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
             <GhostButton href={str(c.secondaryCtaHref, "/register?as=business")}>
               {str(c.secondaryCtaLabel, "Register as a business")}
             </GhostButton>
+          </div>
           </div>
         </section>
       );
@@ -493,7 +515,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
           className="border-t border-[color:var(--line)] bg-[color:var(--paper-warm)] px-5 py-14 sm:px-8 sm:py-20"
         >
           <div className="mx-auto max-w-[1180px]">
-            <h2 className="font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-semibold text-[color:var(--ink)]">
+            <h2 className="font-display text-[clamp(1.95rem,3.6vw,2.65rem)] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
               {str(c.title, "Frequently asked questions")}
             </h2>
             <div className="mt-10 max-w-[820px] border-t border-[color:var(--line-strong)]">

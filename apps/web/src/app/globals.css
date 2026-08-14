@@ -21,8 +21,8 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-urbanist), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-epilogue), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -191,8 +191,8 @@ html {
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    letter-spacing: -0.03em;
     line-height: 1.25;
   }
 
@@ -202,12 +202,12 @@ html {
 }
 
 @utility eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.09em;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--color-brand);
 }
 
 @utility shadow-soft {
@@ -219,16 +219,20 @@ html {
 }
 
 a.btn-primary {
-  color: var(--primary-foreground);
+  color: oklch(0.99 0.01 172);
 }
 
 .btn-primary {
   background: var(--primary);
-  color: var(--primary-foreground);
+  color: oklch(0.99 0.01 172);
   border-radius: var(--radius);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: var(--shadow-soft);
   transition:
     transform 0.15s ease,
-    background 0.15s ease;
+    background 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .btn-primary:hover {

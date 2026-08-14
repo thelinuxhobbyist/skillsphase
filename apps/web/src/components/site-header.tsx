@@ -32,14 +32,14 @@ function GuestActions({
     <div className={layoutClass}>
       <Link
         href="/login"
-        className={`inline-flex items-center justify-center rounded-full border border-[color:var(--line)] px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-[color:var(--ink)] hover:bg-foreground/5 ${stacked ? "text-center" : "max-[920px]:hidden"}`}
+        className={`inline-flex items-center justify-center rounded-lg border border-[color:var(--line)] px-5 py-2.5 text-sm font-semibold tracking-[-0.01em] text-foreground transition-colors hover:border-[color:var(--ink)] hover:bg-foreground/5 ${stacked ? "text-center" : "max-[920px]:hidden"}`}
         onClick={onNavigate}
       >
         Sign in
       </Link>
       <Link
         href="/register"
-        className={`btn-primary inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold ${stacked ? "text-center" : ""}`}
+        className={`btn-primary inline-flex items-center justify-center px-5 py-2.5 text-sm ${stacked ? "text-center" : ""}`}
         onClick={onNavigate}
       >
         Register

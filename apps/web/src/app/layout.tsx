@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { Fraunces, IBM_Plex_Mono, Inter } from "next/font/google";
+import { Epilogue, IBM_Plex_Mono, Urbanist } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { SiteFooterLoader } from "@/components/site-footer-loader";
 import { getClerkFrontendApiOrigin } from "@/lib/clerk-config";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const epilogue = Epilogue({
+  variable: "--font-epilogue",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const urbanist = Urbanist({
+  variable: "--font-urbanist",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["500", "600", "700"],
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
@@ -47,7 +47,7 @@ export default function RootLayout({
         ) : null}
       </head>
       <body
-        className={`${inter.variable} ${fraunces.variable} ${ibmPlexMono.variable} flex min-h-screen flex-col antialiased`}
+        className={`${epilogue.variable} ${urbanist.variable} ${ibmPlexMono.variable} flex min-h-screen flex-col antialiased`}
       >
         <Providers>
           <div className="flex min-h-screen flex-col">
