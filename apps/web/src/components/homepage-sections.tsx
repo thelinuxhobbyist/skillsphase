@@ -304,7 +304,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
                   className="relative px-6 text-center"
                 >
                   <StepIcon index={index} />
-                  <p className="mt-[22px] font-mono text-[11.5px] uppercase tracking-[0.1em] text-[color:var(--stamp-dark,var(--primary))]">
+                  <p className="mt-[22px] font-display text-[11.5px] uppercase tracking-[0.1em] text-[color:var(--stamp-dark,var(--primary))]">
                     Step {index + 1}
                   </p>
                   <h3 className="mt-2.5 font-display text-xl font-bold tracking-[-0.03em] text-[color:var(--ink)]">
@@ -359,7 +359,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
 
             <div className="mx-auto grid max-w-[860px] items-stretch gap-6 md:grid-cols-2">
               <div className="rounded-xl border border-[color:var(--line)] bg-[color:var(--paper-warm)] p-8">
-                <p className="mb-2.5 font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)]">
+                <p className="mb-2.5 font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)]">
                   Before
                 </p>
                 <h3 className="mb-5 font-display text-[22px] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
@@ -379,7 +379,7 @@ function HomepageSectionBlock({ section }: { section: HomepageSection }) {
               </div>
 
               <div className="rounded-xl border-[1.5px] border-primary bg-white p-8 shadow-lift">
-                <p className="mb-2.5 font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--stamp-dark,var(--primary))]">
+                <p className="mb-2.5 font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--stamp-dark,var(--primary))]">
                   After
                 </p>
                 <h3 className="mb-5 font-display text-[22px] font-bold tracking-[-0.03em] text-[color:var(--ink)]">

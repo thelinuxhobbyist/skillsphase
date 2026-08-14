@@ -114,7 +114,7 @@ export function PublicCandidateCardView({ card }: { card: PublicCandidateCard })
             <div className="mb-4 space-y-3 border-y border-dashed border-[color:var(--line)] py-3">
               {capability ? (
                 <div>
-                  <p className="mb-1 font-mono text-[10.5px] font-medium uppercase tracking-[0.08em] text-[color:var(--ink-soft)]">
+                  <p className="mb-1 font-display text-[10.5px] font-medium uppercase tracking-[0.08em] text-[color:var(--ink-soft)]">
                     Primary Capability
                   </p>
                   <p className="line-clamp-2 text-[13.5px] font-semibold leading-snug text-[color:var(--ink)]">
@@ -129,7 +129,7 @@ export function PublicCandidateCardView({ card }: { card: PublicCandidateCard })
               ) : null}
               {project ? (
                 <div>
-                  <p className="mb-1 font-mono text-[10.5px] font-medium uppercase tracking-[0.08em] text-[color:var(--ink-soft)]">
+                  <p className="mb-1 font-display text-[10.5px] font-medium uppercase tracking-[0.08em] text-[color:var(--ink-soft)]">
                     Proof of Ability
                   </p>
                   <p className="line-clamp-2 text-[13.5px] leading-snug text-[color:var(--ink)]">

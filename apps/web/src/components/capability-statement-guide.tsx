@@ -211,7 +211,7 @@ export function CapabilityStatementGuide({
 
       <div className="rounded-xl border border-dashed border-primary/30 bg-white p-4">
         <div className="flex items-center justify-between">
-          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-primary font-bold">
+          <p className="font-display text-[10px] uppercase tracking-[0.1em] text-primary font-bold">
             Generated Draft
           </p>
           {generated && (

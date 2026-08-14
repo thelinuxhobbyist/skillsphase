@@ -82,7 +82,7 @@ export function ProfileShell({
                 : "translate-y-1 opacity-[0.28] grayscale-[0.4]"
             }`}
           >
-            <p className="mb-2 flex items-center gap-[7px] font-mono text-[10.5px] uppercase tracking-[0.1em] text-[color:var(--stamp-dark,var(--primary))]">
+            <p className="mb-2 flex items-center gap-[7px] font-display text-[10.5px] uppercase tracking-[0.1em] text-[color:var(--stamp-dark,var(--primary))]">
               <span className="inline-flex size-[15px] shrink-0 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
                 {field.id}
               </span>
@@ -194,7 +194,7 @@ export function DiscoverySearchMock() {
               </p>
             </div>
             <div className="text-right">
-              <p className="font-mono text-[9.5px] uppercase tracking-[0.08em] text-[color:var(--ink-soft)]">
+              <p className="font-display text-[9.5px] uppercase tracking-[0.08em] text-[color:var(--ink-soft)]">
                 Top skill
               </p>
               <p className="text-[13.5px] font-semibold text-[color:var(--stamp-dark,var(--primary))]">

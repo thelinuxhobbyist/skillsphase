@@ -71,7 +71,7 @@ export function CandidateProfileView({
       {/* 1. Introduction: Hero & Professional Summary */}
       <section className="rounded-sm border border-[color:var(--line)] bg-white p-8 sm:p-11 shadow-[0_1px_0_var(--line)]">
         <div className="flex flex-col gap-3">
-          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
+          <p className="font-display text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
             Candidate Profile
           </p>
           <h1 className="font-display text-3xl font-bold leading-[1.1] text-primary sm:text-4xl">
@@ -88,12 +88,12 @@ export function CandidateProfileView({
               </span>
             ) : null}
             {candidate.availability ? (
-              <span className="rounded-sm border border-primary bg-primary px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.05em] text-primary-foreground font-medium">
+              <span className="rounded-sm border border-primary bg-primary px-2.5 py-1 font-display text-[11px] uppercase tracking-[0.05em] text-primary-foreground font-medium">
                 {AVAILABILITY_LABELS[candidate.availability]}
               </span>
             ) : null}
             {candidate.remotePreference ? (
-              <span className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.05em] text-[color:var(--ink-soft)] font-medium">
+              <span className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-2.5 py-1 font-display text-[11px] uppercase tracking-[0.05em] text-[color:var(--ink-soft)] font-medium">
                 {REMOTE_TYPE_LABELS[candidate.remotePreference]}
               </span>
             ) : null}
@@ -103,7 +103,7 @@ export function CandidateProfileView({
         {/* Profile / Career Summary */}
         {candidate.careerSummary ? (
           <div className="mt-8 border-t border-[color:var(--line)] pt-7">
-            <p className="mb-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
+            <p className="mb-2.5 font-display text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
               Professional Summary
             </p>
             <p className="font-display text-[18px] leading-[1.65] text-primary italic">
@@ -116,7 +116,7 @@ export function CandidateProfileView({
       {/* 2. Skills */}
       {skills.length > 0 ? (
         <section className="rounded-sm border border-[color:var(--line)] bg-white p-8 sm:p-10 shadow-[0_1px_0_var(--line)]">
-          <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
+          <p className="mb-1 font-display text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
             What they can do
           </p>
           <h2 className="mb-2 font-display text-2xl font-semibold text-primary">
@@ -129,7 +129,7 @@ export function CandidateProfileView({
             {skills.map((skill) => (
               <span
                 key={skill.id}
-                className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-3 py-1.5 font-mono text-[11.5px] font-medium uppercase tracking-[0.04em] text-primary"
+                className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-3 py-1.5 font-display text-[11.5px] font-medium uppercase tracking-[0.04em] text-primary"
               >
                 {skill.name}
               </span>
@@ -141,7 +141,7 @@ export function CandidateProfileView({
       {/* 3. Highlights (Capabilities + Proof of Ability merged) */}
       {hasHighlights ? (
         <section className="rounded-sm border border-[color:var(--line)] bg-white p-8 sm:p-10 shadow-[0_1px_0_var(--line)]">
-          <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
+          <p className="mb-1 font-display text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
             Why should I interview them?
           </p>
           <h2 className="mb-2 font-display text-2xl font-semibold text-primary">
@@ -169,7 +169,7 @@ export function CandidateProfileView({
                       {capability.label}
                     </h3>
                     {capability.isPrimary ? (
-                      <span className="rounded-sm bg-primary/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] font-semibold text-primary">
+                      <span className="rounded-sm bg-primary/10 px-2 py-0.5 font-display text-[10px] uppercase tracking-[0.08em] font-semibold text-primary">
                         Primary Capability
                       </span>
                     ) : null}
@@ -178,7 +178,7 @@ export function CandidateProfileView({
                   {/* Outcomes / Achievements */}
                   {capability.outcomes.length > 0 ? (
                     <div className="space-y-2 pt-1">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                      <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
                         Key Achievements & Impact
                       </p>
                       <ul className="space-y-2">
@@ -201,7 +201,7 @@ export function CandidateProfileView({
                       {capability.skillNames.map((skill) => (
                         <span
                           key={`${capability.id}-${skill}`}
-                          className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.04em] text-[color:var(--ink-soft)]"
+                          className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-2.5 py-1 font-display text-[11px] uppercase tracking-[0.04em] text-[color:var(--ink-soft)]"
                         >
                           {skill}
                         </span>
@@ -212,7 +212,7 @@ export function CandidateProfileView({
                   {/* Inline Supporting Evidence / Exhibit cards */}
                   {capProjects.length > 0 ? (
                     <div className="mt-6 border-t border-[color:var(--line)] pt-5 space-y-4">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                      <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
                         Supporting Evidence ({capProjects.length})
                       </p>
                       <div className="space-y-4">
@@ -242,7 +242,7 @@ export function CandidateProfileView({
             {/* Standalone projects not attached to a capability */}
             {projects.filter((p) => !renderedProjectIds.has(p.id)).length > 0 ? (
               <div className="pt-4 space-y-4">
-                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
+                <p className="font-display text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
                   Additional Proof of Ability
                 </p>
                 <div className="space-y-4">
@@ -265,7 +265,7 @@ export function CandidateProfileView({
       {/* 4. Trust (Certificates & Recommendations) */}
       {hasTrustSignals ? (
         <section className="rounded-sm border border-[color:var(--line)] bg-white p-8 sm:p-10 shadow-[0_1px_0_var(--line)]">
-          <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
+          <p className="mb-1 font-display text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
             Can I trust them?
           </p>
           <h2 className="mb-2 font-display text-2xl font-semibold text-primary">
@@ -278,7 +278,7 @@ export function CandidateProfileView({
           <div className="space-y-7">
             {qualifications.length > 0 ? (
               <div>
-                <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                <p className="mb-3 font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
                   Certificates & Qualifications ({qualifications.length})
                 </p>
                 <ul className="grid gap-3 sm:grid-cols-2">
@@ -287,7 +287,7 @@ export function CandidateProfileView({
                       key={row.id}
                       className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-5 py-4 text-sm"
                     >
-                      <p className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)]">
+                      <p className="font-display text-[10.5px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)]">
                         Certificate
                       </p>
                       <p className="mt-1 font-display text-lg font-semibold text-primary">
@@ -298,7 +298,7 @@ export function CandidateProfileView({
                           {row.issuingBody}
                         </p>
                       ) : null}
-                      <p className="mt-2.5 font-mono text-[11px] uppercase tracking-[0.05em] text-[color:var(--ink-soft)]">
+                      <p className="mt-2.5 font-display text-[11px] uppercase tracking-[0.05em] text-[color:var(--ink-soft)]">
                         Full document — available upon request
                       </p>
                     </li>
@@ -315,7 +315,7 @@ export function CandidateProfileView({
                     : ""
                 }
               >
-                <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                <p className="mb-3 font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
                   References & Recommendations ({recommendations.length})
                 </p>
                 <ul className="space-y-4">
@@ -331,7 +331,7 @@ export function CandidateProfileView({
                             : "Professional Reference"}
                         </p>
                         {row.verificationStatus === "verified" ? (
-                          <span className="rounded-sm bg-emerald-100 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] font-semibold text-emerald-800">
+                          <span className="rounded-sm bg-emerald-100 px-2 py-0.5 font-display text-[10px] uppercase tracking-[0.08em] font-semibold text-emerald-800">
                             Verified ✓
                           </span>
                         ) : null}
@@ -371,7 +371,7 @@ export function CandidateProfileView({
       {/* 5. Supporting Context */}
       {hasSupportingContext ? (
         <section className="rounded-sm border border-[color:var(--line)] bg-white p-8 sm:p-10 shadow-[0_1px_0_var(--line)]">
-          <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
+          <p className="mb-1 font-display text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
             Anything else I should know?
           </p>
           <h2 className="mb-2 font-display text-2xl font-semibold text-primary">
@@ -385,7 +385,7 @@ export function CandidateProfileView({
             {/* Work History */}
             {employmentHistory.length > 0 ? (
               <div className="space-y-4">
-                <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
                   Work History
                 </p>
                 <ul className="space-y-4 border-l border-[color:var(--line)] pl-4">
@@ -414,7 +414,7 @@ export function CandidateProfileView({
             <div className="space-y-6">
               {education.length > 0 ? (
                 <div className="space-y-3">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                  <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
                     Education
                   </p>
                   <ul className="space-y-3">
@@ -437,7 +437,7 @@ export function CandidateProfileView({
 
               {candidate.salaryMin || candidate.salaryMax ? (
                 <div className="space-y-2">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                  <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
                     Rate Expectations
                   </p>
                   <div className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-4 py-3 text-sm">
@@ -479,7 +479,7 @@ function ExhibitCard({
       className="rounded-sm border border-[color:var(--line)] border-l-[3px] border-l-primary bg-white p-6 sm:p-7 space-y-3"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+        <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
           Exhibit {letter}
         </p>
         {project.role ? (
@@ -509,7 +509,7 @@ function ExhibitCard({
           {technologies.map((tech) => (
             <span
               key={`${project.id}-${tech}`}
-              className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.04em] text-[color:var(--ink-soft)]"
+              className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-2.5 py-1 font-display text-[11px] uppercase tracking-[0.04em] text-[color:var(--ink-soft)]"
             >
               {tech}
             </span>

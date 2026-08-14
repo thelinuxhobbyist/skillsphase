@@ -253,7 +253,7 @@ export function PublicDiscoveryBrowser({
               <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[color:var(--line)] sm:hidden" />
 
               <div className="mb-3.5 sm:hidden">
-                <label className="mb-1.5 block font-mono text-[10.5px] font-semibold uppercase tracking-[0.05em] text-[color:var(--ink-soft)]">
+                <label className="mb-1.5 block font-display text-[10.5px] font-semibold uppercase tracking-[0.05em] text-[color:var(--ink-soft)]">
                   Availability
                 </label>
                 <select
@@ -273,7 +273,7 @@ export function PublicDiscoveryBrowser({
               </div>
 
               <div className="mb-3.5">
-                <label className="mb-1.5 block font-mono text-[10.5px] font-semibold uppercase tracking-[0.05em] text-[color:var(--ink-soft)]">
+                <label className="mb-1.5 block font-display text-[10.5px] font-semibold uppercase tracking-[0.05em] text-[color:var(--ink-soft)]">
                   Skills
                 </label>
                 <input
@@ -287,7 +287,7 @@ export function PublicDiscoveryBrowser({
               </div>
 
               <div className="mb-3.5">
-                <label className="mb-1.5 block font-mono text-[10.5px] font-semibold uppercase tracking-[0.05em] text-[color:var(--ink-soft)]">
+                <label className="mb-1.5 block font-display text-[10.5px] font-semibold uppercase tracking-[0.05em] text-[color:var(--ink-soft)]">
                   Work style
                 </label>
                 <select
@@ -307,7 +307,7 @@ export function PublicDiscoveryBrowser({
               </div>
 
               <div>
-                <label className="mb-1.5 block font-mono text-[10.5px] font-semibold uppercase tracking-[0.05em] text-[color:var(--ink-soft)]">
+                <label className="mb-1.5 block font-display text-[10.5px] font-semibold uppercase tracking-[0.05em] text-[color:var(--ink-soft)]">
                   Min. years experience
                 </label>
                 <input
