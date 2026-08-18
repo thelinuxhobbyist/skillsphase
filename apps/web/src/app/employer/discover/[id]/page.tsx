@@ -49,7 +49,7 @@ export default async function CandidateDetailPage({
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-[820px] min-w-0 px-4 py-9 sm:px-8 sm:py-14">
+      <main className="mx-auto w-full max-w-[1120px] min-w-0 px-4 py-9 sm:px-8 sm:py-14">
         <Link
           href="/employer/discover"
           className="mb-7 inline-block text-[13px] text-[color:var(--ink-soft)] no-underline hover:text-primary"

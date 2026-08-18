@@ -162,70 +162,74 @@ export function CandidateProfileView({
               return (
                 <div
                   key={capability.id}
-                  className="rounded-sm border border-[color:var(--line)] bg-white p-6 sm:p-7 shadow-xs space-y-4"
+                  className="rounded-sm border border-[color:var(--line)] bg-white p-6 sm:p-7 shadow-xs"
                 >
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h3 className="font-display text-xl font-semibold text-primary">
-                      {capability.label}
-                    </h3>
-                    {capability.isPrimary ? (
-                      <span className="rounded-sm bg-primary/10 px-2 py-0.5 font-display text-[10px] uppercase tracking-[0.08em] font-semibold text-primary">
-                        Primary Capability
-                      </span>
+                  <div className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.35fr)] xl:gap-8">
+                    <div className="space-y-4">
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <h3 className="font-display text-xl font-semibold text-primary">
+                          {capability.label}
+                        </h3>
+                        {capability.isPrimary ? (
+                          <span className="rounded-sm bg-primary/10 px-2 py-0.5 font-display text-[10px] uppercase tracking-[0.08em] font-semibold text-primary">
+                            Primary Capability
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {/* Outcomes / Achievements */}
+                      {capability.outcomes.length > 0 ? (
+                        <div className="space-y-2 pt-1">
+                          <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                            Key Achievements & Impact
+                          </p>
+                          <ul className="space-y-2">
+                            {capability.outcomes.map((outcome) => (
+                              <li
+                                key={`${capability.id}-${outcome}`}
+                                className="flex items-start gap-2.5 text-[15px] text-primary"
+                              >
+                                <span className="mt-1 text-xs text-primary font-bold">✓</span>
+                                <span>{outcome}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+
+                      {/* Skills tagged to capability */}
+                      {capability.skillNames.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {capability.skillNames.map((skill) => (
+                            <span
+                              key={`${capability.id}-${skill}`}
+                              className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-2.5 py-1 font-display text-[11px] uppercase tracking-[0.04em] text-[color:var(--ink-soft)]"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {/* Inline Supporting Evidence / Exhibit cards */}
+                    {capProjects.length > 0 ? (
+                      <div className="border-t border-[color:var(--line)] pt-5 xl:border-t-0 xl:border-l xl:pl-7 xl:pt-0">
+                        <p className="mb-4 font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                          Supporting Evidence ({capProjects.length})
+                        </p>
+                        <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+                          {capProjects.map((project) => (
+                            <ExhibitCard
+                              key={project.id}
+                              project={project}
+                              letter={exhibitMap.get(project.id) ?? "A"}
+                            />
+                          ))}
+                        </div>
+                      </div>
                     ) : null}
                   </div>
-
-                  {/* Outcomes / Achievements */}
-                  {capability.outcomes.length > 0 ? (
-                    <div className="space-y-2 pt-1">
-                      <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
-                        Key Achievements & Impact
-                      </p>
-                      <ul className="space-y-2">
-                        {capability.outcomes.map((outcome) => (
-                          <li
-                            key={`${capability.id}-${outcome}`}
-                            className="flex items-start gap-2.5 text-[15px] text-primary"
-                          >
-                            <span className="mt-1 text-xs text-primary font-bold">✓</span>
-                            <span>{outcome}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-
-                  {/* Skills tagged to capability */}
-                  {capability.skillNames.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {capability.skillNames.map((skill) => (
-                        <span
-                          key={`${capability.id}-${skill}`}
-                          className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-2.5 py-1 font-display text-[11px] uppercase tracking-[0.04em] text-[color:var(--ink-soft)]"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  {/* Inline Supporting Evidence / Exhibit cards */}
-                  {capProjects.length > 0 ? (
-                    <div className="mt-6 border-t border-[color:var(--line)] pt-5 space-y-4">
-                      <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
-                        Supporting Evidence ({capProjects.length})
-                      </p>
-                      <div className="space-y-4">
-                        {capProjects.map((project) => (
-                          <ExhibitCard
-                            key={project.id}
-                            project={project}
-                            letter={exhibitMap.get(project.id) ?? "A"}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
                 </div>
               );
             })}
@@ -245,7 +249,7 @@ export function CandidateProfileView({
                 <p className="font-display text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-soft)] font-medium">
                   Additional Proof of Ability
                 </p>
-                <div className="space-y-4">
+                <div className="grid gap-4 lg:grid-cols-2">
                   {projects
                     .filter((p) => !renderedProjectIds.has(p.id))
                     .map((project) => (
@@ -272,12 +276,18 @@ export function CandidateProfileView({
             Trust & Verification
           </h2>
           <p className="mb-7 max-w-2xl text-sm text-[color:var(--ink-soft)]">
-            Certificates, professional registrations, and verified references on file.
+            Certificates, professional registrations, and references provided by the candidate.
           </p>
 
-          <div className="space-y-7">
+          <div
+            className={
+              qualifications.length > 0 && recommendations.length > 0
+                ? "grid gap-7 lg:grid-cols-2 lg:items-start"
+                : "space-y-7"
+            }
+          >
             {qualifications.length > 0 ? (
-              <div>
+              <div className="min-w-0">
                 <p className="mb-3 font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
                   Certificates & Qualifications ({qualifications.length})
                 </p>
@@ -308,34 +318,19 @@ export function CandidateProfileView({
             ) : null}
 
             {recommendations.length > 0 ? (
-              <div
-                className={
-                  qualifications.length > 0
-                    ? "pt-6 border-t border-[color:var(--line)]"
-                    : ""
-                }
-              >
+              <div className="min-w-0">
                 <p className="mb-3 font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
                   References & Recommendations ({recommendations.length})
                 </p>
-                <ul className="space-y-4">
+                <ul className="grid gap-4">
                   {recommendations.map((row) => (
                     <li
                       key={row.id}
                       className="rounded-sm border border-[color:var(--line)] bg-white px-7 py-6"
                     >
-                      <div className="flex flex-wrap items-baseline justify-between gap-2">
-                        <p className="font-display text-lg font-semibold text-primary">
-                          {row.verificationStatus === "verified"
-                            ? "Verified Professional Reference"
-                            : "Professional Reference"}
-                        </p>
-                        {row.verificationStatus === "verified" ? (
-                          <span className="rounded-sm bg-emerald-100 px-2 py-0.5 font-display text-[10px] uppercase tracking-[0.08em] font-semibold text-emerald-800">
-                            Verified ✓
-                          </span>
-                        ) : null}
-                      </div>
+                      <p className="font-display text-lg font-semibold text-primary">
+                        Reference provided
+                      </p>
                       <p className="mt-0.5 text-sm text-[color:var(--ink-soft)]">
                         {row.relationship}
                       </p>
@@ -381,10 +376,10 @@ export function CandidateProfileView({
             Background timeline, education, and rate expectations.
           </p>
 
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
             {/* Work History */}
             {employmentHistory.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-4 xl:col-span-2">
                 <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
                   Work History
                 </p>
@@ -410,45 +405,42 @@ export function CandidateProfileView({
               </div>
             ) : null}
 
-            {/* Education & Rate Expectations */}
-            <div className="space-y-6">
-              {education.length > 0 ? (
-                <div className="space-y-3">
-                  <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
-                    Education
-                  </p>
-                  <ul className="space-y-3">
-                    {education.map((row) => (
-                      <li
-                        key={row.id}
-                        className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-4 py-3 text-sm"
-                      >
-                        <p className="font-display font-semibold text-primary">
-                          {row.qualification}
-                        </p>
-                        <p className="text-[13px] text-[color:var(--ink-soft)]">
-                          {row.institution}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
+            {education.length > 0 ? (
+              <div className="space-y-3">
+                <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                  Education
+                </p>
+                <ul className="space-y-3">
+                  {education.map((row) => (
+                    <li
+                      key={row.id}
+                      className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-4 py-3 text-sm"
+                    >
+                      <p className="font-display font-semibold text-primary">
+                        {row.qualification}
+                      </p>
+                      <p className="text-[13px] text-[color:var(--ink-soft)]">
+                        {row.institution}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
-              {candidate.salaryMin || candidate.salaryMax ? (
-                <div className="space-y-2">
-                  <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
-                    Rate Expectations
+            {candidate.salaryMin || candidate.salaryMax ? (
+              <div className="space-y-2">
+                <p className="font-display text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-soft)] font-medium">
+                  Rate Expectations
+                </p>
+                <div className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-4 py-3 text-sm">
+                  <p className="font-semibold text-primary">
+                    {candidate.salaryCurrency} {candidate.salaryMin ?? "?"} –{" "}
+                    {candidate.salaryMax ?? "?"}
                   </p>
-                  <div className="rounded-sm border border-[color:var(--line)] bg-[color:var(--paper-warm)] px-4 py-3 text-sm">
-                    <p className="font-semibold text-primary">
-                      {candidate.salaryCurrency} {candidate.salaryMin ?? "?"} –{" "}
-                      {candidate.salaryMax ?? "?"}
-                    </p>
-                  </div>
                 </div>
-              ) : null}
-            </div>
+              </div>
+            ) : null}
           </div>
         </section>
       ) : null}
