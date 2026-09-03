@@ -3,7 +3,7 @@ import { Epilogue, Urbanist } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { SiteFooterLoader } from "@/components/site-footer-loader";
 import { getClerkFrontendApiOrigin } from "@/lib/clerk-config";
-import { isComingSoon } from "@/lib/coming-soon";
+import { comingSoonMetadata, isComingSoon } from "@/lib/coming-soon";
 import "./globals.css";
 
 const epilogue = Epilogue({
@@ -19,12 +19,7 @@ const urbanist = Urbanist({
 });
 
 export const metadata: Metadata = isComingSoon()
-  ? {
-      title: "SkillsPhase — We're building something",
-      description:
-        "SkillsPhase is a skills-first jobs platform. We're not open to the public yet — check back soon.",
-      robots: { index: false, follow: false },
-    }
+  ? comingSoonMetadata
   : {
       title: "SkillsPhase — Skills first. Because life happens.",
       description:

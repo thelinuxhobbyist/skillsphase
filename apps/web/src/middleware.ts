@@ -25,6 +25,8 @@ const isComingSoonAllowed = createRouteMatcher([
   "/",
   "/admin(.*)",
   "/api/admin(.*)",
+  "/robots.txt",
+  "/sitemap.xml",
 ]);
 
 function comingSoonRedirect(req: NextRequest) {

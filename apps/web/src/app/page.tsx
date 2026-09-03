@@ -1,18 +1,13 @@
 import { ComingSoonPage } from "@/components/coming-soon-page";
 import { HomepageSections } from "@/components/homepage-sections";
 import { SiteHeader } from "@/components/site-header";
-import { isComingSoon } from "@/lib/coming-soon";
+import { comingSoonMetadata, isComingSoon } from "@/lib/coming-soon";
 import { filterHomepageBodySections, getDefaultHomepageSections } from "@horizon/shared";
 import { getHomepageContent } from "@/lib/api";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = isComingSoon()
-  ? {
-      title: "SkillsPhase — We're building something",
-      description:
-        "SkillsPhase is a skills-first jobs platform. We're not open to the public yet — check back soon.",
-      robots: { index: false, follow: false },
-    }
+  ? comingSoonMetadata
   : {
       title: "SkillsPhase — Skills first. Because life happens.",
       description:
