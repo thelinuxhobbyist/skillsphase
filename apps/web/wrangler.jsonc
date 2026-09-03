@@ -17,5 +17,8 @@
   ],
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "COMING_SOON": "1"
   }
 }

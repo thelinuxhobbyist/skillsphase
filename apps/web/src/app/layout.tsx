@@ -3,6 +3,7 @@ import { Epilogue, Urbanist } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { SiteFooterLoader } from "@/components/site-footer-loader";
 import { getClerkFrontendApiOrigin } from "@/lib/clerk-config";
+import { isComingSoon } from "@/lib/coming-soon";
 import "./globals.css";
 
 const epilogue = Epilogue({
@@ -17,11 +18,18 @@ const urbanist = Urbanist({
   weight: ["500", "600", "700"],
 });
 
-export const metadata: Metadata = {
-  title: "SkillsPhase — Skills first. Because life happens.",
-  description:
-    "Work changes. Life changes. Your skills don't disappear. Build a SkillsPhase profile around what you can do, the evidence behind it, and the impact you've made — then use it to apply for jobs.",
-};
+export const metadata: Metadata = isComingSoon()
+  ? {
+      title: "SkillsPhase — We're building something",
+      description:
+        "SkillsPhase is a skills-first jobs platform. We're not open to the public yet — check back soon.",
+      robots: { index: false, follow: false },
+    }
+  : {
+      title: "SkillsPhase — Skills first. Because life happens.",
+      description:
+        "Work changes. Life changes. Your skills don't disappear. Build a SkillsPhase profile around what you can do, the evidence behind it, and the impact you've made — then use it to apply for jobs.",
+    };
 
 export default function RootLayout({
   children,
@@ -46,7 +54,7 @@ export default function RootLayout({
         <Providers>
           <div className="flex min-h-screen flex-col">
             <div className="flex-1">{children}</div>
-            <SiteFooterLoader />
+            {isComingSoon() ? null : <SiteFooterLoader />}
           </div>
         </Providers>
       </body>
