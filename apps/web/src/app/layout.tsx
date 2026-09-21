@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Epilogue, Urbanist } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { SiteFooterLoader } from "@/components/site-footer-loader";
+import { brandAsset, brandIcons } from "@/lib/brand";
 import { getClerkFrontendApiOrigin } from "@/lib/clerk-config";
 import { comingSoonMetadata, isComingSoon } from "@/lib/coming-soon";
 import "./globals.css";
@@ -24,6 +25,8 @@ export const metadata: Metadata = isComingSoon()
       title: "SkillsPhase — Skills first. Because life happens.",
       description:
         "Work changes. Life changes. Your skills don't disappear. Build a SkillsPhase profile around what you can do, the evidence behind it, and the impact you've made — then use it to apply for jobs.",
+      icons: brandIcons,
+      manifest: brandAsset("site.webmanifest"),
     };
 
 export default function RootLayout({

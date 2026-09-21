@@ -1,24 +1,4 @@
-function StampMark({ className }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={`relative inline-flex shrink-0 items-center justify-center rounded-full border-[1.5px] border-current ${className ?? "h-9 w-9"}`}
-    >
-      <span className="absolute inset-[3px] rounded-full border border-dashed border-current opacity-60" />
-      <svg
-        viewBox="0 0 24 24"
-        className="relative h-4 w-4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
-    </span>
-  );
-}
+import { BrandLogo } from "@/components/brand-logo";
 
 export function ComingSoonPage() {
   return (
@@ -37,11 +17,8 @@ export function ComingSoonPage() {
       />
 
       <div className="relative mx-auto flex w-full max-w-[40rem] flex-1 flex-col justify-center px-6 py-16 sm:px-8">
-        <div className="animate-[dossier-rise_0.6s_ease_both] flex items-center gap-2.5">
-          <StampMark className="h-[29px] w-[29px] text-foreground" />
-          <p className="font-display text-[19px] font-semibold tracking-tight text-foreground">
-            SkillsPhase
-          </p>
+        <div className="animate-[dossier-rise_0.6s_ease_both]">
+          <BrandLogo className="h-9 w-auto" />
         </div>
         <h1 className="mt-10 animate-[dossier-rise_0.7s_ease_both] font-display text-[clamp(2.25rem,6vw,3.5rem)] leading-[1.1] font-bold tracking-[-0.03em] text-[color:var(--ink)]">
           We&apos;re working on something.

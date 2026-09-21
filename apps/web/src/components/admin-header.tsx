@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { getAdminMe, type HorizonUser } from "@/lib/api";
+import { BrandLogo } from "@/components/brand-logo";
 import { useAdminToken } from "@/lib/use-admin-token";
 
 const ADMIN_LINKS = [
@@ -46,28 +47,6 @@ function MenuIcon({ open }: { open: boolean }) {
         </>
       )}
     </svg>
-  );
-}
-
-function StampMark() {
-  return (
-    <span
-      aria-hidden
-      className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-current sm:h-9 sm:w-9"
-    >
-      <span className="absolute inset-[3px] rounded-full border border-dashed border-current opacity-60" />
-      <svg
-        viewBox="0 0 24 24"
-        className="relative h-4 w-4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
-    </span>
   );
 }
 
@@ -121,11 +100,10 @@ export function AdminHeader() {
       <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-4">
         <Link
           href="/admin"
-          className="flex min-w-0 shrink items-center gap-2.5 font-display text-lg font-semibold tracking-tight text-primary sm:text-xl lg:text-2xl"
+          className="flex min-w-0 shrink items-center"
           onClick={close}
         >
-          <StampMark />
-          <span className="truncate">SkillsPhase</span>
+          <BrandLogo className="h-8 w-auto sm:h-9" />
         </Link>
 
         <button

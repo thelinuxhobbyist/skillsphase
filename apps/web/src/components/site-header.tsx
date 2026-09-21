@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { getCurrentUser, type HorizonUser } from "@/lib/api";
+import { BrandLogo } from "@/components/brand-logo";
 import { SafeUserButton } from "@/components/safe-user-button";
 import { isClerkConfigured } from "@/lib/clerk-config";
 import {
@@ -32,7 +33,7 @@ function GuestActions({
     <div className={layoutClass}>
       <Link
         href="/login"
-        className={`inline-flex items-center justify-center rounded-lg border border-[color:var(--line)] px-5 py-2.5 text-sm font-semibold tracking-[-0.01em] text-foreground transition-colors hover:border-[color:var(--ink)] hover:bg-foreground/5 ${stacked ? "text-center" : "max-[920px]:hidden"}`}
+        className={`inline-flex items-center justify-center rounded-lg border border-[color:var(--line)] px-5 py-2.5 text-sm font-semibold tracking-[-0.01em] text-foreground transition-colors hover:border-[color:var(--ink)] hover:bg-foreground/5 ${stacked ? "text-center" : ""}`}
         onClick={onNavigate}
       >
         Sign in
@@ -72,28 +73,6 @@ function MenuIcon({ open }: { open: boolean }) {
         </>
       )}
     </svg>
-  );
-}
-
-function StampMark({ className }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={`relative inline-flex shrink-0 items-center justify-center rounded-full border-[1.5px] border-current ${className ?? "h-9 w-9"}`}
-    >
-      <span className="absolute inset-[3px] rounded-full border border-dashed border-current opacity-60" />
-      <svg
-        viewBox="0 0 24 24"
-        className="relative h-4 w-4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
-    </span>
   );
 }
 
@@ -230,10 +209,9 @@ function AppHeaderChrome({
       <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3.5 sm:px-5">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 font-display text-base font-semibold tracking-tight text-primary sm:text-lg"
+          className="flex shrink-0 items-center"
         >
-          <StampMark className="h-7 w-7 sm:h-8 sm:w-8" />
-          <span>SkillsPhase</span>
+          <BrandLogo className="h-8 w-auto sm:h-9" />
         </Link>
         <div className="flex shrink-0 items-center gap-3">
           {hasClerk ? <SafeUserButton /> : null}
@@ -284,16 +262,15 @@ function PublicHeaderChrome({
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-[10px]">
       <nav
-        className="relative mx-auto flex w-full max-w-[1160px] items-center justify-between gap-6 px-5 py-4 sm:px-8"
+        className="relative flex w-full items-center justify-between gap-6 px-5 py-4 sm:px-8 lg:px-10"
         aria-label="Main"
       >
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2.5 font-display text-[19px] font-semibold tracking-tight text-foreground"
+          className="flex shrink-0 items-center"
           onClick={close}
         >
-          <StampMark className="h-[29px] w-[29px]" />
-          <span>SkillsPhase</span>
+          <BrandLogo className="h-9 w-auto" />
         </Link>
 
         <div
@@ -336,20 +313,35 @@ function PublicHeaderChrome({
                 ))
               : null}
           </ul>
+          {hasClerk ? (
+            <SignedOut>
+              <div className="border-t border-border px-5 py-4 min-[921px]:hidden sm:px-8">
+                <GuestActions stacked onNavigate={close} />
+              </div>
+            </SignedOut>
+          ) : (
+            <div className="border-t border-border px-5 py-4 min-[921px]:hidden sm:px-8">
+              <GuestActions stacked onNavigate={close} />
+            </div>
+          )}
         </div>
 
         <div className="flex shrink-0 items-center gap-[18px]">
           {hasClerk ? (
             <>
               <SignedOut>
-                <GuestActions />
+                <div className="max-[920px]:hidden">
+                  <GuestActions />
+                </div>
               </SignedOut>
               <SignedIn>
                 <SafeUserButton />
               </SignedIn>
             </>
           ) : (
-            <GuestActions />
+            <div className="max-[920px]:hidden">
+              <GuestActions />
+            </div>
           )}
           <button
             type="button"

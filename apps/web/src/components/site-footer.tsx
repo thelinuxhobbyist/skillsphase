@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import { getDefaultFooterSection } from "@horizon/shared";
 
 type FooterLink = { label: string; href: string };
@@ -36,25 +37,8 @@ export function SiteFooter({
     <footer className="mt-auto bg-ink text-ink-foreground">
       <div className="mx-auto grid w-full max-w-[1180px] gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div className="max-w-sm lg:col-span-1">
-          <p className="flex items-center gap-2.5 font-display text-xl font-semibold">
-            <span
-              aria-hidden
-              className="relative inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-[1.5px] border-primary text-primary"
-            >
-              <span className="absolute inset-[3px] rounded-full border border-dashed border-current opacity-60" />
-              <svg
-                viewBox="0 0 24 24"
-                className="relative h-3.5 w-3.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </span>
-            SkillsPhase
+          <p className="flex items-center">
+            <BrandLogo variant="lockupOnDark" className="h-9 w-auto" />
           </p>
           <p className="mt-3 max-w-[32ch] text-sm leading-relaxed text-ink-foreground/70">
             {tagline}

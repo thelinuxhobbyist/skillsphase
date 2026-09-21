@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { brandAsset, brandIcons } from "@/lib/brand";
 
 /**
  * Optional coming-soon cover for the public site.
@@ -21,6 +22,8 @@ export const comingSoonMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: COMING_SOON_TITLE,
   description: COMING_SOON_DESCRIPTION,
+  icons: brandIcons,
+  manifest: brandAsset("site.webmanifest"),
   alternates: { canonical: SITE_URL },
   openGraph: {
     title: COMING_SOON_TITLE,

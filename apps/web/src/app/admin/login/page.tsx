@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminLoginForm } from "@/components/admin-login-form";
+import { BrandLogo } from "@/components/brand-logo";
 import { getAdminMe } from "@/lib/api";
 import { ADMIN_SESSION_COOKIE } from "@/lib/admin-session";
 
@@ -23,9 +24,7 @@ export default async function AdminLoginPage() {
 
   return (
     <main className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-6 py-16">
-      <p className="mb-2 text-sm font-medium text-primary">
-        SkillsPhase
-      </p>
+      <BrandLogo className="mb-6 h-9 w-auto" />
       <h1 className="mb-2 font-display text-3xl text-primary">
         Administrator sign-in
       </h1>
