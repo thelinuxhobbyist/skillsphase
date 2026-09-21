@@ -1,6 +1,6 @@
--- Demo skill profiles are no longer seeded.
--- This file only removes leftover rows identified by clerk_user_id prefix
--- test-candidate:. Prefer remove-test-skill-profiles.sql going forward.
+-- Remove seeded demo candidates (clerk_user_id prefix test-candidate:).
+-- Safe to re-run. Cascades cover most child tables; explicit deletes avoid
+-- ordering issues where FK rules differ.
 
 DELETE FROM capability_projects
 WHERE capability_id IN (

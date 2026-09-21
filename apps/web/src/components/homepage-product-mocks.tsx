@@ -139,55 +139,50 @@ export function DiscoverySearchMock() {
       <ul className="space-y-1">
         {[
           {
-            initials: "PR",
-            name: "Priya R.",
-            role: "Teacher · Improves GCSE exam performance & confidence",
+            label: "Teacher",
+            role: "Improves GCSE exam performance & confidence",
             skill: "Lesson Planning",
             tone: "bg-primary",
           },
           {
-            initials: "MT",
-            name: "Marcus T.",
-            role: "Warehouse Operative · FLT license & inventory control",
+            label: "Warehouse",
+            role: "FLT license & inventory control",
             skill: "Forklift Driver",
             tone: "bg-emerald-700",
           },
           {
-            initials: "JM",
-            name: "Jordan M.",
-            role: "Electrician · Commercial wiring & 18th edition testing",
+            label: "Electrician",
+            role: "Commercial wiring & 18th edition testing",
             skill: "18th Edition",
             tone: "bg-slate-700",
           },
           {
-            initials: "SK",
-            name: "Sarah K.",
-            role: "Registered Nurse · Patient care & acute clinical triage",
+            label: "Nurse",
+            role: "Patient care & acute clinical triage",
             skill: "NMC Registered",
             tone: "bg-teal-700",
           },
           {
-            initials: "AL",
-            name: "Aisha L.",
-            role: "Designer · Creates brand identities that convert",
+            label: "Designer",
+            role: "Creates brand identities that convert",
             skill: "Brand Design",
             tone: "bg-amber-700",
           },
         ].map((row, index) => (
           <li
-            key={row.name}
+            key={row.label}
             className={`flex items-center gap-3.5 px-1.5 py-3 ${
               index === 0 ? "" : "border-t border-[color:var(--line)]"
             }`}
           >
             <span
-              className={`inline-flex size-[42px] shrink-0 items-center justify-center rounded-full font-display text-[15px] font-semibold text-white ${row.tone}`}
+              className={`inline-flex size-[42px] shrink-0 items-center justify-center rounded-full font-display text-[11px] font-semibold text-white ${row.tone}`}
             >
-              {row.initials}
+              {row.label.slice(0, 2).toUpperCase()}
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-[15px] font-semibold text-[color:var(--ink)]">
-                {row.name}
+                {row.label}
               </p>
               <p className="truncate text-[12.5px] text-[color:var(--ink-soft)]">
                 {row.role}
