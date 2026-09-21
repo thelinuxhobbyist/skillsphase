@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 /**
- * Public shell is hidden while the product is unfinished.
- * Set COMING_SOON=0 to show the full site (local development).
- * Unset or any other value keeps the coming-soon landing page on.
+ * Optional coming-soon cover for the public site.
+ * Set COMING_SOON=1 (or omit locally) to show the placeholder landing page.
+ * Production sets COMING_SOON=0 so the full site is live.
  */
 export function isComingSoon(): boolean {
   const value = process.env.COMING_SOON?.trim().toLowerCase();

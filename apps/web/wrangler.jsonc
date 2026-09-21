@@ -19,6 +19,6 @@
     "enabled": true
   },
   "vars": {
-    "COMING_SOON": "1"
+    "COMING_SOON": "0"
   }
 }
